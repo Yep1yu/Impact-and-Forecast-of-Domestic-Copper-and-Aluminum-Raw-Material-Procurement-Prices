@@ -1,0 +1,80 @@
+{
+  "vat_adjustment": "tax_exclusive_price = tax_inclusive_avg_price / 1.13",
+  "seasonal_period": 5,
+  "test_size": 60,
+  "metrics_file": "C:\\Users\\Administrator\\Documents\\BSHintern\\ccmn_sarima_model_evaluation_metrics.csv",
+  "test_prediction_file": "C:\\Users\\Administrator\\Documents\\BSHintern\\ccmn_sarima_test_actual_vs_pred.csv",
+  "forecast_file": "C:\\Users\\Administrator\\Documents\\BSHintern\\ccmn_sarima_forecast_next_month.csv",
+  "series_summary": [
+    {
+      "series": "1#铜",
+      "sample_start": "2021-07-01",
+      "sample_end": "2026-07-06",
+      "sample_rows": 1214,
+      "test_start": "2026-04-08",
+      "test_end": "2026-07-06",
+      "validation_order": "(0, 1, 0)",
+      "validation_seasonal_order": "(0, 0, 0, 5)",
+      "validation_aic": -7404.083933612979,
+      "validation_converged": 72,
+      "full_order": "(0, 1, 0)",
+      "full_seasonal_order": "(0, 0, 0, 5)"
+    },
+    {
+      "series": "A00铝",
+      "sample_start": "2021-07-01",
+      "sample_end": "2026-07-06",
+      "sample_rows": 1214,
+      "test_start": "2026-04-08",
+      "test_end": "2026-07-06",
+      "validation_order": "(0, 1, 0)",
+      "validation_seasonal_order": "(0, 0, 0, 5)",
+      "validation_aic": -7268.502722961901,
+      "validation_converged": 72,
+      "full_order": "(0, 1, 0)",
+      "full_seasonal_order": "(0, 0, 0, 5)"
+    },
+    {
+      "series": "1#白银",
+      "sample_start": "2021-07-01",
+      "sample_end": "2026-07-06",
+      "sample_rows": 1214,
+      "test_start": "2026-04-08",
+      "test_end": "2026-07-06",
+      "validation_order": "(2, 1, 2)",
+      "validation_seasonal_order": "(0, 0, 0, 5)",
+      "validation_aic": -5718.224678220237,
+      "validation_converged": 72,
+      "full_order": "(0, 1, 0)",
+      "full_seasonal_order": "(0, 0, 0, 5)"
+    },
+    {
+      "series": "铝合金ADC12",
+      "sample_start": "2021-07-01",
+      "sample_end": "2026-07-06",
+      "sample_rows": 1214,
+      "test_start": "2026-04-08",
+      "test_end": "2026-07-06",
+      "validation_order": "(2, 1, 1)",
+      "validation_seasonal_order": "(0, 0, 0, 5)",
+      "validation_aic": -8666.853542596371,
+      "validation_converged": 72,
+      "full_order": "(2, 1, 1)",
+      "full_seasonal_order": "(0, 0, 0, 5)"
+    },
+    {
+      "series": "铸造铝合金锭(ZLD104)",
+      "sample_start": "2022-04-01",
+      "sample_end": "2026-07-06",
+      "sample_rows": 1031,
+      "test_start": "2026-04-08",
+      "test_end": "2026-07-06",
+      "validation_order": "(1, 1, 0)",
+      "validation_seasonal_order": "(0, 0, 0, 5)",
+      "validation_aic": -6777.0741441531945,
+      "validation_converged": 72,
+      "full_order": "(1, 1, 0)",
+      "full_seasonal_order": "(0, 0, 0, 5)"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+database_path: domestic_procurement_prices.sqlite
+forecast_days: 30
+model_version: daily-hybrid-variable-anchor-v1
+default_source: excel
+
+excel:
+  path: "D:/BSH实习/铜、铝采购影响分析/原材料日度价格.xlsx"
+  sheet_name: ccmn_changjiang_avg_prices
+  date_column: date
+  columns:
+    copper_1: "1#铜"
+    aluminum_a00: "A00铝"
+    silver_1: "1#白银"
+    aluminum_adc12: "铝合金ADC12"
+    aluminum_zld104: "铸造铝合金锭(ZLD104)"
+
+changjiang:
+  # 有色宝长江历史查询，市场为“有色宝长江”，铜/铝品种 id 分别为 2/3。
+  history_url: "https://market.cnal.com/historical/search.html"
+  referer_url: "https://market.cnal.com/historical/cj.html"
+  timeout_seconds: 30
+  lookback_days: 365
+  product_ids:
+    copper: "2"
+    aluminum: "3"
+
+shfe:
+  enabled: true
+  # SHFE public endpoints are slow when queried day-by-day; keep this short for daily automation.
+  lookback_days: 14
+  include_warehouse_receipts: false
+
+smm:
+  # Optional enhancement source. Set SMM_API_BASE_URL and SMM_API_TOKEN in the environment.
+  # Fill these endpoint paths according to the authorized SMM API contract if using --source api.
+  base_url: ""
+  token_env: SMM_API_TOKEN
+  timeout_seconds: 30
+  metals:
+    - metal: copper
+      display_name: "SMM 1# Copper Cathode"
+      smm_symbol: "SMM_1_COPPER_CATHODE"
+      spot_endpoint: ""
+      feature_endpoint: ""
+    - metal: aluminum
+      display_name: "SMM A00 Aluminum Ingot"
+      smm_symbol: "SMM_A00_ALUMINUM_INGOT"
+      spot_endpoint: ""
+      feature_endpoint: ""

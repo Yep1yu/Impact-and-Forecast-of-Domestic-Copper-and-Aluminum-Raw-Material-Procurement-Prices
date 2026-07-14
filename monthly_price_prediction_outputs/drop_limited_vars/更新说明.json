@@ -1,0 +1,26 @@
+{
+  "dropped_variables": [
+    "SHFE铜仓单库存_环比",
+    "SHFE铝仓单库存_环比",
+    "房地产开发景气指数环比"
+  ],
+  "forecast_end": "2026-12",
+  "outputs": {
+    "回归全变量结果.xlsx": "C:\\Users\\Administrator\\Documents\\BSHintern\\monthly_price_prediction_outputs\\drop_limited_vars\\回归全变量结果.xlsx",
+    "回归原始数据.xlsx": "C:\\Users\\Administrator\\Documents\\BSHintern\\monthly_price_prediction_outputs\\drop_limited_vars\\回归原始数据.xlsx",
+    "引入变量结果分析.xlsx": "C:\\Users\\Administrator\\Documents\\BSHintern\\monthly_price_prediction_outputs\\drop_limited_vars\\引入变量结果分析.xlsx",
+    "引入变量预测结果.xlsx": "C:\\Users\\Administrator\\Documents\\BSHintern\\monthly_price_prediction_outputs\\drop_limited_vars\\引入变量预测结果.xlsx",
+    "测试集对比.xlsx": "C:\\Users\\Administrator\\Documents\\BSHintern\\monthly_price_prediction_outputs\\drop_limited_vars\\测试集对比.xlsx"
+  },
+  "future_forecast_fix": {
+    "reason": "2026-06 has complete actual daily prices, so future forecast starts from 2026-07.",
+    "actual_base_month": "2026-06",
+    "forecast_start": "2026-07",
+    "forecast_end": "2026-12",
+    "updated_files": [
+      "C:\\Users\\Administrator\\Documents\\BSHintern\\monthly_price_prediction_outputs\\drop_limited_vars\\引入变量预测结果.xlsx",
+      "C:\\Users\\Administrator\\Documents\\BSHintern\\monthly_price_prediction_outputs\\drop_limited_vars\\引入变量预测结果.csv",
+      "C:\\Users\\Administrator\\Documents\\BSHintern\\monthly_price_prediction_outputs\\drop_limited_vars\\引入变量结果分析.xlsx"
+    ]
+  }
+}

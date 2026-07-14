@@ -1,0 +1,16 @@
+# Credentials and local secrets
+nbs_cookies.txt
+.env
+.env.*
+!.env.example
+
+# Python and Streamlit runtime files
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.streamlit/secrets.toml
+.mplconfig/
+
+# Local temporary output
+.tmp/
+.tmp_word_update_charts/

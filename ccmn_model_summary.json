@@ -1,0 +1,58 @@
+{
+  "input_file": "C:\\Users\\Administrator\\Documents\\BSHintern\\ccmn_changjiang_avg_prices.csv",
+  "forecast_file": "C:\\Users\\Administrator\\Documents\\BSHintern\\ccmn_price_forecast_next_month.csv",
+  "metrics_file": "C:\\Users\\Administrator\\Documents\\BSHintern\\ccmn_model_evaluation_metrics.csv",
+  "vat_adjustment": "tax_exclusive_price = tax_inclusive_avg_price / 1.13",
+  "sample_start": "2022-04-01",
+  "sample_end": "2026-07-06",
+  "sample_rows": 1031,
+  "test_size": 60,
+  "test_start": "2026-04-08",
+  "test_end": "2026-07-06",
+  "best_model": "Holt_damped_log",
+  "aggregate_metrics": [
+    {
+      "model": "Holt_damped_log",
+      "mean_MAPE_pct": 5.62824989221672,
+      "mean_RMSE": 2185.990262208802,
+      "mean_MAE": 2000.182175709182
+    },
+    {
+      "model": "Naive_last",
+      "mean_MAPE_pct": 5.722377493755452,
+      "mean_RMSE": 2226.8219745119522,
+      "mean_MAE": 2017.802359882005
+    },
+    {
+      "model": "ARIMA_log",
+      "mean_MAPE_pct": 5.740529307100753,
+      "mean_RMSE": 2225.941095812674,
+      "mean_MAE": 2022.4521937946215
+    },
+    {
+      "model": "Drift_log",
+      "mean_MAPE_pct": 6.1685194296950625,
+      "mean_RMSE": 2207.4810360192832,
+      "mean_MAE": 1958.2622084836298
+    },
+    {
+      "model": "VAR_log_returns",
+      "mean_MAPE_pct": 6.21570876580341,
+      "mean_RMSE": 2237.794586897505,
+      "mean_MAE": 1989.559974714694
+    }
+  ],
+  "details": {
+    "ARIMA_log_orders": {
+      "1#铜": "(0, 1, 0)",
+      "A00铝": "(0, 1, 0)",
+      "1#白银": "(2, 1, 2)",
+      "铝合金ADC12": "(2, 1, 1)",
+      "铸造铝合金锭(ZLD104)": "(0, 1, 1)"
+    },
+    "VAR_log_returns_lag": 2
+  },
+  "forecast_start": "2026-07-07",
+  "forecast_end": "2026-08-06",
+  "forecast_rows": 23
+}

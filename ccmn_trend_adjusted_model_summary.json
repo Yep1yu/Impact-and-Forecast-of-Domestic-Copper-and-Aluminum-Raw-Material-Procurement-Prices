@@ -1,0 +1,69 @@
+{
+  "vat_adjustment": "tax_exclusive_price = tax_inclusive_avg_price / 1.13",
+  "selection_rule": "choose lowest test MAPE among candidates whose one-month forecast range is at least 0.1% of latest price; fall back to lowest MAPE if none pass",
+  "forecast_file": "C:\\Users\\Administrator\\Documents\\BSHintern\\ccmn_price_forecast_next_month_trend_adjusted.csv",
+  "metrics_file": "C:\\Users\\Administrator\\Documents\\BSHintern\\ccmn_trend_adjusted_model_evaluation_metrics.csv",
+  "test_wide_file": "C:\\Users\\Administrator\\Documents\\BSHintern\\ccmn_trend_adjusted_test_actual_vs_pred_wide_with_errors.csv",
+  "series_summary": [
+    {
+      "series": "1#铜",
+      "sample_start": "2021-07-01",
+      "sample_end": "2026-07-06",
+      "sample_rows": 1214,
+      "chosen_model": "Rolling_log_drift_120d",
+      "MAE": 3404.0230754069953,
+      "RMSE": 3871.5483192918778,
+      "MAPE_%": 3.6859220471240572,
+      "future_range_%": 0.4903719995040904,
+      "nonflat_threshold_%": 0.1
+    },
+    {
+      "series": "A00铝",
+      "sample_start": "2021-07-01",
+      "sample_end": "2026-07-06",
+      "sample_rows": 1214,
+      "chosen_model": "Rolling_log_drift_20d",
+      "MAE": 455.6206237755112,
+      "RMSE": 672.646511887139,
+      "MAPE_%": 2.1953396215093393,
+      "future_range_%": 5.560322976516228,
+      "nonflat_threshold_%": 0.1
+    },
+    {
+      "series": "1#白银",
+      "sample_start": "2021-07-01",
+      "sample_end": "2026-07-06",
+      "sample_rows": 1214,
+      "chosen_model": "Rolling_log_drift_60d",
+      "MAE": 1341.415136642034,
+      "RMSE": 1660.9520267978412,
+      "MAPE_%": 8.988834422590054,
+      "future_range_%": 7.506985159945182,
+      "nonflat_threshold_%": 0.1
+    },
+    {
+      "series": "铝合金ADC12",
+      "sample_start": "2021-07-01",
+      "sample_end": "2026-07-06",
+      "sample_rows": 1214,
+      "chosen_model": "ARIMA_log(1, 1, 1)_trend_n",
+      "MAE": 782.9240975237725,
+      "RMSE": 839.6979519302215,
+      "MAPE_%": 3.7357409991024326,
+      "future_range_%": 0.4247666166628341,
+      "nonflat_threshold_%": 0.1
+    },
+    {
+      "series": "铸造铝合金锭(ZLD104)",
+      "sample_start": "2022-04-01",
+      "sample_end": "2026-07-06",
+      "sample_rows": 1031,
+      "chosen_model": "ARIMA_log(2, 1, 2)_trend_n",
+      "MAE": 1378.3135227334096,
+      "RMSE": 1498.4219876791713,
+      "MAPE_%": 6.4313432459769935,
+      "future_range_%": 0.11594464351983944,
+      "nonflat_threshold_%": 0.1
+    }
+  ]
+}

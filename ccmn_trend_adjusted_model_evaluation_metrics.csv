@@ -1,0 +1,6 @@
+﻿series,model,MAE,RMSE,MAPE_%,future_range_%,passes_nonflat_rule
+1#铜,Rolling_log_drift_120d,3404.023075,3871.548319,3.685922,0.490372,True
+A00铝,Rolling_log_drift_20d,455.620624,672.646512,2.195340,5.560323,True
+1#白银,Rolling_log_drift_60d,1341.415137,1660.952027,8.988834,7.506985,True
+铝合金ADC12,"ARIMA_log(1,1,1)_trend_n",782.924098,839.697952,3.735741,0.424767,True
+铸造铝合金锭(ZLD104),"ARIMA_log(2,1,2)_trend_n",1378.313523,1498.421988,6.431343,0.115945,True

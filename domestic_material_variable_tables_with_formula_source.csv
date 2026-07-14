@@ -1,0 +1,80 @@
+﻿品种,变量,变量含义,数据来源,标准化系数,显著性
+1#白银,电线电缆光缆及电工器材制造PPI_环比,电线电缆、光缆及电工器材制造业PPI，代理电力电工下游价格与需求传导；建模时计算环比=(本月值/上月值-1)*100。,国家统计局行业PPI，data_cache_v3/nbs_monthly_indicators.csv,0.4977975812342099,***
+1#白银,中国贸易政策不确定性指数_变化,中国贸易政策不确定性指数，反映贸易政策和外贸环境不确定性；建模时计算月度变化=本月值-上月值。,FRED/PolicyUncertainty.com，data_cache_v3/policy_uncertainty_monthly.csv,-0.4183055919114375,**
+1#白银,工业增加值同比增长,工业增加值同比增速，反映宏观工业生产强弱；该字段为发布口径；直接使用月度发布值进入模型。,AkShare宏观中国接口，国家统计局口径，data_cache_v3/domestic_macro_monthly.csv,0.4004640533120847,*
+1#白银,COVID供应链冲击,COVID供应链冲击事件虚拟变量；2022-03、2022-04、2022-05、2022-12、2023-01取1，其余月份取0。,人工事件dummy，run_domestic_regression_analysis_v2.py中按事件月份构造，data_cache_v3/domestic_event_dummies_monthly.csv,0.3924796395989018,***
+1#白银,中国经济政策不确定性指数_变化,中国经济政策不确定性指数，反映国内宏观政策不确定性；建模时计算月度变化=本月值-上月值。,FRED/PolicyUncertainty.com，data_cache_v3/policy_uncertainty_monthly.csv,0.3840627768497444,*
+1#白银,当月出口额环比增长,出口额当月环比增速，反映外需和贸易活跃度；该字段为发布口径；直接使用月度发布值进入模型。,AkShare宏观中国接口，海关总署口径，data_cache_v3/domestic_macro_monthly.csv,-0.1772864125331537,不显著
+1#白银,光缆产量当期值_环比,光缆月度产量当期值，代理电工电缆及光通信相关工业需求；建模时计算环比=(本月值/上月值-1)*100。,国家统计局月度工业产品产量，data_cache_v3/nbs_monthly_indicators.csv,0.126105277344912,不显著
+1#白银,PPI当月同比增长,工业生产者出厂价格当月同比增速，反映工业品价格压力；该字段为发布口径；直接使用月度发布值进入模型。,AkShare宏观中国接口，国家统计局口径，data_cache_v3/domestic_macro_monthly.csv,-0.1209956686538479,不显著
+1#白银,企业商品价格矿产品环比增长,企业商品价格指数中矿产品分项的环比增速，反映矿端成本压力；该字段为发布口径；直接使用月度发布值进入模型。,AkShare宏观中国接口，企业商品价格指数口径，data_cache_v3/domestic_macro_monthly.csv,0.119068655463214,不显著
+1#白银,发电量当期值_环比,发电量月度当期值，反映工业活动和能源端景气度；建模时计算环比=(本月值/上月值-1)*100。,国家统计局月度工业产品产量，data_cache_v3/nbs_monthly_indicators.csv,-0.1122264070634605,不显著
+1#白银,制造业PMI_变化,制造业采购经理指数，反映制造业景气度；建模时计算月度变化=本月值-上月值。,AkShare宏观中国接口，国家统计局口径，data_cache_v3/domestic_macro_monthly.csv,-0.0836517718257096,不显著
+1#白银,能源价格冲击,能源价格冲击事件虚拟变量；2021-09、2021-10、2021-11、2022-02、2022-03、2022-04取1，其余月份取0。,人工事件dummy，run_domestic_regression_analysis_v2.py中按事件月份构造，data_cache_v3/domestic_event_dummies_monthly.csv,0.0590857339568734,不显著
+1#白银,地缘政治冲击,地缘政治冲击事件虚拟变量；2022-02、2022-03、2022-04取1，其余月份取0。,人工事件dummy，run_domestic_regression_analysis_v2.py中按事件月份构造，data_cache_v3/domestic_event_dummies_monthly.csv,-0.0540249440318826,不显著
+1#铜,SHFE铜主连收盘价_环比,SHFE铜主力连续合约月度收盘价，用于反映期货市场价格传导与预期；建模时计算环比=(本月值/上月值-1)*100。,上海期货交易所主连行情，经AkShare抓取，data_cache_v3/shfe_futures_monthly.csv,0.574335242528781,***
+1#铜,电线电缆光缆及电工器材制造PPI_环比,电线电缆、光缆及电工器材制造业PPI，代理电力电工下游价格与需求传导；建模时计算环比=(本月值/上月值-1)*100。,国家统计局行业PPI，data_cache_v3/nbs_monthly_indicators.csv,0.405707865679662,***
+1#铜,工业增加值同比增长,工业增加值同比增速，反映宏观工业生产强弱；该字段为发布口径；直接使用月度发布值进入模型。,AkShare宏观中国接口，国家统计局口径，data_cache_v3/domestic_macro_monthly.csv,0.348802277830518,不显著
+1#铜,运输扰动冲击,运输扰动冲击事件虚拟变量；2022-04、2022-05取1，其余月份取0。,人工事件dummy，run_domestic_regression_analysis_v2.py中按事件月份构造，data_cache_v3/domestic_event_dummies_monthly.csv,0.2924816585712882,*
+1#铜,PPI当月同比增长,工业生产者出厂价格当月同比增速，反映工业品价格压力；该字段为发布口径；直接使用月度发布值进入模型。,AkShare宏观中国接口，国家统计局口径，data_cache_v3/domestic_macro_monthly.csv,0.2184446543488671,***
+1#铜,SHFE铜仓单库存_环比,上期所铜仓单库存，月末附近取数；用于代理交易所铜库存压力；建模时计算环比=(本月值/上月值-1)*100。,上海期货交易所仓单库存，经AkShare/脚本抓取，data_cache_v3/shfe_warrant_monthly.csv,0.1841442591684825,不显著
+1#铜,中国贸易政策不确定性指数_变化,中国贸易政策不确定性指数，反映贸易政策和外贸环境不确定性；建模时计算月度变化=本月值-上月值。,FRED/PolicyUncertainty.com，data_cache_v3/policy_uncertainty_monthly.csv,0.1826919286674507,不显著
+1#铜,中国经济政策不确定性指数_变化,中国经济政策不确定性指数，反映国内宏观政策不确定性；建模时计算月度变化=本月值-上月值。,FRED/PolicyUncertainty.com，data_cache_v3/policy_uncertainty_monthly.csv,-0.1342425241431903,不显著
+1#铜,SHFE铜主连成交量_环比,SHFE铜主力连续合约月度成交量，用于反映市场交易活跃度；建模时计算环比=(本月值/上月值-1)*100。,上海期货交易所主连行情，经AkShare抓取，data_cache_v3/shfe_futures_monthly.csv,-0.1270138204368313,不显著
+1#铜,SHFE铜主连持仓量_环比,SHFE铜主力连续合约月度持仓量，用于反映资金参与和市场预期；建模时计算环比=(本月值/上月值-1)*100。,上海期货交易所主连行情，经AkShare抓取，data_cache_v3/shfe_futures_monthly.csv,-0.1062066907957606,不显著
+1#铜,制造业PMI_变化,制造业采购经理指数，反映制造业景气度；建模时计算月度变化=本月值-上月值。,AkShare宏观中国接口，国家统计局口径，data_cache_v3/domestic_macro_monthly.csv,0.0885563923979171,不显著
+1#铜,企业商品价格矿产品环比增长,企业商品价格指数中矿产品分项的环比增速，反映矿端成本压力；该字段为发布口径；直接使用月度发布值进入模型。,AkShare宏观中国接口，企业商品价格指数口径，data_cache_v3/domestic_macro_monthly.csv,0.0816946278944696,不显著
+1#铜,地缘政治冲击,地缘政治冲击事件虚拟变量；2022-02、2022-03、2022-04取1，其余月份取0。,人工事件dummy，run_domestic_regression_analysis_v2.py中按事件月份构造，data_cache_v3/domestic_event_dummies_monthly.csv,0.074968731462087,不显著
+1#铜,光缆产量当期值_环比,光缆月度产量当期值，代理电工电缆及光通信相关工业需求；建模时计算环比=(本月值/上月值-1)*100。,国家统计局月度工业产品产量，data_cache_v3/nbs_monthly_indicators.csv,-0.0577118219953757,不显著
+1#铜,当月进口额环比增长,进口额当月环比增速，反映外部供给和贸易活跃度；该字段为发布口径；直接使用月度发布值进入模型。,AkShare宏观中国接口，海关总署口径，data_cache_v3/domestic_macro_monthly.csv,-0.0559489348191138,不显著
+1#铜,房地产开发景气指数环比,房地产开发景气指数环比指标；直接使用月度发布值进入模型。,建模月度数据集 domestic_material_monthly_dataset_v1.csv,-0.0368468713986228,不显著
+1#铜,COVID供应链冲击,COVID供应链冲击事件虚拟变量；2022-03、2022-04、2022-05、2022-12、2023-01取1，其余月份取0。,人工事件dummy，run_domestic_regression_analysis_v2.py中按事件月份构造，data_cache_v3/domestic_event_dummies_monthly.csv,-0.0245243256496093,不显著
+A00铝,SHFE铝主连收盘价_环比,SHFE铝主力连续合约月度收盘价，用于反映期货市场价格传导与预期；建模时计算环比=(本月值/上月值-1)*100。,上海期货交易所主连行情，经AkShare抓取，data_cache_v3/shfe_futures_monthly.csv,0.7051192519103089,***
+A00铝,环保限产冲击,环保限产冲击事件虚拟变量；2021-11、2021-12、2022-01、2022-02取1，其余月份取0。,人工事件dummy，run_domestic_regression_analysis_v2.py中按事件月份构造，data_cache_v3/domestic_event_dummies_monthly.csv,-0.6970876177098754,***
+A00铝,家用电冰箱产量当期值_环比,家用电冰箱月度产量当期值，代理家电端用铝需求；建模时计算环比=(本月值/上月值-1)*100。,国家统计局月度工业产品产量，data_cache_v3/nbs_monthly_indicators.csv,-0.6562912495528236,***
+A00铝,COVID供应链冲击,COVID供应链冲击事件虚拟变量；2022-03、2022-04、2022-05、2022-12、2023-01取1，其余月份取0。,人工事件dummy，run_domestic_regression_analysis_v2.py中按事件月份构造，data_cache_v3/domestic_event_dummies_monthly.csv,-0.5622365523710956,***
+A00铝,房间空气调节器产量当期值_环比,房间空气调节器月度产量当期值，代理家电及建筑端用铝需求；建模时计算环比=(本月值/上月值-1)*100。,国家统计局月度工业产品产量，data_cache_v3/nbs_monthly_indicators.csv,0.4981276194293942,***
+A00铝,汽车销量Top50厂商合计_环比,盖世汽车车企榜Top50厂商月度销量合计，代理汽车终端需求；建模时计算环比=(本月值/上月值-1)*100。,盖世汽车排行榜，经AkShare抓取，data_cache_v3/gasgoo_auto_top50_monthly.csv,0.48723546608959,不显著
+A00铝,中国经济政策不确定性指数_变化,中国经济政策不确定性指数，反映国内宏观政策不确定性；建模时计算月度变化=本月值-上月值。,FRED/PolicyUncertainty.com，data_cache_v3/policy_uncertainty_monthly.csv,-0.2464832099934683,*
+A00铝,房地产开发景气指数环比,房地产开发景气指数环比指标；直接使用月度发布值进入模型。,建模月度数据集 domestic_material_monthly_dataset_v1.csv,-0.2415253204856236,*
+A00铝,企业商品价格煤油电环比增长,企业商品价格指数中煤油电分项的环比增速，反映能源成本压力；该字段为发布口径；直接使用月度发布值进入模型。,AkShare宏观中国接口，企业商品价格指数口径，data_cache_v3/domestic_macro_monthly.csv,0.1878538210293022,**
+A00铝,中国贸易政策不确定性指数_变化,中国贸易政策不确定性指数，反映贸易政策和外贸环境不确定性；建模时计算月度变化=本月值-上月值。,FRED/PolicyUncertainty.com，data_cache_v3/policy_uncertainty_monthly.csv,-0.1873611887161347,*
+A00铝,SHFE铝仓单库存_环比,上期所铝仓单库存，月末附近取数；用于代理交易所铝库存压力；建模时计算环比=(本月值/上月值-1)*100。,上海期货交易所仓单库存，经AkShare/脚本抓取，data_cache_v3/shfe_warrant_monthly.csv,0.1820158966957649,不显著
+A00铝,ADC12_A00价差_滞后1期变化,先计算ADC12月均价-A00铝月均价得到价差，再计算价差变化=本月价差-上月价差，最后滞后1个月用于回归，避免当期价格信息泄漏。,原始数据.csv / ccmn_changjiang_avg_prices.csv，长江有色五类原材料日度均价，按月均值聚合,0.1724853399403579,不显著
+A00铝,能源价格冲击,能源价格冲击事件虚拟变量；2021-09、2021-10、2021-11、2022-02、2022-03、2022-04取1，其余月份取0。,人工事件dummy，run_domestic_regression_analysis_v2.py中按事件月份构造，data_cache_v3/domestic_event_dummies_monthly.csv,0.12305129263729,不显著
+A00铝,限电政策冲击,限电政策冲击事件虚拟变量；2021-09、2021-10、2022-08取1，其余月份取0。,人工事件dummy，run_domestic_regression_analysis_v2.py中按事件月份构造，data_cache_v3/domestic_event_dummies_monthly.csv,0.1168074853517796,不显著
+A00铝,SHFE铝主连成交量_环比,SHFE铝主力连续合约月度成交量，用于反映市场交易活跃度；建模时计算环比=(本月值/上月值-1)*100。,上海期货交易所主连行情，经AkShare抓取，data_cache_v3/shfe_futures_monthly.csv,-0.1035064492439439,不显著
+A00铝,制造业PMI_变化,制造业采购经理指数，反映制造业景气度；建模时计算月度变化=本月值-上月值。,AkShare宏观中国接口，国家统计局口径，data_cache_v3/domestic_macro_monthly.csv,-0.0771890454666231,不显著
+A00铝,企业商品价格矿产品环比增长,企业商品价格指数中矿产品分项的环比增速，反映矿端成本压力；该字段为发布口径；直接使用月度发布值进入模型。,AkShare宏观中国接口，企业商品价格指数口径，data_cache_v3/domestic_macro_monthly.csv,0.0626526023629468,不显著
+A00铝,SHFE铝主连持仓量_环比,SHFE铝主力连续合约月度持仓量，用于反映资金参与和市场预期；建模时计算环比=(本月值/上月值-1)*100。,上海期货交易所主连行情，经AkShare抓取，data_cache_v3/shfe_futures_monthly.csv,0.0371746093752097,不显著
+A00铝,PPI当月同比增长,工业生产者出厂价格当月同比增速，反映工业品价格压力；该字段为发布口径；直接使用月度发布值进入模型。,AkShare宏观中国接口，国家统计局口径，data_cache_v3/domestic_macro_monthly.csv,0.0093181975342586,不显著
+A00铝,汽车产量当期值_环比,汽车月度产量当期值，代理汽车产业链对铝合金/再生铝需求；建模时计算环比=(本月值/上月值-1)*100。,国家统计局月度工业产品产量，data_cache_v3/nbs_monthly_indicators.csv,-0.006275935758732,不显著
+ADC12,汽车产量当期值_环比,汽车月度产量当期值，代理汽车产业链对铝合金/再生铝需求；建模时计算环比=(本月值/上月值-1)*100。,国家统计局月度工业产品产量，data_cache_v3/nbs_monthly_indicators.csv,1.0441232001234448,***
+ADC12,汽车销量Top50厂商合计_环比,盖世汽车车企榜Top50厂商月度销量合计，代理汽车终端需求；建模时计算环比=(本月值/上月值-1)*100。,盖世汽车排行榜，经AkShare抓取，data_cache_v3/gasgoo_auto_top50_monthly.csv,-0.9234300476736782,***
+ADC12,A00铝_价格月环比,A00铝日度价格先按月求均价，再计算价格月环比=(本月月均价/上月月均价-1)*100；用于表示铝合金成本传导。,原始数据.csv / ccmn_changjiang_avg_prices.csv，长江有色五类原材料日度均价，按月均值聚合,0.7469884399680544,***
+ADC12,限电政策冲击,限电政策冲击事件虚拟变量；2021-09、2021-10、2022-08取1，其余月份取0。,人工事件dummy，run_domestic_regression_analysis_v2.py中按事件月份构造，data_cache_v3/domestic_event_dummies_monthly.csv,0.2042775049890733,*
+ADC12,工业增加值同比增长,工业增加值同比增速，反映宏观工业生产强弱；该字段为发布口径；直接使用月度发布值进入模型。,AkShare宏观中国接口，国家统计局口径，data_cache_v3/domestic_macro_monthly.csv,0.1085958100277025,不显著
+ADC12,制造业PMI_变化,制造业采购经理指数，反映制造业景气度；建模时计算月度变化=本月值-上月值。,AkShare宏观中国接口，国家统计局口径，data_cache_v3/domestic_macro_monthly.csv,-0.1081825761584223,不显著
+ADC12,运输扰动冲击,运输扰动冲击事件虚拟变量；2022-04、2022-05取1，其余月份取0。,人工事件dummy，run_domestic_regression_analysis_v2.py中按事件月份构造，data_cache_v3/domestic_event_dummies_monthly.csv,0.1015178607762512,**
+ADC12,COVID供应链冲击,COVID供应链冲击事件虚拟变量；2022-03、2022-04、2022-05、2022-12、2023-01取1，其余月份取0。,人工事件dummy，run_domestic_regression_analysis_v2.py中按事件月份构造，data_cache_v3/domestic_event_dummies_monthly.csv,0.1015178607762511,**
+ADC12,环保限产冲击,环保限产冲击事件虚拟变量；2021-11、2021-12、2022-01、2022-02取1，其余月份取0。,人工事件dummy，run_domestic_regression_analysis_v2.py中按事件月份构造，data_cache_v3/domestic_event_dummies_monthly.csv,-0.0792763675018827,不显著
+ADC12,ADC12_A00价差_滞后1期变化,先计算ADC12月均价-A00铝月均价得到价差，再计算价差变化=本月价差-上月价差，最后滞后1个月用于回归，避免当期价格信息泄漏。,原始数据.csv / ccmn_changjiang_avg_prices.csv，长江有色五类原材料日度均价，按月均值聚合,0.0790482706312175,不显著
+ADC12,中国经济政策不确定性指数_变化,中国经济政策不确定性指数，反映国内宏观政策不确定性；建模时计算月度变化=本月值-上月值。,FRED/PolicyUncertainty.com，data_cache_v3/policy_uncertainty_monthly.csv,0.0772843674101781,不显著
+ADC12,新能源汽车产量当期值_环比,新能源汽车月度产量当期值，代理汽车轻量化及铝合金需求；建模时计算环比=(本月值/上月值-1)*100。,国家统计局月度工业产品产量，data_cache_v3/nbs_monthly_indicators.csv,-0.0733673081085666,不显著
+ADC12,企业商品价格煤油电环比增长,企业商品价格指数中煤油电分项的环比增速，反映能源成本压力；该字段为发布口径；直接使用月度发布值进入模型。,AkShare宏观中国接口，企业商品价格指数口径，data_cache_v3/domestic_macro_monthly.csv,0.0611714184132298,不显著
+ADC12,PPI当月同比增长,工业生产者出厂价格当月同比增速，反映工业品价格压力；该字段为发布口径；直接使用月度发布值进入模型。,AkShare宏观中国接口，国家统计局口径，data_cache_v3/domestic_macro_monthly.csv,-0.0285022710196932,不显著
+ADC12,SHFE铝仓单库存_环比,上期所铝仓单库存，月末附近取数；用于代理交易所铝库存压力；建模时计算环比=(本月值/上月值-1)*100。,上海期货交易所仓单库存，经AkShare/脚本抓取，data_cache_v3/shfe_warrant_monthly.csv,0.0039779033560332,不显著
+ZLD104,A00铝_价格月环比,A00铝日度价格先按月求均价，再计算价格月环比=(本月月均价/上月月均价-1)*100；用于表示铝合金成本传导。,原始数据.csv / ccmn_changjiang_avg_prices.csv，长江有色五类原材料日度均价，按月均值聚合,0.7050118836084193,***
+ZLD104,PPI当月同比增长,工业生产者出厂价格当月同比增速，反映工业品价格压力；该字段为发布口径；直接使用月度发布值进入模型。,AkShare宏观中国接口，国家统计局口径，data_cache_v3/domestic_macro_monthly.csv,-0.231819238920159,***
+ZLD104,发电量当期值_环比,发电量月度当期值，反映工业活动和能源端景气度；建模时计算环比=(本月值/上月值-1)*100。,国家统计局月度工业产品产量，data_cache_v3/nbs_monthly_indicators.csv,-0.2251005762571081,***
+ZLD104,COVID供应链冲击,COVID供应链冲击事件虚拟变量；2022-03、2022-04、2022-05、2022-12、2023-01取1，其余月份取0。,人工事件dummy，run_domestic_regression_analysis_v2.py中按事件月份构造，data_cache_v3/domestic_event_dummies_monthly.csv,0.1810047157368697,***
+ZLD104,中国经济政策不确定性指数_变化,中国经济政策不确定性指数，反映国内宏观政策不确定性；建模时计算月度变化=本月值-上月值。,FRED/PolicyUncertainty.com，data_cache_v3/policy_uncertainty_monthly.csv,0.1226397347993141,***
+ZLD104,SHFE铝仓单库存_环比,上期所铝仓单库存，月末附近取数；用于代理交易所铝库存压力；建模时计算环比=(本月值/上月值-1)*100。,上海期货交易所仓单库存，经AkShare/脚本抓取，data_cache_v3/shfe_warrant_monthly.csv,0.0904525147843517,**
+ZLD104,制造业PMI_变化,制造业采购经理指数，反映制造业景气度；建模时计算月度变化=本月值-上月值。,AkShare宏观中国接口，国家统计局口径，data_cache_v3/domestic_macro_monthly.csv,0.0685671204214292,**
+ZLD104,企业商品价格煤油电环比增长,企业商品价格指数中煤油电分项的环比增速，反映能源成本压力；该字段为发布口径；直接使用月度发布值进入模型。,AkShare宏观中国接口，企业商品价格指数口径，data_cache_v3/domestic_macro_monthly.csv,0.0339440708983955,不显著
+ZLD104,非制造业PMI_变化,非制造业采购经理指数，反映服务业和建筑业景气度；建模时计算月度变化=本月值-上月值。,AkShare宏观中国接口，国家统计局口径，data_cache_v3/domestic_macro_monthly.csv,-0.03391106498329,不显著
+ZLD104,限电政策冲击,限电政策冲击事件虚拟变量；2021-09、2021-10、2022-08取1，其余月份取0。,人工事件dummy，run_domestic_regression_analysis_v2.py中按事件月份构造，data_cache_v3/domestic_event_dummies_monthly.csv,0.0325188240660579,不显著
+ZLD104,ZLD104_A00价差_滞后1期变化,先计算ZLD104月均价-A00铝月均价得到价差，再计算价差变化=本月价差-上月价差，最后滞后1个月用于回归，避免当期价格信息泄漏。,原始数据.csv / ccmn_changjiang_avg_prices.csv，长江有色五类原材料日度均价，按月均值聚合,-0.0311385142474801,不显著
+ZLD104,工业增加值同比增长,工业增加值同比增速，反映宏观工业生产强弱；该字段为发布口径；直接使用月度发布值进入模型。,AkShare宏观中国接口，国家统计局口径，data_cache_v3/domestic_macro_monthly.csv,0.0237854733599085,不显著
+ZLD104,房地产开发景气指数环比,房地产开发景气指数环比指标；直接使用月度发布值进入模型。,建模月度数据集 domestic_material_monthly_dataset_v1.csv,0.0227674610970619,不显著
+ZLD104,发电机组产量当期值_环比,发电机组月度产量当期值，代理电力设备制造需求；建模时计算环比=(本月值/上月值-1)*100。,国家统计局月度工业产品产量，data_cache_v3/nbs_monthly_indicators.csv,-0.0134046556616544,不显著

@@ -1,0 +1,339 @@
+{
+  "model_version": "daily-hybrid-variable-anchor-v1",
+  "daily_prices": "C:\\Users\\Administrator\\Documents\\BSHintern\\ccmn_changjiang_avg_prices_tax_exclusive.csv",
+  "ensemble_forecast": "C:\\Users\\Administrator\\Documents\\BSHintern\\daily_ensemble_forecast_next_30d.csv",
+  "ensemble_backtest": "C:\\Users\\Administrator\\Documents\\BSHintern\\daily_ensemble_actual_vs_pred.csv",
+  "monthly_dir": "C:\\Users\\Administrator\\Documents\\BSHintern\\monthly_price_prediction_outputs",
+  "anchor_strength": 0.75,
+  "monthly_anchor_months": [
+    "2025-06",
+    "2025-07",
+    "2025-08",
+    "2025-09",
+    "2025-10",
+    "2025-11",
+    "2025-12",
+    "2026-01",
+    "2026-02",
+    "2026-03",
+    "2026-04",
+    "2026-05",
+    "2026-06",
+    "2026-07",
+    "2026-08",
+    "2026-09",
+    "2026-10",
+    "2026-11",
+    "2026-12"
+  ],
+  "forecast_start": "2026-07-15",
+  "forecast_end": "2026-08-25",
+  "series_summary": [
+    {
+      "series": "1#白银",
+      "mean_hybrid_MAE": 2469.708654508732,
+      "mean_selected_MAE": 2455.0088566683457,
+      "mean_ensemble_MAE": 2702.460033433943,
+      "beats_ensemble_horizon_count": 20,
+      "selected_beats_ensemble_horizon_count": 20,
+      "beats_naive_horizon_count": 21,
+      "selected_beats_naive_horizon_count": 23,
+      "checkpoint_horizons": {
+        "1": {
+          "hybrid_MAE": 675.3499863360386,
+          "selected_MAE": 654.5567719309947,
+          "ensemble_MAE": 654.5567719309947,
+          "naive_MAE": 664.7492625368733,
+          "hybrid_MAPE_%": 3.696567991293407,
+          "selected_MAPE_%": 3.560069294561161,
+          "beats_ensemble": false,
+          "selected_beats_ensemble": false,
+          "beats_naive": false,
+          "selected_beats_naive": true
+        },
+        "7": {
+          "hybrid_MAE": 1935.289700173726,
+          "selected_MAE": 1872.7876106194692,
+          "ensemble_MAE": 1872.7876106194692,
+          "naive_MAE": 1872.7876106194692,
+          "hybrid_MAPE_%": 10.74268817112277,
+          "selected_MAPE_%": 10.289380582076896,
+          "beats_ensemble": false,
+          "selected_beats_ensemble": false,
+          "beats_naive": false,
+          "selected_beats_naive": false
+        },
+        "14": {
+          "hybrid_MAE": 2555.1199288922985,
+          "selected_MAE": 2555.1199288922985,
+          "ensemble_MAE": 2619.6165191740415,
+          "naive_MAE": 2619.6165191740415,
+          "hybrid_MAPE_%": 14.081127973785842,
+          "selected_MAPE_%": 14.081127973785842,
+          "beats_ensemble": true,
+          "selected_beats_ensemble": true,
+          "beats_naive": true,
+          "selected_beats_naive": true
+        },
+        "30": {
+          "hybrid_MAE": 3265.3325228532553,
+          "selected_MAE": 3265.3325228532553,
+          "ensemble_MAE": 4151.474926253688,
+          "naive_MAE": 4151.474926253688,
+          "hybrid_MAPE_%": 17.797001970015305,
+          "selected_MAPE_%": 17.797001970015305,
+          "beats_ensemble": true,
+          "selected_beats_ensemble": true,
+          "beats_naive": true,
+          "selected_beats_naive": true
+        }
+      }
+    },
+    {
+      "series": "1#铜",
+      "mean_hybrid_MAE": 2669.9100142045468,
+      "mean_selected_MAE": 2669.9100142045468,
+      "mean_ensemble_MAE": 3088.39970501475,
+      "beats_ensemble_horizon_count": 30,
+      "selected_beats_ensemble_horizon_count": 30,
+      "beats_naive_horizon_count": 30,
+      "selected_beats_naive_horizon_count": 30,
+      "checkpoint_horizons": {
+        "1": {
+          "hybrid_MAE": 868.376908373063,
+          "selected_MAE": 868.376908373063,
+          "ensemble_MAE": 884.3657817109153,
+          "naive_MAE": 884.3657817109153,
+          "hybrid_MAPE_%": 0.9783404308764013,
+          "selected_MAPE_%": 0.9783404308764013,
+          "beats_ensemble": true,
+          "selected_beats_ensemble": true,
+          "beats_naive": true,
+          "selected_beats_naive": true
+        },
+        "7": {
+          "hybrid_MAE": 1811.8071306417503,
+          "selected_MAE": 1811.8071306417503,
+          "ensemble_MAE": 2070.7964601769913,
+          "naive_MAE": 2070.7964601769913,
+          "hybrid_MAPE_%": 2.03472350198349,
+          "selected_MAPE_%": 2.03472350198349,
+          "beats_ensemble": true,
+          "selected_beats_ensemble": true,
+          "beats_naive": true,
+          "selected_beats_naive": true
+        },
+        "14": {
+          "hybrid_MAE": 2718.16774170562,
+          "selected_MAE": 2718.16774170562,
+          "ensemble_MAE": 3092.4778761061953,
+          "naive_MAE": 3092.4778761061953,
+          "hybrid_MAPE_%": 3.0395401861025837,
+          "selected_MAPE_%": 3.0395401861025837,
+          "beats_ensemble": true,
+          "selected_beats_ensemble": true,
+          "beats_naive": true,
+          "selected_beats_naive": true
+        },
+        "30": {
+          "hybrid_MAE": 3487.5950516731637,
+          "selected_MAE": 3487.5950516731637,
+          "ensemble_MAE": 4229.351032448377,
+          "naive_MAE": 4229.351032448377,
+          "hybrid_MAPE_%": 3.866135774865292,
+          "selected_MAPE_%": 3.866135774865292,
+          "beats_ensemble": true,
+          "selected_beats_ensemble": true,
+          "beats_naive": true,
+          "selected_beats_naive": true
+        }
+      }
+    },
+    {
+      "series": "A00铝",
+      "mean_hybrid_MAE": 580.3661366016747,
+      "mean_selected_MAE": 580.3513461823453,
+      "mean_ensemble_MAE": 638.5724458612708,
+      "beats_ensemble_horizon_count": 29,
+      "selected_beats_ensemble_horizon_count": 29,
+      "beats_naive_horizon_count": 29,
+      "selected_beats_naive_horizon_count": 29,
+      "checkpoint_horizons": {
+        "1": {
+          "hybrid_MAE": 196.4614116949273,
+          "selected_MAE": 196.0176991150439,
+          "ensemble_MAE": 196.0176991150439,
+          "naive_MAE": 196.0176991150439,
+          "hybrid_MAPE_%": 0.9283296420723156,
+          "selected_MAPE_%": 0.9264821418532413,
+          "beats_ensemble": false,
+          "selected_beats_ensemble": false,
+          "beats_naive": false,
+          "selected_beats_naive": false
+        },
+        "7": {
+          "hybrid_MAE": 482.064326218249,
+          "selected_MAE": 482.064326218249,
+          "ensemble_MAE": 498.7463126843656,
+          "naive_MAE": 498.7463126843656,
+          "hybrid_MAPE_%": 2.2668317735099173,
+          "selected_MAPE_%": 2.2668317735099173,
+          "beats_ensemble": true,
+          "selected_beats_ensemble": true,
+          "beats_naive": true,
+          "selected_beats_naive": true
+        },
+        "14": {
+          "hybrid_MAE": 613.7460823652589,
+          "selected_MAE": 613.7460823652589,
+          "ensemble_MAE": 659.3657817109145,
+          "naive_MAE": 659.3657817109145,
+          "hybrid_MAPE_%": 2.871006454907908,
+          "selected_MAPE_%": 2.871006454907908,
+          "beats_ensemble": true,
+          "selected_beats_ensemble": true,
+          "beats_naive": true,
+          "selected_beats_naive": true
+        },
+        "30": {
+          "hybrid_MAE": 709.8865958198938,
+          "selected_MAE": 709.8865958198938,
+          "ensemble_MAE": 866.2241887905606,
+          "naive_MAE": 866.2241887905606,
+          "hybrid_MAPE_%": 3.3436688310894365,
+          "selected_MAPE_%": 3.3436688310894365,
+          "beats_ensemble": true,
+          "selected_beats_ensemble": true,
+          "beats_naive": true,
+          "selected_beats_naive": true
+        }
+      }
+    },
+    {
+      "series": "铝合金ADC12",
+      "mean_hybrid_MAE": 514.8262661050434,
+      "mean_selected_MAE": 514.8060372245743,
+      "mean_ensemble_MAE": 557.6941986234018,
+      "beats_ensemble_horizon_count": 29,
+      "selected_beats_ensemble_horizon_count": 29,
+      "beats_naive_horizon_count": 29,
+      "selected_beats_naive_horizon_count": 29,
+      "checkpoint_horizons": {
+        "1": {
+          "hybrid_MAE": 97.95199915743642,
+          "selected_MAE": 97.3451327433633,
+          "ensemble_MAE": 97.3451327433633,
+          "naive_MAE": 97.3451327433633,
+          "hybrid_MAPE_%": 0.46747907237078096,
+          "selected_MAPE_%": 0.46450180303378114,
+          "beats_ensemble": false,
+          "selected_beats_ensemble": false,
+          "beats_naive": false,
+          "selected_beats_naive": false
+        },
+        "7": {
+          "hybrid_MAE": 335.13993141320344,
+          "selected_MAE": 335.13993141320344,
+          "ensemble_MAE": 350.2949852507367,
+          "naive_MAE": 350.2949852507367,
+          "hybrid_MAPE_%": 1.5887936108447611,
+          "selected_MAPE_%": 1.5887936108447611,
+          "beats_ensemble": true,
+          "selected_beats_ensemble": true,
+          "beats_naive": true,
+          "selected_beats_naive": true
+        },
+        "14": {
+          "hybrid_MAE": 524.129740600054,
+          "selected_MAE": 524.129740600054,
+          "ensemble_MAE": 540.5604719764004,
+          "naive_MAE": 540.5604719764004,
+          "hybrid_MAPE_%": 2.483136336160651,
+          "selected_MAPE_%": 2.483136336160651,
+          "beats_ensemble": true,
+          "selected_beats_ensemble": true,
+          "beats_naive": true,
+          "selected_beats_naive": true
+        },
+        "30": {
+          "hybrid_MAE": 739.7242567692117,
+          "selected_MAE": 739.7242567692117,
+          "ensemble_MAE": 859.8820058997046,
+          "naive_MAE": 859.8820058997046,
+          "hybrid_MAPE_%": 3.487244854406439,
+          "selected_MAPE_%": 3.487244854406439,
+          "beats_ensemble": true,
+          "selected_beats_ensemble": true,
+          "beats_naive": true,
+          "selected_beats_naive": true
+        }
+      }
+    },
+    {
+      "series": "铸造铝合金锭(ZLD104)",
+      "mean_hybrid_MAE": 561.8250974601443,
+      "mean_selected_MAE": 559.3137019809329,
+      "mean_ensemble_MAE": 716.986234021632,
+      "beats_ensemble_horizon_count": 25,
+      "selected_beats_ensemble_horizon_count": 25,
+      "beats_naive_horizon_count": 25,
+      "selected_beats_naive_horizon_count": 25,
+      "checkpoint_horizons": {
+        "1": {
+          "hybrid_MAE": 176.61021924615866,
+          "selected_MAE": 163.71681415929203,
+          "ensemble_MAE": 163.71681415929203,
+          "naive_MAE": 163.71681415929203,
+          "hybrid_MAPE_%": 0.7994023565918216,
+          "selected_MAPE_%": 0.7412779355687955,
+          "beats_ensemble": false,
+          "selected_beats_ensemble": false,
+          "beats_naive": false,
+          "selected_beats_naive": false
+        },
+        "7": {
+          "hybrid_MAE": 475.17257292985573,
+          "selected_MAE": 475.17257292985573,
+          "ensemble_MAE": 483.77581120943927,
+          "naive_MAE": 483.77581120943927,
+          "hybrid_MAPE_%": 2.1364781581361627,
+          "selected_MAPE_%": 2.1364781581361627,
+          "beats_ensemble": true,
+          "selected_beats_ensemble": true,
+          "beats_naive": true,
+          "selected_beats_naive": true
+        },
+        "14": {
+          "hybrid_MAE": 572.39571551784,
+          "selected_MAE": 572.39571551784,
+          "ensemble_MAE": 670.3539823008847,
+          "naive_MAE": 670.3539823008847,
+          "hybrid_MAPE_%": 2.568276833873669,
+          "selected_MAPE_%": 2.568276833873669,
+          "beats_ensemble": true,
+          "selected_beats_ensemble": true,
+          "beats_naive": true,
+          "selected_beats_naive": true
+        },
+        "30": {
+          "hybrid_MAE": 643.0947134911388,
+          "selected_MAE": 643.0947134911388,
+          "ensemble_MAE": 1112.831858407079,
+          "naive_MAE": 1112.831858407079,
+          "hybrid_MAPE_%": 2.8832828626063156,
+          "selected_MAPE_%": 2.8832828626063156,
+          "beats_ensemble": true,
+          "selected_beats_ensemble": true,
+          "beats_naive": true,
+          "selected_beats_naive": true
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "forecast": "C:\\Users\\Administrator\\Documents\\BSHintern\\daily_hybrid_variable_anchored_forecast_30d.csv",
+    "backtest_by_horizon": "C:\\Users\\Administrator\\Documents\\BSHintern\\daily_hybrid_backtest_by_horizon.csv",
+    "actual_vs_pred": "C:\\Users\\Administrator\\Documents\\BSHintern\\daily_hybrid_actual_vs_pred.csv",
+    "summary": "C:\\Users\\Administrator\\Documents\\BSHintern\\daily_hybrid_summary.json"
+  }
+}

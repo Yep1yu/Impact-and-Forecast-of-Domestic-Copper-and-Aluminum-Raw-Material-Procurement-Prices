@@ -1,0 +1,92 @@
+{
+  "input_file": "C:\\Users\\Administrator\\Documents\\BSHintern\\ccmn_changjiang_avg_prices.csv",
+  "forecast_file": "C:\\Users\\Administrator\\Documents\\BSHintern\\ccmn_price_forecast_next_month_individual.csv",
+  "metrics_file": "C:\\Users\\Administrator\\Documents\\BSHintern\\ccmn_individual_model_evaluation_metrics.csv",
+  "vat_adjustment": "tax_exclusive_price = tax_inclusive_avg_price / 1.13",
+  "test_size_per_series": 60,
+  "forecast_start": "2026-07-07",
+  "forecast_end": "2026-08-06",
+  "forecast_rows": 23,
+  "series_summary": [
+    {
+      "series": "1#铜",
+      "sample_start": "2021-07-01",
+      "sample_end": "2026-07-06",
+      "sample_rows": 1214,
+      "test_start": "2026-04-08",
+      "test_end": "2026-07-06",
+      "best_model": "Drift_log",
+      "best_MAPE_%": 5.665285302276311,
+      "best_RMSE": 5518.31129538753,
+      "best_MAE": 5227.467015632722
+    },
+    {
+      "series": "A00铝",
+      "sample_start": "2021-07-01",
+      "sample_end": "2026-07-06",
+      "sample_rows": 1214,
+      "test_start": "2026-04-08",
+      "test_end": "2026-07-06",
+      "best_model": "ARIMA_log",
+      "best_MAPE_%": 2.13944154949138,
+      "best_RMSE": 659.6730304183783,
+      "best_MAE": 443.9528023598777
+    },
+    {
+      "series": "1#白银",
+      "sample_start": "2021-07-01",
+      "sample_end": "2026-07-06",
+      "sample_rows": 1214,
+      "test_start": "2026-04-08",
+      "test_end": "2026-07-06",
+      "best_model": "Holt_damped_log",
+      "best_MAPE_%": 9.008869320682553,
+      "best_RMSE": 1630.5416793677596,
+      "best_MAE": 1371.366243721279
+    },
+    {
+      "series": "铝合金ADC12",
+      "sample_start": "2021-07-01",
+      "sample_end": "2026-07-06",
+      "sample_rows": 1214,
+      "test_start": "2026-04-08",
+      "test_end": "2026-07-06",
+      "best_model": "ARIMA_log",
+      "best_MAPE_%": 3.7357409991024326,
+      "best_RMSE": 839.6979519302215,
+      "best_MAE": 782.9240975237725
+    },
+    {
+      "series": "铸造铝合金锭(ZLD104)",
+      "sample_start": "2022-04-01",
+      "sample_end": "2026-07-06",
+      "sample_rows": 1031,
+      "test_start": "2026-04-08",
+      "test_end": "2026-07-06",
+      "best_model": "ARIMA_log",
+      "best_MAPE_%": 6.43930147790029,
+      "best_RMSE": 1499.6809012723643,
+      "best_MAE": 1380.0615039151796
+    }
+  ],
+  "details": {
+    "1#铜": {
+      "ARIMA_order_validation": "(0, 1, 0)"
+    },
+    "A00铝": {
+      "ARIMA_order_validation": "(0, 1, 0)",
+      "ARIMA_order_full": "(0, 1, 0)"
+    },
+    "1#白银": {
+      "ARIMA_order_validation": "(2, 1, 2)"
+    },
+    "铝合金ADC12": {
+      "ARIMA_order_validation": "(1, 1, 1)",
+      "ARIMA_order_full": "(2, 1, 1)"
+    },
+    "铸造铝合金锭(ZLD104)": {
+      "ARIMA_order_validation": "(0, 1, 1)",
+      "ARIMA_order_full": "(0, 1, 1)"
+    }
+  }
+}

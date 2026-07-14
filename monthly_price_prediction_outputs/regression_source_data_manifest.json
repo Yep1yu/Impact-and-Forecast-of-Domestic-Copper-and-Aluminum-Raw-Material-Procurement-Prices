@@ -1,0 +1,29 @@
+{
+  "description": "Regression source data export. Excel includes full v2 monthly modeling data, regression results, and complete model samples by product. Zip includes raw/cache files used to build those data.",
+  "modeling_data": "C:\\Users\\Administrator\\Documents\\BSHintern\\domestic_material_regression_analysis_v2.xlsx#sheet_index_4(v2_modeling_data)",
+  "complete_sample_definition": "price target + lag monthly average price + original p<0.1 significant predictors, after row-wise missing-value deletion.",
+  "exports": {
+    "excel": "C:\\Users\\Administrator\\Documents\\BSHintern\\monthly_price_prediction_outputs\\regression_source_data_export.xlsx",
+    "zip": "C:\\Users\\Administrator\\Documents\\BSHintern\\monthly_price_prediction_outputs\\regression_raw_source_files.zip",
+    "manifest": "C:\\Users\\Administrator\\Documents\\BSHintern\\monthly_price_prediction_outputs\\regression_source_data_manifest.json"
+  },
+  "source_files": [
+    "C:\\Users\\Administrator\\Documents\\BSHintern\\ccmn_changjiang_avg_prices.csv",
+    "C:\\Users\\Administrator\\Documents\\BSHintern\\domestic_material_monthly_dataset_v1.csv",
+    "C:\\Users\\Administrator\\Documents\\BSHintern\\domestic_material_all_variable_results.csv",
+    "C:\\Users\\Administrator\\Documents\\BSHintern\\domestic_material_regression_analysis_v2.xlsx",
+    "C:\\Users\\Administrator\\Documents\\BSHintern\\domestic_material_variable_dictionary_v1.csv",
+    "C:\\Users\\Administrator\\Documents\\BSHintern\\domestic_material_industry_chain_variable_library_v2.xlsx",
+    "C:\\Users\\Administrator\\Documents\\BSHintern\\data_cache_v3\\domestic_event_dummies_monthly.csv",
+    "C:\\Users\\Administrator\\Documents\\BSHintern\\data_cache_v3\\domestic_macro_monthly.csv",
+    "C:\\Users\\Administrator\\Documents\\BSHintern\\data_cache_v3\\gasgoo_auto_top50_monthly.csv",
+    "C:\\Users\\Administrator\\Documents\\BSHintern\\data_cache_v3\\lme_monthly.csv",
+    "C:\\Users\\Administrator\\Documents\\BSHintern\\data_cache_v3\\nbs_annual_indicators.csv",
+    "C:\\Users\\Administrator\\Documents\\BSHintern\\data_cache_v3\\nbs_monthly_indicators.csv",
+    "C:\\Users\\Administrator\\Documents\\BSHintern\\data_cache_v3\\policy_uncertainty_monthly.csv",
+    "C:\\Users\\Administrator\\Documents\\BSHintern\\data_cache_v3\\recycling_import_monthly.csv",
+    "C:\\Users\\Administrator\\Documents\\BSHintern\\data_cache_v3\\recycling_import_monthly_sources.csv",
+    "C:\\Users\\Administrator\\Documents\\BSHintern\\data_cache_v3\\shfe_futures_monthly.csv",
+    "C:\\Users\\Administrator\\Documents\\BSHintern\\data_cache_v3\\shfe_warrant_monthly.csv"
+  ]
+}

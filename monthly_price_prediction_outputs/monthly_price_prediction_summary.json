@@ -1,0 +1,18 @@
+{
+  "modeling_data": "C:\\Users\\Administrator\\Documents\\BSHintern\\domestic_material_regression_analysis_v2.xlsx#sheet_index_4",
+  "significant_source": "C:\\Users\\Administrator\\Documents\\BSHintern\\domestic_material_all_variable_results.csv",
+  "target_definition": "monthly average price level",
+  "predictors": "all p<0.1 variables from the previous monthly mom regression plus lagged monthly average price",
+  "future_forecast_end": "2026-12",
+  "future_forecast_assumptions": "continuous predictors use latest known value, event dummies default to 0, lagged price is recursive",
+  "outputs": {
+    "summary": "C:\\Users\\Administrator\\Documents\\BSHintern\\monthly_price_prediction_outputs\\monthly_price_model_train_test_summary.csv",
+    "metrics": "C:\\Users\\Administrator\\Documents\\BSHintern\\monthly_price_prediction_outputs\\monthly_price_model_metrics.csv",
+    "test_compare": "C:\\Users\\Administrator\\Documents\\BSHintern\\monthly_price_prediction_outputs\\monthly_price_model_test_actual_vs_pred.csv",
+    "known_month_backcast": "C:\\Users\\Administrator\\Documents\\BSHintern\\monthly_price_prediction_outputs\\monthly_price_model_latest_known_prediction.csv",
+    "future_forecast": "C:\\Users\\Administrator\\Documents\\BSHintern\\monthly_price_prediction_outputs\\monthly_price_model_future_forecast_to_2026_12.csv",
+    "coefficients": "C:\\Users\\Administrator\\Documents\\BSHintern\\monthly_price_prediction_outputs\\monthly_price_model_coefficients.csv",
+    "formulas": "C:\\Users\\Administrator\\Documents\\BSHintern\\monthly_price_prediction_outputs\\monthly_price_model_formulas.csv",
+    "excel_report": "C:\\Users\\Administrator\\Documents\\BSHintern\\monthly_price_prediction_outputs\\monthly_price_prediction_report_full_significant_vars.xlsx"
+  }
+}
