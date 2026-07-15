@@ -1,6 +1,6 @@
 {
   "model_version": "daily-ensemble-v1",
-  "input_file": "C:\\Users\\Administrator\\Documents\\BSHintern\\ccmn_changjiang_avg_prices_tax_exclusive.csv",
+  "input_file": "/home/runner/work/Impact-and-Forecast-of-Domestic-Copper-and-Aluminum-Raw-Material-Procurement-Prices/Impact-and-Forecast-of-Domestic-Copper-and-Aluminum-Raw-Material-Procurement-Prices/ccmn_changjiang_avg_prices_tax_exclusive.csv",
   "forecast_days": 30,
   "validation_origins": 120,
   "min_train_days": 500,
@@ -16,11 +16,11 @@
     "Median_ensemble"
   ],
   "outputs": {
-    "forecast": "C:\\Users\\Administrator\\Documents\\BSHintern\\daily_ensemble_forecast_next_30d.csv",
-    "backtest_by_horizon": "C:\\Users\\Administrator\\Documents\\BSHintern\\daily_ensemble_backtest_by_horizon.csv",
-    "model_weights": "C:\\Users\\Administrator\\Documents\\BSHintern\\daily_ensemble_model_weights.csv",
-    "actual_vs_pred": "C:\\Users\\Administrator\\Documents\\BSHintern\\daily_ensemble_actual_vs_pred.csv",
-    "summary": "C:\\Users\\Administrator\\Documents\\BSHintern\\daily_ensemble_summary.json"
+    "forecast": "/home/runner/work/Impact-and-Forecast-of-Domestic-Copper-and-Aluminum-Raw-Material-Procurement-Prices/Impact-and-Forecast-of-Domestic-Copper-and-Aluminum-Raw-Material-Procurement-Prices/daily_ensemble_forecast_next_30d.csv",
+    "backtest_by_horizon": "/home/runner/work/Impact-and-Forecast-of-Domestic-Copper-and-Aluminum-Raw-Material-Procurement-Prices/Impact-and-Forecast-of-Domestic-Copper-and-Aluminum-Raw-Material-Procurement-Prices/daily_ensemble_backtest_by_horizon.csv",
+    "model_weights": "/home/runner/work/Impact-and-Forecast-of-Domestic-Copper-and-Aluminum-Raw-Material-Procurement-Prices/Impact-and-Forecast-of-Domestic-Copper-and-Aluminum-Raw-Material-Procurement-Prices/daily_ensemble_model_weights.csv",
+    "actual_vs_pred": "/home/runner/work/Impact-and-Forecast-of-Domestic-Copper-and-Aluminum-Raw-Material-Procurement-Prices/Impact-and-Forecast-of-Domestic-Copper-and-Aluminum-Raw-Material-Procurement-Prices/daily_ensemble_actual_vs_pred.csv",
+    "summary": "/home/runner/work/Impact-and-Forecast-of-Domestic-Copper-and-Aluminum-Raw-Material-Procurement-Prices/Impact-and-Forecast-of-Domestic-Copper-and-Aluminum-Raw-Material-Procurement-Prices/daily_ensemble_summary.json"
   },
   "series_summary": [
     {
@@ -143,14 +143,14 @@
         ],
         "trend": "t"
       },
-      "mean_final_MAE": 2702.460033433943,
+      "mean_final_MAE": 2702.460033436582,
       "mean_naive_MAE": 2705.479351032448,
       "beats_naive_horizon_count": 3,
       "checkpoint_horizons": {
         "1": {
-          "final_MAE": 654.5567719309947,
+          "final_MAE": 654.5567720101567,
           "naive_MAE": 664.7492625368733,
-          "final_MAPE_%": 3.560069294561162,
+          "final_MAPE_%": 3.560069295048321,
           "naive_MAPE_%": 3.6132330529629315,
           "beats_naive": true
         },
