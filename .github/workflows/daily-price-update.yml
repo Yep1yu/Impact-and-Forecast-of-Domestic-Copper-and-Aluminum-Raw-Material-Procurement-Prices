@@ -25,7 +25,9 @@ jobs:
       - name: Fetch prices and rebuild forecasts
         env:
           CCMN_COOKIE: ${{ secrets.CCMN_COOKIE }}
-        run: python update_hybrid_price_database.py --refresh-monthly-model
+        run: >
+          python update_hybrid_price_database.py
+          --monthly-workbook "monthly_price_prediction_outputs/drop_limited_vars/引入变量结果分析.xlsx"
 
       - name: Commit refreshed dashboard data
         run: |
