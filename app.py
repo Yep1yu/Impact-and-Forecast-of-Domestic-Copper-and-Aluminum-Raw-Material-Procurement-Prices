@@ -810,6 +810,23 @@ def render_report_center(
                 file_name="国内原材料日度预测.csv",
                 mime="text/csv",
             )
+        monthly_export = monthly_forecasts.copy()
+        if not monthly_export.empty:
+            monthly_export["品种"] = monthly_export["metal"].map(display).fillna(monthly_export["metal"])
+            monthly_export["预测月份"] = pd.to_datetime(monthly_export["forecast_month"]).dt.strftime("%Y-%m")
+            monthly_export = monthly_export[["品种", "预测月份", "predicted_price_cny_per_tonne", "source", "model_version"]].rename(
+                columns={
+                    "predicted_price_cny_per_tonne": "预测月度均价",
+                    "source": "数据来源",
+                    "model_version": "模型版本",
+                }
+            )
+            st.download_button(
+                "下载月度预测 CSV",
+                monthly_export.to_csv(index=False, encoding="utf-8-sig").encode("utf-8-sig"),
+                file_name="国内原材料月度预测.csv",
+                mime="text/csv",
+            )
     with status_column:
         st.metric("日度预测", "已生成" if not forecasts.empty else "暂无")
         st.metric("月度预测", "已生成" if not monthly_forecasts.empty else "暂无")
@@ -1271,8 +1288,6 @@ def render_backtest(
     metrics[1].metric("MAE", f"{mae:,.2f}")
     metrics[2].metric("MAPE", f"{mape:.2f}%")
     metrics[3].metric("RMSE", f"{rmse:,.2f}")
-    st.caption("模型及训练区间固定为该材料最早至最晚的完整样本；选择月份仅筛选展示范围，不会重新训练。")
-
     fig = go.Figure()
     fig.add_trace(
         go.Scatter(
