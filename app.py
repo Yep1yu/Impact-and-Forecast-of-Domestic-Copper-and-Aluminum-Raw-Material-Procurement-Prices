@@ -9,6 +9,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
+import statsmodels.api as sm
 import streamlit as st
 
 from domestic_prices.config import load_config
@@ -21,7 +22,7 @@ from domestic_prices.db import (
     load_spot_prices,
     load_update_runs,
 )
-from domestic_prices.model import build_feature_snapshot, generate_forecasts
+from domestic_prices.model import build_feature_snapshot
 
 
 DEFAULT_DISPLAY = {
@@ -329,8 +330,8 @@ def inject_style() -> None:
         .future-card-value {{ color: var(--ink); font-size: 20px; font-weight: 760; letter-spacing: -.03em; margin-top: 12px; }}
         .future-card-meta {{ color: var(--muted); font-size: 11px; line-height: 1.5; margin-top: 5px; }}
         .future-card-trend {{ font-size: 12px; font-weight: 750; margin-top: 8px; }}
-        .future-card-trend.up {{ color: #6f9a8b; }}
-        .future-card-trend.down {{ color: #bd7d85; }}
+        .future-card-trend.up {{ color: #c9372c; }}
+        .future-card-trend.down {{ color: #258553; }}
         .future-card-trend.steady {{ color: #87859b; }}
         .st-key-overview_trend_window [data-testid="stWidgetLabel"] {{ display: none; }}
         .st-key-overview_trend_window [role="radiogroup"] {{ justify-content: flex-end; gap: 6px; }}
@@ -686,6 +687,7 @@ def render_market_cards(spot: pd.DataFrame, metals: list[str], display: dict[str
             display.get(metal, metal),
             f"{latest_price:,.0f}",
             f"{change_5d * 100:.2f}%" if pd.notna(change_5d) else "暂无",
+            delta_color="inverse",
         )
 
 
@@ -902,7 +904,7 @@ def render_range_stats(metal: str, metal_spot: pd.DataFrame, color: str) -> None
         st.plotly_chart(fig, width="stretch")
 
 
-def render_backtest(
+def render_daily_backtest_legacy(
     spot: pd.DataFrame,
     market_features: pd.DataFrame,
     metals: list[str],
@@ -1135,6 +1137,186 @@ def render_backtest(
         width="stretch",
         hide_index=True,
     )
+
+
+@st.cache_data(show_spinner=False)
+def load_monthly_history_predictions() -> pd.DataFrame:
+    output_rows: list[pd.DataFrame] = []
+    output_dir = Path(__file__).resolve().parent / "monthly_price_prediction_outputs" / "drop_limited_vars"
+    raw_workbook = None
+    for candidate in sorted(output_dir.glob("*.xlsx")):
+        try:
+            if "v2_modeling_data_full" in pd.ExcelFile(candidate).sheet_names:
+                raw_workbook = candidate
+                break
+        except (OSError, ValueError):
+            continue
+
+    sample_metals = {
+        1: "silver_1",
+        2: "copper_1",
+        3: "aluminum_a00",
+        4: "aluminum_adc12",
+        5: "aluminum_zld104",
+    }
+    if raw_workbook is not None:
+        for sample_index, metal in sample_metals.items():
+            try:
+                sample = pd.read_excel(raw_workbook, sheet_name=f"sample_{sample_index}")
+            except ValueError:
+                continue
+            if sample.shape[1] < 3:
+                continue
+            month_col, target_col = sample.columns[:2]
+            predictors = list(sample.columns[2:])
+            frame = sample.replace([np.inf, -np.inf], np.nan).dropna().copy()
+            frame[month_col] = pd.to_datetime(frame[month_col])
+            predictors = [column for column in predictors if frame[column].std(ddof=0) > 0]
+            if len(frame) < max(15, len(predictors) + 8):
+                continue
+            fit = sm.OLS(
+                frame[target_col],
+                sm.add_constant(frame[predictors], has_constant="add"),
+            ).fit()
+            predicted = fit.predict(sm.add_constant(frame[predictors], has_constant="add"))
+            output_rows.append(
+                pd.DataFrame(
+                    {
+                        "metal": metal,
+                        "month": frame[month_col],
+                        "actual_monthly_price": frame[target_col],
+                        "predicted_monthly_price": predicted,
+                    }
+                )
+            )
+
+    lithium_dir = Path(__file__).resolve().parent / "lithium_carbonate_prediction_outputs"
+    lithium_file = next(iter(sorted(lithium_dir.glob("*monthly*fitted*.csv"))), None)
+    if lithium_file is not None:
+        lithium = pd.read_csv(lithium_file, encoding="utf-8-sig")
+        if {"month", "target_price", "predicted_monthly_price"}.issubset(lithium.columns):
+            output_rows.append(
+                pd.DataFrame(
+                    {
+                        "metal": "lithium_carbonate",
+                        "month": pd.to_datetime(lithium["month"]),
+                        "actual_monthly_price": lithium["target_price"],
+                        "predicted_monthly_price": lithium["predicted_monthly_price"],
+                    }
+                )
+            )
+
+    if not output_rows:
+        return pd.DataFrame(columns=["metal", "month", "actual_monthly_price", "predicted_monthly_price"])
+    return pd.concat(output_rows, ignore_index=True).sort_values(["metal", "month"]).reset_index(drop=True)
+
+
+def render_backtest(
+    spot: pd.DataFrame,
+    market_features: pd.DataFrame,
+    metals: list[str],
+    display: dict[str, str],
+    colors: dict[str, str],
+    model_version: str,
+) -> None:
+    del spot, market_features, model_version
+    st.subheader("历史月均价与模型预测")
+    history = load_monthly_history_predictions()
+    available_metals = [metal for metal in metals if metal in set(history["metal"])]
+    if not available_metals:
+        st.info("暂未找到可展示的月度模型历史结果。")
+        return
+
+    selected_metal = st.selectbox(
+        "原材料",
+        available_metals,
+        format_func=lambda item: display.get(item, item),
+        key="monthly_history_metal",
+    )
+    series = history[history["metal"] == selected_metal].copy().sort_values("month")
+    min_month = series["month"].min().date()
+    max_month = series["month"].max().date()
+    start_col, end_col = st.columns(2)
+    selected_start = start_col.date_input(
+        "开始月份",
+        value=min_month,
+        min_value=min_month,
+        max_value=max_month,
+        key="monthly_history_start",
+    )
+    selected_end = end_col.date_input(
+        "结束月份",
+        value=max_month,
+        min_value=min_month,
+        max_value=max_month,
+        key="monthly_history_end",
+    )
+    if selected_start > selected_end:
+        st.warning("开始月份不能晚于结束月份。")
+        return
+
+    selected = series[
+        (series["month"] >= pd.Timestamp(selected_start)) & (series["month"] <= pd.Timestamp(selected_end))
+    ].copy()
+    if selected.empty:
+        st.info("所选区间没有完整的模型样本。")
+        return
+
+    error = selected["predicted_monthly_price"] - selected["actual_monthly_price"]
+    mae = error.abs().mean()
+    rmse = float(np.sqrt(np.mean(np.square(error))))
+    mape = (error.abs() / selected["actual_monthly_price"]).mean() * 100
+    metrics = st.columns(4)
+    metrics[0].metric("历史月数", f"{len(selected)}")
+    metrics[1].metric("MAE", f"{mae:,.2f}")
+    metrics[2].metric("MAPE", f"{mape:.2f}%")
+    metrics[3].metric("RMSE", f"{rmse:,.2f}")
+    st.caption("模型及训练区间固定为该材料最早至最晚的完整样本；选择月份仅筛选展示范围，不会重新训练。")
+
+    fig = go.Figure()
+    fig.add_trace(
+        go.Scatter(
+            x=selected["month"],
+            y=selected["actual_monthly_price"],
+            mode="lines+markers",
+            name="历史月度均价",
+            line={"color": colors.get(selected_metal, "#2E78F6"), "width": 2.6},
+            marker={"size": 5},
+        )
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=selected["month"],
+            y=selected["predicted_monthly_price"],
+            mode="lines+markers",
+            name="模型预测值",
+            line={"color": "#c9372c", "width": 2, "dash": "dash"},
+            marker={"size": 4},
+        )
+    )
+    fig.update_layout(
+        height=440,
+        template="plotly_white",
+        paper_bgcolor="rgba(255,255,255,0)",
+        plot_bgcolor="#ffffff",
+        font={"color": "#64748b"},
+        margin={"l": 20, "r": 20, "t": 20, "b": 20},
+        yaxis_title="元/吨",
+        hovermode="x unified",
+        legend={"orientation": "h", "y": 1.12},
+    )
+    st.plotly_chart(fig, width="stretch")
+
+    table = selected.assign(
+        月份=selected["month"].dt.strftime("%Y-%m"),
+        历史月度均价=selected["actual_monthly_price"],
+        模型预测值=selected["predicted_monthly_price"],
+        预测误差=error,
+        误差率=error / selected["actual_monthly_price"] * 100,
+    )[["月份", "历史月度均价", "模型预测值", "预测误差", "误差率"]]
+    table["误差率"] = table["误差率"].map(lambda value: f"{value:.2f}%")
+    st.markdown('<div class="section-title">月度价格明细</div>', unsafe_allow_html=True)
+    st.dataframe(table, width="stretch", hide_index=True)
 
 
 def render_model_formula() -> None:
