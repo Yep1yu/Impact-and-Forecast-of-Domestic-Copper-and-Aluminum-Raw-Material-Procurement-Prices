@@ -14,6 +14,7 @@
     "电线电缆光缆及电工器材制造PPI"
   ],
   "monthly_model": "月度结算价 ~ 显著外生变量；不含滞后价格",
-  "daily_model": "日度结算价 ~ 同一组显著外生变量；未来日度结果按月度预测校准",
-  "model_version": "lithium-variable-monthly-daily-v1"
+  "daily_model": "共享日度价格路径模型：滞后价格、移动均线、多步 Ridge 与单步幅度限制；不使用月初平移校准",
+  "monthly_model_version": "lithium-variable-monthly-daily-v1",
+  "daily_model_version": "lithium-daily-hybrid-price-path-v1"
 }

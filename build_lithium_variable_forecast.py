@@ -9,6 +9,7 @@ import pandas as pd
 import statsmodels.api as sm
 
 from domestic_prices.db import connect, initialize, replace_latest_forecasts, replace_latest_monthly_forecasts, upsert_spot_prices
+from domestic_prices.model import generate_forecasts
 
 
 ROOT = Path(__file__).resolve().parent
@@ -18,6 +19,7 @@ OUTPUT_DIR = ROOT / "lithium_carbonate_prediction_outputs"
 METAL = "lithium_carbonate"
 DISPLAY_NAME = "碳酸锂"
 MODEL_VERSION = "lithium-variable-monthly-daily-v1"
+DAILY_MODEL_VERSION = "lithium-daily-hybrid-price-path-v1"
 
 
 def parse_args() -> argparse.Namespace:
@@ -178,7 +180,7 @@ def extrapolate_factors(factors: pd.DataFrame, predictors: list[str], months: pd
     return rows
 
 
-def daily_model(main: pd.DataFrame, factors: pd.DataFrame, predictors: list[str], monthly_forecast: pd.DataFrame, forecast_days: int):
+def daily_variable_model_legacy(main: pd.DataFrame, factors: pd.DataFrame, predictors: list[str], monthly_forecast: pd.DataFrame, forecast_days: int):
     daily = main[["date", "month", "settlement_price", "contract", "volume", "open_interest", "open_interest_change"]].copy()
     factor_daily = factors[["month"] + predictors].copy()
     for column in predictors:
@@ -225,6 +227,22 @@ def daily_model(main: pd.DataFrame, factors: pd.DataFrame, predictors: list[str]
     return daily, fit, actual, future, usable
 
 
+def daily_model(main: pd.DataFrame, forecast_days: int) -> pd.DataFrame:
+    """Use the shared price-path model used by the other raw materials."""
+    spot = main[["date", "settlement_price", "contract"]].rename(
+        columns={"date": "trade_date", "settlement_price": "price_cny_per_tonne", "contract": "raw_symbol"}
+    )
+    spot["metal"] = METAL
+    spot["source"] = "GFEX LC main contract settlement price"
+    forecast = generate_forecasts(
+        spot[["trade_date", "metal", "price_cny_per_tonne", "source", "raw_symbol"]],
+        pd.DataFrame(),
+        forecast_days=forecast_days,
+        model_version=DAILY_MODEL_VERSION,
+    )
+    return forecast.rename(columns={"forecast_date": "date", "predicted_price_cny_per_tonne": "predicted_price"})
+
+
 def coefficient_frame(fit, predictors: list[str]) -> pd.DataFrame:
     return pd.DataFrame(
         [
@@ -249,20 +267,21 @@ def import_to_website_db(main: pd.DataFrame, future: pd.DataFrame, monthly_forec
     spot["raw_symbol"] = main["contract"].values
     upsert_spot_prices(conn, spot[["trade_date", "metal", "price_cny_per_tonne", "source", "raw_symbol"]])
     generated = pd.Timestamp.utcnow().isoformat()
-    latest = float(main["settlement_price"].iloc[-1])
     forecast = pd.DataFrame(
         {
             "metal": METAL,
             "forecast_date": future["date"],
             "predicted_price_cny_per_tonne": future["predicted_price"].round(2),
-            "lower_bound": (future["predicted_price"] * 0.97).round(2),
-            "upper_bound": (future["predicted_price"] * 1.03).round(2),
-            "direction": np.where(future["predicted_price"] > latest * 1.005, "up", np.where(future["predicted_price"] < latest * 0.995, "down", "flat")),
-            "model_version": MODEL_VERSION,
+            "lower_bound": future["lower_bound"].round(2),
+            "upper_bound": future["upper_bound"].round(2),
+            "direction": future["direction"],
+            "model_version": DAILY_MODEL_VERSION,
             "generated_at": generated,
         }
     )
-    replace_latest_forecasts(conn, forecast, MODEL_VERSION)
+    conn.execute("DELETE FROM daily_forecasts WHERE metal = ?", (METAL,))
+    conn.commit()
+    replace_latest_forecasts(conn, forecast, DAILY_MODEL_VERSION)
     monthly_rows = pd.DataFrame(
         {
             "metal": METAL,
@@ -285,15 +304,15 @@ def main() -> None:
     monthly_target = main_prices.groupby("month", as_index=False)["settlement_price"].mean().rename(columns={"settlement_price": "target_price"})
     screening, predictors = regression_screen(monthly_target, factors)
     target, monthly_fit, monthly_fitted, monthly_forecast, usable = monthly_model(main_prices, factors, predictors)
-    daily, daily_fit, daily_fitted, daily_forecast, usable = daily_model(main_prices, factors, predictors, monthly_forecast, args.forecast_days)
+    daily_forecast = daily_model(main_prices, args.forecast_days)
 
     screening.to_csv(OUTPUT_DIR / "lithium_impact_regression_screening.csv", index=False, encoding="utf-8-sig")
     coefficient_frame(monthly_fit, usable).to_csv(OUTPUT_DIR / "lithium_monthly_model_coefficients.csv", index=False, encoding="utf-8-sig")
-    coefficient_frame(daily_fit, usable).to_csv(OUTPUT_DIR / "lithium_daily_model_coefficients.csv", index=False, encoding="utf-8-sig")
     monthly_fitted.to_csv(OUTPUT_DIR / "lithium_monthly_fitted_prices.csv", index=False, encoding="utf-8-sig")
     monthly_forecast.to_csv(OUTPUT_DIR / "lithium_monthly_forecast.csv", index=False, encoding="utf-8-sig")
-    daily_fitted.to_csv(OUTPUT_DIR / "lithium_daily_fitted_prices.csv", index=False, encoding="utf-8-sig")
-    daily_forecast[["date", "predicted_price", "predicted_monthly_price"]].to_csv(OUTPUT_DIR / "lithium_daily_forecast.csv", index=False, encoding="utf-8-sig")
+    daily_forecast.to_csv(OUTPUT_DIR / "lithium_daily_forecast.csv", index=False, encoding="utf-8-sig")
+    for obsolete in ["lithium_daily_model_coefficients.csv", "lithium_daily_fitted_prices.csv"]:
+        (OUTPUT_DIR / obsolete).unlink(missing_ok=True)
     report_path = OUTPUT_DIR / "lithium_variable_forecast_report.xlsx"
     try:
         writer = pd.ExcelWriter(report_path, engine="openpyxl")
@@ -304,7 +323,6 @@ def main() -> None:
         screening.to_excel(writer, sheet_name="影响变量回归", index=False)
         monthly_fitted.to_excel(writer, sheet_name="月度拟合", index=False)
         monthly_forecast.to_excel(writer, sheet_name="月度预测", index=False)
-        daily_fitted.to_excel(writer, sheet_name="日度拟合", index=False)
         daily_forecast.to_excel(writer, sheet_name="日度预测", index=False)
     summary = {
         "metal": METAL,
@@ -313,8 +331,9 @@ def main() -> None:
         "sample_end": str(main_prices.date.max().date()),
         "significant_variables": predictors,
         "monthly_model": "月度结算价 ~ 显著外生变量；不含滞后价格",
-        "daily_model": "日度结算价 ~ 同一组显著外生变量；未来日度结果按月度预测校准",
-        "model_version": MODEL_VERSION,
+        "daily_model": "共享日度价格路径模型：滞后价格、移动均线、多步 Ridge 与单步幅度限制；不使用月初平移校准",
+        "monthly_model_version": MODEL_VERSION,
+        "daily_model_version": DAILY_MODEL_VERSION,
     }
     (OUTPUT_DIR / "lithium_variable_forecast_summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
     if not args.skip_db:
