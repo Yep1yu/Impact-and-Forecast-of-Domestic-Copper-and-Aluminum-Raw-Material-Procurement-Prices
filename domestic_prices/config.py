@@ -81,6 +81,7 @@ def _default_config() -> dict[str, Any]:
                 "silver_1": "1#白银",
                 "aluminum_adc12": "铝合金ADC12",
                 "aluminum_zld104": "铸造铝合金锭(ZLD104)",
+                "lithium_carbonate": "碳酸锂",
             },
         },
         "changjiang": {

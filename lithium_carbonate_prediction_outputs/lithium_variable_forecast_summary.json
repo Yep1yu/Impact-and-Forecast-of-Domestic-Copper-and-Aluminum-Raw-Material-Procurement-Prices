@@ -1,0 +1,19 @@
+{
+  "metal": "lithium_carbonate",
+  "price_definition": "每个交易日成交量最大合约的结算价",
+  "sample_start": "2023-07-21",
+  "sample_end": "2026-07-15",
+  "significant_variables": [
+    "废铜进口量_变化_环比",
+    "废铜进口量_环比_环比",
+    "企业商品价格矿产品同比增长",
+    "企业商品价格矿产品指数",
+    "PPI当月指数_变化",
+    "PPI当月同比增长_变化",
+    "PPI当月指数_环比",
+    "电线电缆光缆及电工器材制造PPI"
+  ],
+  "monthly_model": "月度结算价 ~ 显著外生变量；不含滞后价格",
+  "daily_model": "日度结算价 ~ 同一组显著外生变量；未来日度结果按月度预测校准",
+  "model_version": "lithium-variable-monthly-daily-v1"
+}

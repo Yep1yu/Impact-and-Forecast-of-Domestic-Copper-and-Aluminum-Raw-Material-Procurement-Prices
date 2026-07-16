@@ -32,6 +32,7 @@ DEFAULT_DISPLAY = {
     "silver_1": "1#白银",
     "aluminum_adc12": "铝合金ADC12",
     "aluminum_zld104": "铸造铝合金锭(ZLD104)",
+    "lithium_carbonate": "碳酸锂",
 }
 PALETTE = ["#E77A3D", "#2BB9A8", "#A66BE7", "#F0A83B", "#D8568B"]
 METAL_COLORS = {
@@ -40,6 +41,7 @@ METAL_COLORS = {
     "silver_1": "#A66BE7",
     "aluminum_adc12": "#F0A83B",
     "aluminum_zld104": "#D8568B",
+    "lithium_carbonate": "#4C78A8",
 }
 FACTOR_CN = {
     "price_cny_per_tonne": "最新不含税现货均价",
@@ -73,6 +75,7 @@ FACTOR_MATERIAL = {
     "silver_1": "1#白银",
     "aluminum_adc12": "ADC12",
     "aluminum_zld104": "ZLD104",
+    "lithium_carbonate": "碳酸锂",
 }
 
 
@@ -85,7 +88,22 @@ def image_data_uri(path: Path) -> str:
 def load_factor_coefficients() -> pd.DataFrame:
     if not FACTOR_COEFFICIENTS.exists():
         return pd.DataFrame()
-    return pd.read_csv(FACTOR_COEFFICIENTS, encoding="utf-8-sig")
+    coefficients = pd.read_csv(FACTOR_COEFFICIENTS, encoding="utf-8-sig")
+    lithium_path = Path(__file__).resolve().parent / "lithium_carbonate_prediction_outputs" / "lithium_impact_regression_screening.csv"
+    if lithium_path.exists():
+        lithium = pd.read_csv(lithium_path, encoding="utf-8-sig")
+        lithium = lithium.rename(
+            columns={
+                "标准化系数": "标准化系数",
+                "影响强度_绝对值": "影响强度_绝对值",
+                "方向": "回归方向",
+            }
+        )
+        lithium["模型版本"] = "碳酸锂影响变量回归"
+        lithium["强弱排名"] = lithium.groupby("品种")["影响强度_绝对值"].rank(method="first", ascending=False).astype(int)
+        columns = ["品种", "模型版本", "目标变量", "变量", "标准化系数", "影响强度_绝对值", "p值", "显著性", "回归方向", "强弱排名"]
+        coefficients = pd.concat([coefficients, lithium[columns]], ignore_index=True)
+    return coefficients
 
 
 def inject_style() -> None:
@@ -429,7 +447,7 @@ def render_landing_page() -> None:
                 <h2>不只看到价格，更理解价格所处的位置。</h2>
                 <p>平台将近期现货走势、未来 30 天预测和模型回测放到同一套视图中，降低跨来源比对的成本。</p>
                 <div class="detail-points">
-                    <div class="detail-point"><strong>多品种同步跟踪</strong><span>覆盖 1#铜、A00铝、1#白银、铝 ADC12 与 ZLD104。</span></div>
+                    <div class="detail-point"><strong>多品种同步跟踪</strong><span>覆盖 1#铜、A00铝、1#白银、铝 ADC12、ZLD104 与碳酸锂。</span></div>
                     <div class="detail-point"><strong>预测区间可见</strong><span>使用 P10 至 P90 区间表达价格判断的边界，而非单一结论。</span></div>
                     <div class="detail-point"><strong>历史表现可复核</strong><span>保留历史回测，以相同口径检查模型的实际表现。</span></div>
                 </div>
@@ -768,7 +786,7 @@ def render_report_center(
     catalog_column, status_column = st.columns([3, 1])
     reports = pd.DataFrame(
         [
-            {"报告": "日度价格预测", "内容": "五种原材料未来30天预测", "状态": "可用" if not forecasts.empty else "暂无"},
+            {"报告": "日度价格预测", "内容": "六种原材料未来30天预测", "状态": "可用" if not forecasts.empty else "暂无"},
             {"报告": "月度均价预测", "内容": "各原材料月度预测均价", "状态": "可用" if not monthly_forecasts.empty else "暂无"},
             {"报告": "影响因素分析", "内容": "标准化回归系数与 Top 5 驱动因素", "状态": "可用" if not load_factor_coefficients().empty else "暂无"},
             {"报告": "数据更新记录", "内容": "最近数据更新与模型重训状态", "状态": "可用" if not runs.empty else "暂无"},
@@ -1228,7 +1246,7 @@ def main() -> None:
         <div class="hero">
             <div class="eyebrow">Metal intelligence · tax-exclusive basis</div>
             <h1>国内原材料采购价格预测</h1>
-            <p>基于长江有色日度价格，统一按不含税口径跟踪 1#铜、A00铝、1#白银、铝ADC12 和 ZLD104 的历史趋势、未来预测与历史回测表现。</p>
+            <p>基于国内公开日度价格与碳酸锂期货结算价，统一按不含税口径跟踪 1#铜、A00铝、1#白银、铝ADC12、ZLD104 和碳酸锂的历史趋势与未来预测。</p>
         </div>
         """,
         unsafe_allow_html=True,

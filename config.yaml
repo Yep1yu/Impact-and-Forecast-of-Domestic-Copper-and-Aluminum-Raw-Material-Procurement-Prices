@@ -13,6 +13,7 @@ excel:
     silver_1: "1#白银"
     aluminum_adc12: "铝合金ADC12"
     aluminum_zld104: "铸造铝合金锭(ZLD104)"
+    lithium_carbonate: "碳酸锂"
 
 changjiang:
   # 有色宝长江历史查询，市场为“有色宝长江”，铜/铝品种 id 分别为 2/3。
