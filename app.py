@@ -3,6 +3,7 @@ from __future__ import annotations
 import random
 import sqlite3
 import base64
+from io import BytesIO
 from datetime import date, timedelta
 from pathlib import Path
 
@@ -96,6 +97,13 @@ FACTOR_SOURCE_LINKS = {
     "A00铝": ("长江有色金属网", "https://www.ccmn.cn/"),
     "企业商品价格": ("国家统计局数据查询", "https://data.stats.gov.cn/"),
 }
+MONTHLY_EXPORT_MATERIALS = {
+    "1#铜": "1#铜",
+    "A00铝": "A00铝",
+    "1#白银": "1#白银",
+    "ADC12": "ADC12",
+    "ZLD104": "ZLD104",
+}
 
 FACTOR_DISPLAY_NAMES = {
     "ADC12_A00价差_滞后1期变化": "ADC12 与 A00铝的价格差",
@@ -142,6 +150,56 @@ def factor_source(name: str) -> tuple[str, str]:
         if keyword in name:
             return source
     return "国家统计局数据查询", "https://data.stats.gov.cn/"
+
+
+def excel_bytes(sheets: dict[str, pd.DataFrame]) -> bytes:
+    buffer = BytesIO()
+    with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
+        for sheet_name, data in sheets.items():
+            data.to_excel(writer, sheet_name=sheet_name, index=False)
+            worksheet = writer.sheets[sheet_name]
+            worksheet.freeze_panes = "A2"
+            for column_cells in worksheet.columns:
+                width = min(max(len(str(cell.value or "")) for cell in column_cells) + 2, 36)
+                worksheet.column_dimensions[column_cells[0].column_letter].width = width
+    return buffer.getvalue()
+
+
+def build_raw_monthly_export() -> bytes | None:
+    if not MONTHLY_RAW_DATA.exists():
+        return None
+    raw = pd.read_csv(MONTHLY_RAW_DATA, encoding="utf-8-sig")
+    sheets: dict[str, pd.DataFrame] = {}
+    excluded_terms = ("环比", "同比", "变化", "滞后")
+    for material, prefix in MONTHLY_EXPORT_MATERIALS.items():
+        columns = [
+            column
+            for column in raw.columns
+            if column == "月份" or (column.startswith(prefix) and not any(term in column for term in excluded_terms))
+        ]
+        data = raw[columns].copy()
+        data = data.rename(columns={"月份": "月份", f"{prefix}_月均价": f"{material}月均价"})
+        data = data.rename(columns={column: plain_factor_name(column) for column in data.columns if column != "月份"})
+        sheets[material] = data
+    return excel_bytes(sheets)
+
+
+def build_factor_export() -> bytes | None:
+    coefficients = load_factor_coefficients()
+    if coefficients.empty:
+        return None
+    sheets: dict[str, pd.DataFrame] = {}
+    for material in MONTHLY_EXPORT_MATERIALS:
+        data = coefficients[coefficients["品种"] == material].copy()
+        if data.empty:
+            continue
+        data["影响因素"] = data["变量"].map(plain_factor_name)
+        data["数据来源"] = data["变量"].map(lambda value: factor_source(str(value))[0])
+        data["数据来源链接"] = data["变量"].map(lambda value: factor_source(str(value))[1])
+        sheets[material] = data.rename(columns={"影响强度_绝对值": "影响强度", "回归方向": "关联方向"})[
+            ["影响因素", "影响强度", "关联方向", "数据来源", "数据来源链接"]
+        ].sort_values("影响强度", ascending=False)
+    return excel_bytes(sheets) if sheets else None
 
 
 def image_data_uri(path: Path) -> str:
@@ -744,6 +802,7 @@ def render_top_impact_factors(metal: str) -> None:
     st.markdown('<div class="section-title">影响因素 Top 5</div>', unsafe_allow_html=True)
     st.caption("影响强度用于比较各因素与价格变化的关联程度；它不表示因果关系，也不代表价格会按同样幅度变化。")
     st.plotly_chart(fig, width="stretch")
+    st.caption("“ADC12 与 A00铝的价格差”及“ZLD104 与 A00铝的价格差”分别等于对应合金价格减去 A00铝价格。它们反映再生铝或铸造合金相对原铝的成本、加工溢价和替代关系，是模型的市场信号，不表示价差会单向导致价格变化。")
     st.caption("点击下方因素可查看对应官方或原始数据发布页面。")
     source_columns = st.columns(len(factors))
     for column, (_, factor) in zip(source_columns, factors.sort_values("强弱排名").iterrows()):
@@ -901,13 +960,23 @@ def render_report_center(
                 file_name="国内原材料月度预测.csv",
                 mime="text/csv",
             )
-        if MONTHLY_RAW_DATA.exists():
+        raw_monthly_export = build_raw_monthly_export()
+        if raw_monthly_export is not None:
             st.download_button(
-                "下载原始月度数据 CSV",
-                MONTHLY_RAW_DATA.read_bytes(),
-                file_name="国内原材料原始月度数据.csv",
-                mime="text/csv",
-                help="包含建模前汇集的月度原始指标数据。",
+                "下载原始月度数据 Excel（5个工作表）",
+                raw_monthly_export,
+                file_name="国内原材料原始月度数据.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                help="按 1#铜、A00铝、1#白银、ADC12、ZLD104 分为五个工作表。",
+            )
+        factor_export = build_factor_export()
+        if factor_export is not None:
+            st.download_button(
+                "下载影响因素分析 Excel（5个工作表）",
+                factor_export,
+                file_name="国内原材料影响因素分析.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                help="按 1#铜、A00铝、1#白银、ADC12、ZLD104 分为五个工作表。",
             )
     with status_column:
         st.metric("日度预测", "已生成" if not forecasts.empty else "暂无")
