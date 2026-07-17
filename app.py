@@ -70,6 +70,7 @@ HEADER_IMAGE = Path(__file__).resolve().parent / "assets" / "dashboard_header.pn
 LANDING_HERO_IMAGE = Path(__file__).resolve().parent / "assets" / "metalpulse_landing_hero.png"
 LANDING_DETAIL_IMAGE = Path(__file__).resolve().parent / "assets" / "metalpulse_landing_detail.png"
 FACTOR_COEFFICIENTS = Path(__file__).resolve().parent / "domestic_material_factor_coefficients_v1.csv"
+MONTHLY_RAW_DATA = Path(__file__).resolve().parent / "domestic_material_monthly_dataset_v1.csv"
 FACTOR_MATERIAL = {
     "copper_1": "1#铜",
     "aluminum_a00": "A00铝",
@@ -78,6 +79,41 @@ FACTOR_MATERIAL = {
     "aluminum_zld104": "ZLD104",
     "lithium_carbonate": "碳酸锂",
 }
+
+FACTOR_SOURCE_LINKS = {
+    "SHFE": ("上海期货交易所", "https://www.shfe.com.cn/"),
+    "PPI": ("国家统计局数据查询", "https://data.stats.gov.cn/"),
+    "PMI": ("国家统计局数据查询", "https://data.stats.gov.cn/"),
+    "工业增加值": ("国家统计局数据查询", "https://data.stats.gov.cn/"),
+    "房地产": ("国家统计局数据查询", "https://data.stats.gov.cn/"),
+    "光缆": ("国家统计局数据查询", "https://data.stats.gov.cn/"),
+    "电线电缆": ("国家统计局数据查询", "https://data.stats.gov.cn/"),
+    "发电量": ("国家统计局数据查询", "https://data.stats.gov.cn/"),
+    "进口": ("国家统计局数据查询", "https://data.stats.gov.cn/"),
+    "汽车": ("中国汽车工业协会", "http://www.caam.org.cn/"),
+    "中国贸易政策不确定性": ("经济政策不确定性指数数据库", "https://www.policyuncertainty.com/china_monthly.html"),
+    "中国经济政策不确定性": ("经济政策不确定性指数数据库", "https://www.policyuncertainty.com/china_monthly.html"),
+    "A00铝": ("长江有色金属网", "https://www.ccmn.cn/"),
+    "企业商品价格": ("国家统计局数据查询", "https://data.stats.gov.cn/"),
+}
+
+
+def plain_factor_name(name: str) -> str:
+    cleaned = str(name)
+    for suffix in ("_滞后1期变化", "_当月同比增长", "_环比增长", "_环比", "_变化"):
+        cleaned = cleaned.replace(suffix, "")
+    cleaned = cleaned.replace("SHFE", "上海期货交易所（SHFE）")
+    cleaned = cleaned.replace("PPI", "工业生产者出厂价格指数（PPI）")
+    cleaned = cleaned.replace("制造业PMI", "制造业采购经理指数（PMI）")
+    cleaned = cleaned.replace("非制造业PMI", "非制造业采购经理指数（PMI）")
+    return cleaned
+
+
+def factor_source(name: str) -> tuple[str, str]:
+    for keyword, source in FACTOR_SOURCE_LINKS.items():
+        if keyword in name:
+            return source
+    return "国家统计局数据查询", "https://data.stats.gov.cn/"
 
 
 def image_data_uri(path: Path) -> str:
@@ -461,7 +497,7 @@ def render_landing_page() -> None:
                 <div class="capability-main"><h3>价格预测总览</h3><p>将已公布现货均价、未来预测曲线和预测区间组合呈现，快速识别趋势变化。</p></div>
                 <div class="capability-stack">
                     <div class="capability-small"><h3>历史回测</h3><p>用真实价格检查预测表现，让模型结果可被持续验证。</p></div>
-                    <div class="capability-small"><h3>模型与口径</h3><p>明确数据来源、价格口径和模型逻辑，方便内部协作与复盘。</p></div>
+                    <div class="capability-small"><h3>模型说明</h3><p>用通俗语言说明数据来源、价格范围和预测逻辑，方便内部协作与复盘。</p></div>
                 </div>
             </div>
         </section>
@@ -511,7 +547,7 @@ def build_trend_figure(metal_spot: pd.DataFrame, metal_forecast: pd.DataFrame, c
             mode="lines",
             fill="tonexty",
             line={"width": 0},
-            name="80%预测区间（P10–P90）",
+            name="80% 可能范围（P10–P90）",
             fillcolor="rgba(46, 120, 246, 0.13)",
             hoverinfo="skip",
         )
@@ -639,18 +675,22 @@ def render_top_impact_factors(metal: str) -> None:
     factors = coefficients[coefficients["品种"] == material].copy()
     if factors.empty:
         return
-    factors = factors.sort_values("强弱排名").head(5).sort_values("影响强度_绝对值")
+    factors = factors.sort_values("强弱排名").head(5).copy()
+    factors["展示名称"] = factors["变量"].map(plain_factor_name)
+    factors["数据来源"] = factors["变量"].map(lambda value: factor_source(str(value))[0])
+    factors["数据链接"] = factors["变量"].map(lambda value: factor_source(str(value))[1])
+    factors = factors.sort_values("影响强度_绝对值")
     colors = np.where(factors["回归方向"].eq("正向"), "#A8C5B9", "#C98A91")
     fig = go.Figure(
         go.Bar(
-            x=factors["标准化系数"],
-            y=factors["变量"],
+            x=factors["影响强度_绝对值"],
+            y=factors["展示名称"],
             orientation="h",
             marker_color=colors,
-            text=[f"{value:+.3f}" for value in factors["标准化系数"]],
+            text=[f"{value:.2f}" for value in factors["影响强度_绝对值"]],
             textposition="outside",
             hovertemplate=(
-                "%{y}<br>标准化系数：%{x:+.3f}<br>影响强度：%{customdata:.3f}<extra></extra>"
+                "%{y}<br>影响强度：%{customdata:.2f}<br>数值越大，说明该因素与价格变化的关联越强。<extra></extra>"
             ),
             customdata=factors["影响强度_绝对值"],
         )
@@ -663,7 +703,7 @@ def render_top_impact_factors(metal: str) -> None:
         font={"color": "#64748b", "size": 12},
         margin={"l": 210, "r": 55, "t": 10, "b": 28},
         showlegend=False,
-        xaxis_title="标准化回归系数",
+        xaxis_title="影响强度",
     )
     fig.update_xaxes(
         showgrid=True,
@@ -674,7 +714,12 @@ def render_top_impact_factors(metal: str) -> None:
     )
     fig.update_yaxes(showgrid=False)
     st.markdown('<div class="section-title">影响因素 Top 5</div>', unsafe_allow_html=True)
+    st.caption("影响强度用于比较各因素与价格变化的关联程度；它不表示因果关系，也不代表价格会按同样幅度变化。")
     st.plotly_chart(fig, width="stretch")
+    st.caption("点击下方因素可查看对应官方或原始数据发布页面。")
+    source_columns = st.columns(len(factors))
+    for column, (_, factor) in zip(source_columns, factors.sort_values("强弱排名").iterrows()):
+        column.link_button(f"{factor['展示名称']} · 数据来源", factor["数据链接"], width="stretch")
 
 
 def render_market_cards(spot: pd.DataFrame, metals: list[str], display: dict[str, str]) -> None:
@@ -700,6 +745,7 @@ def render_home_overview(
 ) -> None:
     st.markdown('<div class="section-title">市场概览</div>', unsafe_allow_html=True)
     render_market_cards(spot, metals, display)
+    st.caption("卡片中的箭头和百分比表示最新不含税现货均价相较 5 个交易日前的变化：上箭头为上涨，下箭头为下跌。")
 
     trend_title, trend_window = st.columns([3, 2])
     trend_title.markdown('<div class="section-title">综合价格趋势</div>', unsafe_allow_html=True)
@@ -758,7 +804,7 @@ def render_home_overview(
             last_price = float(forecast.iloc[-1]["predicted_price_cny_per_tonne"])
             forecast_summaries.append((display.get(metal, metal), first_price, last_price, last_price / first_price - 1))
 
-    st.markdown('<div class="section-title">未来30天走势</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">第 30 日预测价格</div>', unsafe_allow_html=True)
     future_cards = st.columns(len(forecast_summaries))
     for column, (name, first_price, last_price, change) in zip(future_cards, forecast_summaries):
         if abs(change) < 0.005:
@@ -771,7 +817,7 @@ def render_home_overview(
             f'''<div class="future-card">
                 <div class="future-card-title">{name}</div>
                 <div class="future-card-value">{last_price:,.0f} 元/吨</div>
-                <div class="future-card-meta">预测起点：{first_price:,.0f} 元/吨<br>30日变化：{change:+.2%}</div>
+                <div class="future-card-meta">第 30 日预测价格<br>相对首日预测：{change:+.2%}</div>
                 <div class="future-card-trend {direction_class}">{direction}</div>
             </div>''',
             unsafe_allow_html=True,
@@ -790,13 +836,13 @@ def render_report_center(
         [
             {"报告": "日度价格预测", "内容": "六种原材料未来30天预测", "状态": "可用" if not forecasts.empty else "暂无"},
             {"报告": "月度均价预测", "内容": "各原材料月度预测均价", "状态": "可用" if not monthly_forecasts.empty else "暂无"},
-            {"报告": "影响因素分析", "内容": "标准化回归系数与 Top 5 驱动因素", "状态": "可用" if not load_factor_coefficients().empty else "暂无"},
+            {"报告": "影响因素分析", "内容": "影响强度与 Top 5 主要因素", "状态": "可用" if not load_factor_coefficients().empty else "暂无"},
             {"报告": "数据更新记录", "内容": "最近数据更新与模型重训状态", "状态": "可用" if not runs.empty else "暂无"},
         ]
     )
     with catalog_column:
         st.dataframe(reports, width="stretch", hide_index=True)
-        st.markdown('<div class="section-title">预测数据导出</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-title">数据导出</div>', unsafe_allow_html=True)
         export = forecasts.copy()
         if not export.empty:
             export["品种"] = export["metal"].map(display).fillna(export["metal"])
@@ -826,6 +872,14 @@ def render_report_center(
                 monthly_export.to_csv(index=False, encoding="utf-8-sig").encode("utf-8-sig"),
                 file_name="国内原材料月度预测.csv",
                 mime="text/csv",
+            )
+        if MONTHLY_RAW_DATA.exists():
+            st.download_button(
+                "下载原始月度数据 CSV",
+                MONTHLY_RAW_DATA.read_bytes(),
+                file_name="国内原材料原始月度数据.csv",
+                mime="text/csv",
+                help="包含建模前汇集的月度原始指标数据。",
             )
     with status_column:
         st.metric("日度预测", "已生成" if not forecasts.empty else "暂无")
@@ -1288,6 +1342,10 @@ def render_backtest(
     metrics[1].metric("MAE", f"{mae:,.2f}")
     metrics[2].metric("MAPE", f"{mape:.2f}%")
     metrics[3].metric("RMSE", f"{rmse:,.2f}")
+    st.markdown(
+        '<div class="comparison-note">指标说明：MAE（平均绝对误差）表示每个月的预测价格平均相差多少元/吨；MAPE（平均绝对百分比误差）表示平均相差真实价格的百分之多少；RMSE（均方根误差）会对较大的偏差给予更高权重。三项指标均为越低越好。</div>',
+        unsafe_allow_html=True,
+    )
     fig = go.Figure()
     fig.add_trace(
         go.Scatter(
@@ -1335,44 +1393,43 @@ def render_backtest(
 
 
 def render_model_formula() -> None:
-    st.subheader("预测模型与公式")
+    st.subheader("模型说明")
     st.markdown(
         """
-        当前看板使用 `daily-hybrid-variable-anchor-v1`。它不是单一模型：先由多个日度模型竞争，
-        再在有可用月度预测时进行月均价锚定，最后按每个品种、每个预测步长的历史回测误差择优展示。
+        看板使用的是组合预测模型，而不是只依赖一种算法。它会同时参考近期价格变化、历史价格规律和月度影响因素，
+        再用过去的实际结果检验不同方法，选择在相近情形下误差较小的结果。所有价格均为不含税价格；预测用于辅助判断，并非对未来价格的保证。
         """
     )
 
     st.markdown('<div class="section-title">1. 日度候选模型</div>', unsafe_allow_html=True)
     st.markdown(
         """
-        对每个品种分别回测并比较：最近价（Naive）、不同窗口的对数漂移、Ridge 直接多步预测、
-        ARIMA 对数价格预测，以及中位数集成。候选模型的权重来自滚动历史验证，而不是固定指定。
+        系统会为每种原材料同时计算多种预测：以最近价格为基准、根据近期变化速度推演、根据历史规律推演，以及把多种结果综合起来。
+        每种方法都会用过去一段时间的真实价格反复检验，表现更稳定的方法会获得更高权重。
         """
     )
 
-    st.markdown('<div class="section-title">2. 月均价锚定</div>', unsafe_allow_html=True)
-    st.latex(r"P^{hybrid}_{t+h}=P^{daily}_{t+h}+w_h\,(T_m-\overline{P}^{daily}_m)")
+    st.markdown('<div class="section-title">2. 与月度判断保持一致</div>', unsafe_allow_html=True)
     st.markdown(
         """
-        `T_m` 是月度变量模型给出的该月均价目标，`P_daily_month` 是日度预测在该月的均值。
-        锚定权重 `w_h` 随预测步长由 0 平滑升至最多 0.75，使近端预测保留日度模型信息、远端预测与月均价保持一致。
+        当月度模型能够给出可靠的月均价判断时，系统会适度校准日度预测，使同一个月内的每日预测与月度判断不互相矛盾。
+        越靠近预测起点，越保留近期日度价格信号；预测日期越远，越多参考月度信息。
         """
     )
 
     st.markdown('<div class="section-title">3. 自适应择优</div>', unsafe_allow_html=True)
     st.markdown(
         """
-        对每个“品种 × 预测天数”，只有当月度锚定模型在历史回测中 MAE 低于日度集成时，
-        看板才采用锚定结果；否则显示日度集成结果。因此不同品种、不同日期可能来自不同分支。
+        系统会按“原材料种类”和“预测到第几天”分别比较历史表现。只有某种方法过去的平均误差更低时，才会采用它；否则保留另一种方法的结果。
+        因此不同原材料、不同预测日期采用的计算路径可能不同。
         """
     )
 
     st.markdown('<div class="section-title">4. 预测区间</div>', unsafe_allow_html=True)
     st.markdown(
         """
-        阴影是 P10–P90，即模型给出的 80% 预测区间；并且现已按原始上下界绘制，不再做视觉放宽。
-        鼠标停在红色预测点上会显示该日的预测均价及完整区间，单位统一为元/吨。
+        每个预测日期都会给出一个最可能的价格和一个合理范围。该范围覆盖模型认为有约 80% 可能出现的价格区间，
+        不代表价格一定会落在其中。鼠标停在预测点上可查看该日的预测均价与完整范围，单位统一为元/吨。
         """
     )
 
@@ -1498,7 +1555,7 @@ def main() -> None:
             st.session_state["show_landing"] = True
             st.query_params.clear()
             st.rerun()
-        page = st.radio("导航", ["首页概览", "预测总览", "历史回测", "模型与口径", "报告中心", "更新记录"], label_visibility="collapsed")
+        page = st.radio("导航", ["首页概览", "预测总览", "历史回测", "模型说明", "报告中心", "更新记录"], label_visibility="collapsed")
         st.markdown("---")
         selected_metal = st.selectbox("跟踪品种", metals, format_func=lambda item: display.get(item, item))
         st.markdown(
@@ -1520,7 +1577,9 @@ def main() -> None:
 
         latest_price = metal_spot.iloc[-1]["price_cny_per_tonne"]
         change_5d = metal_spot["price_cny_per_tonne"].pct_change(5).iloc[-1]
+        st.markdown('<div class="section-title">市场概览</div>', unsafe_allow_html=True)
         render_market_cards(spot, metals, display)
+        st.caption("卡片中的箭头和百分比表示最新不含税现货均价相较 5 个交易日前的变化：上箭头为上涨，下箭头为下跌。")
 
         fig = build_trend_figure(metal_spot, metal_forecast, colors[metal])
         chart_column, model_column = st.columns([3, 1])
@@ -1528,7 +1587,7 @@ def main() -> None:
             st.markdown('<div class="section-title">价格趋势 · ' + display.get(metal, metal) + '</div>', unsafe_allow_html=True)
             st.plotly_chart(fig, width="stretch")
             st.markdown(
-                '<div class="forecast-note"><b>读图方式：</b>实线为已公布的不含税现货均价，蓝线为未来 30 天预测，浅蓝阴影为 P10–P90 的 80% 预测区间。</div>',
+                '<div class="forecast-note"><b>读图方式：</b>实线为已公布的不含税现货均价；蓝线为未来 30 天每天的预测价格；浅蓝阴影是预测的合理范围。该范围为 P10–P90，意思是模型认为约有 80% 的可能性，实际价格会落在阴影的下沿与上沿之间。阴影越宽，表示该日期的不确定性越高；它不是价格一定会达到的上下限。</div>',
                 unsafe_allow_html=True,
             )
         with model_column:
@@ -1566,7 +1625,7 @@ def main() -> None:
     elif page == "历史回测":
         render_backtest(spot, market_features, metals, display, colors, config.model_version)
 
-    elif page == "模型与口径":
+    elif page == "模型说明":
         render_model_formula()
 
     elif page == "报告中心":
