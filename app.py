@@ -97,8 +97,20 @@ FACTOR_SOURCE_LINKS = {
     "企业商品价格": ("国家统计局数据查询", "https://data.stats.gov.cn/"),
 }
 
+FACTOR_DISPLAY_NAMES = {
+    "ADC12_A00价差_滞后1期变化": "ADC12 与 A00铝的价格差",
+    "ZLD104_A00价差_滞后1期变化": "ZLD104 与 A00铝的价格差",
+    "A00铝_价格月环比": "A00铝价格",
+    "发电量当期值_环比": "全国发电量",
+    "发电机组产量当期值_环比": "全国发电机组产量",
+    "企业商品价格矿产品环比增长": "矿产品企业商品价格指数",
+    "企业商品价格煤油电环比增长": "煤油电企业商品价格指数",
+}
+
 
 def plain_factor_name(name: str) -> str:
+    if name in FACTOR_DISPLAY_NAMES:
+        return FACTOR_DISPLAY_NAMES[name]
     cleaned = str(name)
     for suffix in (
         "_滞后1期变化",
@@ -563,7 +575,7 @@ def build_trend_figure(metal_spot: pd.DataFrame, metal_forecast: pd.DataFrame, c
             mode="lines",
             fill="tonexty",
             line={"width": 0},
-            name="80% 可能范围（P10–P90）",
+            name="80% 可能范围",
             fillcolor="rgba(46, 120, 246, 0.13)",
             hoverinfo="skip",
         )
@@ -1424,8 +1436,8 @@ def render_model_formula() -> None:
         每种方法都会用过去一段时间的真实价格反复检验，表现更稳定的方法会获得更高权重。
         """
     )
-    st.latex(r"\hat{P}^{daily}_{t+h}=\operatorname{median}(\hat{P}^{recent}_{t+h},\hat{P}^{trend}_{t+h},\hat{P}^{history}_{t+h})")
-    st.caption("上式表示：对同一天的多种预测结果取中间值，避免单一方法出现异常时对结果造成过大影响。P 表示价格，t 表示当前日期，h 表示预测到未来第几天，带“帽子”的 P 表示预测价格。")
+    st.latex(r"P^{daily}_{t+h}=\operatorname{median}(P^{recent}_{t+h},P^{trend}_{t+h},P^{history}_{t+h})")
+    st.caption("上式表示：对同一天的多种预测结果取中间值，避免单一方法出现异常时对结果造成过大影响。P 表示价格，t 表示当前日期，h 表示预测到未来第几天。")
 
     st.markdown('<div class="section-title">2. 与月度判断保持一致</div>', unsafe_allow_html=True)
     st.markdown(
@@ -1434,7 +1446,7 @@ def render_model_formula() -> None:
         越靠近预测起点，越保留近期日度价格信号；预测日期越远，越多参考月度信息。
         """
     )
-    st.latex(r"\hat{P}^{final}_{t+h}=\hat{P}^{daily}_{t+h}+w_h\,(T_m-\overline{P}^{daily}_m)")
+    st.latex(r"P^{final}_{t+h}=P^{daily}_{t+h}+w_h\,(T_m-\overline{P}^{daily}_m)")
     st.caption("上式表示：最终预测价格 = 日度预测价格 + 校准值。Tₘ 是该月的月均价判断，P̄ᵈᵃⁱˡʸₘ 是日度预测在该月的平均值；两者的差距会按权重 wₕ 逐步加入最终结果。")
 
     st.markdown('<div class="section-title">3. 自适应择优</div>', unsafe_allow_html=True)
