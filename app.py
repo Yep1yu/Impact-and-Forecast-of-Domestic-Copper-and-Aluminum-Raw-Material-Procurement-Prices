@@ -100,13 +100,29 @@ FACTOR_SOURCE_LINKS = {
 
 def plain_factor_name(name: str) -> str:
     cleaned = str(name)
-    for suffix in ("_滞后1期变化", "_当月同比增长", "_环比增长", "_环比", "_变化"):
+    for suffix in (
+        "_滞后1期变化",
+        "滞后1期变化",
+        "_当月同比增长",
+        "当月同比增长",
+        "同比增长",
+        "_环比增长",
+        "环比增长",
+        "价格月环比",
+        "_环比",
+        "环比",
+        "_变化",
+        "变化",
+        "当期值",
+        "当月",
+    ):
         cleaned = cleaned.replace(suffix, "")
     cleaned = cleaned.replace("SHFE", "上海期货交易所（SHFE）")
+    cleaned = cleaned.replace("主连", "主力连续合约")
     cleaned = cleaned.replace("PPI", "工业生产者出厂价格指数（PPI）")
     cleaned = cleaned.replace("制造业PMI", "制造业采购经理指数（PMI）")
     cleaned = cleaned.replace("非制造业PMI", "非制造业采购经理指数（PMI）")
-    return cleaned
+    return cleaned.strip("_")
 
 
 def factor_source(name: str) -> tuple[str, str]:
@@ -745,7 +761,7 @@ def render_home_overview(
 ) -> None:
     st.markdown('<div class="section-title">市场概览</div>', unsafe_allow_html=True)
     render_market_cards(spot, metals, display)
-    st.caption("卡片中的箭头和百分比表示最新不含税现货均价相较 5 个交易日前的变化：上箭头为上涨，下箭头为下跌。")
+    st.caption("数值表示最新不含税现货均价相较 5 个交易日前的变化。")
 
     trend_title, trend_window = st.columns([3, 2])
     trend_title.markdown('<div class="section-title">综合价格趋势</div>', unsafe_allow_html=True)
@@ -1408,6 +1424,8 @@ def render_model_formula() -> None:
         每种方法都会用过去一段时间的真实价格反复检验，表现更稳定的方法会获得更高权重。
         """
     )
+    st.latex(r"\hat{P}^{daily}_{t+h}=\operatorname{median}(\hat{P}^{recent}_{t+h},\hat{P}^{trend}_{t+h},\hat{P}^{history}_{t+h})")
+    st.caption("上式表示：对同一天的多种预测结果取中间值，避免单一方法出现异常时对结果造成过大影响。P 表示价格，t 表示当前日期，h 表示预测到未来第几天，带“帽子”的 P 表示预测价格。")
 
     st.markdown('<div class="section-title">2. 与月度判断保持一致</div>', unsafe_allow_html=True)
     st.markdown(
@@ -1416,6 +1434,8 @@ def render_model_formula() -> None:
         越靠近预测起点，越保留近期日度价格信号；预测日期越远，越多参考月度信息。
         """
     )
+    st.latex(r"\hat{P}^{final}_{t+h}=\hat{P}^{daily}_{t+h}+w_h\,(T_m-\overline{P}^{daily}_m)")
+    st.caption("上式表示：最终预测价格 = 日度预测价格 + 校准值。Tₘ 是该月的月均价判断，P̄ᵈᵃⁱˡʸₘ 是日度预测在该月的平均值；两者的差距会按权重 wₕ 逐步加入最终结果。")
 
     st.markdown('<div class="section-title">3. 自适应择优</div>', unsafe_allow_html=True)
     st.markdown(
@@ -1432,6 +1452,15 @@ def render_model_formula() -> None:
         不代表价格一定会落在其中。鼠标停在预测点上可查看该日的预测均价与完整范围，单位统一为元/吨。
         """
     )
+
+    st.markdown('<div class="section-title">5. 如何评估预测是否可靠</div>', unsafe_allow_html=True)
+    st.markdown("以下指标将预测价格与之后实际公布的价格逐日或逐月对比。n 为对比次数，ŷᵢ 为第 i 次预测价格，yᵢ 为对应的实际价格。三项指标均越低越好。")
+    st.latex(r"MAE=\frac{1}{n}\sum_{i=1}^{n}|\hat{y}_i-y_i|")
+    st.caption("MAE：平均每次预测相差多少元/吨。")
+    st.latex(r"MAPE=\frac{100\%}{n}\sum_{i=1}^{n}\left|\frac{\hat{y}_i-y_i}{y_i}\right|")
+    st.caption("MAPE：平均误差占实际价格的百分之多少。")
+    st.latex(r"RMSE=\sqrt{\frac{1}{n}\sum_{i=1}^{n}(\hat{y}_i-y_i)^2}")
+    st.caption("RMSE：会更重视偏差特别大的预测，用于识别是否存在较明显的单次失准。")
 
 
 @st.cache_data(show_spinner=False)
@@ -1500,7 +1529,7 @@ def main() -> None:
         <div class="hero">
             <div class="eyebrow">Metal intelligence · tax-exclusive basis</div>
             <h1>国内原材料采购价格预测</h1>
-            <p>基于国内公开日度价格与碳酸锂期货结算价，统一按不含税口径跟踪 1#铜、A00铝、1#白银、铝ADC12、ZLD104 和碳酸锂的历史趋势与未来预测。</p>
+            <p>基于长江有色金属网公开日度价格与碳酸锂广州期货结算价，统一按不含税价格进行 1#铜、A00铝、1#白银、铝ADC12、ZLD104 和碳酸锂的历史趋势分析与未来价格预测。</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -1579,7 +1608,7 @@ def main() -> None:
         change_5d = metal_spot["price_cny_per_tonne"].pct_change(5).iloc[-1]
         st.markdown('<div class="section-title">市场概览</div>', unsafe_allow_html=True)
         render_market_cards(spot, metals, display)
-        st.caption("卡片中的箭头和百分比表示最新不含税现货均价相较 5 个交易日前的变化：上箭头为上涨，下箭头为下跌。")
+        st.caption("数值表示最新不含税现货均价相较 5 个交易日前的变化。")
 
         fig = build_trend_figure(metal_spot, metal_forecast, colors[metal])
         chart_column, model_column = st.columns([3, 1])
