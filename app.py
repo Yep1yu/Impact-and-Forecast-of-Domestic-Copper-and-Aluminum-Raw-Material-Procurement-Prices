@@ -1616,7 +1616,7 @@ def main() -> None:
             st.markdown('<div class="section-title">价格趋势 · ' + display.get(metal, metal) + '</div>', unsafe_allow_html=True)
             st.plotly_chart(fig, width="stretch")
             st.markdown(
-                '<div class="forecast-note"><b>读图方式：</b>实线为已公布的不含税现货均价；蓝线为未来 30 天每天的预测价格；浅蓝阴影是预测的合理范围。该范围为 P10–P90，意思是模型认为约有 80% 的可能性，实际价格会落在阴影的下沿与上沿之间。阴影越宽，表示该日期的不确定性越高；它不是价格一定会达到的上下限。</div>',
+                '<div class="forecast-note"><b>读图方式：</b>实线为已公布的不含税现货均价；蓝线为未来 30 天每天的预测价格；浅蓝阴影是预测的合理范围，意思是价格大约有 80% 的概率落在这两条边界之间。</div>',
                 unsafe_allow_html=True,
             )
         with model_column:
