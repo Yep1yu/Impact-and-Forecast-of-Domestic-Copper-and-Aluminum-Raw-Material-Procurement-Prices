@@ -65,10 +65,19 @@ CREATE TABLE IF NOT EXISTS update_runs (
 """
 
 
-def connect(database_path: str | Path) -> sqlite3.Connection:
-    conn = sqlite3.connect(Path(database_path))
+def connect(database_path: str | Path, *, read_only: bool = False) -> sqlite3.Connection:
+    path = Path(database_path)
+    if read_only:
+        resolved = path.resolve().as_posix()
+        conn = sqlite3.connect(f"file:{resolved}?mode=ro&immutable=1", uri=True)
+        conn.execute("PRAGMA query_only = ON")
+        return conn
+
+    conn = sqlite3.connect(path)
     conn.execute("PRAGMA foreign_keys = ON")
-    conn.execute("PRAGMA journal_mode = WAL")
+    # The published database is a single Git-tracked file. DELETE journaling
+    # prevents WAL sidecar files from being required by Streamlit Cloud.
+    conn.execute("PRAGMA journal_mode = DELETE")
     return conn
 
 

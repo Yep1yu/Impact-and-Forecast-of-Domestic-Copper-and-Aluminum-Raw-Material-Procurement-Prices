@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import tempfile
 import unittest
+import sqlite3
 from pathlib import Path
 
 import numpy as np
@@ -51,6 +52,14 @@ class DomesticPricePipelineTest(unittest.TestCase):
             self.assertEqual(len(forecast[forecast["metal"] == "aluminum"]), 30)
             self.assertTrue((forecast["lower_bound"] <= forecast["predicted_price_cny_per_tonne"]).all())
             self.assertTrue((forecast["upper_bound"] >= forecast["predicted_price_cny_per_tonne"]).all())
+
+            read_only_conn = connect(db_path, read_only=True)
+            try:
+                self.assertEqual(len(load_spot_prices(read_only_conn)), len(spot))
+                with self.assertRaises(sqlite3.OperationalError):
+                    read_only_conn.execute("DELETE FROM domestic_spot_prices")
+            finally:
+                read_only_conn.close()
 
     @staticmethod
     def _write_sample_spot_csv(path: Path) -> None:
