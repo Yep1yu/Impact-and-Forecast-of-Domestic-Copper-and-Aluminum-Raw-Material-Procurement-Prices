@@ -16,7 +16,6 @@ import streamlit as st
 from domestic_prices.config import load_config
 from domestic_prices.db import (
     connect,
-    initialize,
     load_latest_monthly_forecasts,
     load_latest_forecasts,
     load_market_features,
@@ -1618,8 +1617,7 @@ def main() -> None:
 
     config = load_config()
     display = {**DEFAULT_DISPLAY, **{metal: name for metal, name in config.excel.columns.items()}}
-    conn = connect(config.database_path)
-    initialize(conn)
+    conn = connect(config.database_path, read_only=True)
 
     try:
         spot = load_spot_prices(conn)

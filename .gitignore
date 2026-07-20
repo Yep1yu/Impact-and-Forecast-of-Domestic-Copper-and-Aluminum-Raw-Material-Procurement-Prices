@@ -10,6 +10,9 @@ __pycache__/
 .pytest_cache/
 .streamlit/secrets.toml
 .mplconfig/
+*.sqlite-shm
+*.sqlite-wal
+*.sqlite-journal
 
 # Local temporary output
 .tmp/
