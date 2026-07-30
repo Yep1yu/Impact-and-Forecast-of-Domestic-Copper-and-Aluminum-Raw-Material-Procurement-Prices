@@ -3,6 +3,7 @@ from __future__ import annotations
 import random
 import sqlite3
 import base64
+import html
 from io import BytesIO
 from datetime import date, timedelta
 from pathlib import Path
@@ -12,19 +13,30 @@ import pandas as pd
 import plotly.graph_objects as go
 import statsmodels.api as sm
 import streamlit as st
+from plotly.subplots import make_subplots
 
+from domestic_prices.analytics import (
+    build_market_relationship_snapshot,
+    build_driver_snapshot,
+    ensure_monthly_horizon,
+    events_in_range,
+    factor_series,
+    filter_price_history,
+    load_curated_factor_catalog,
+    load_monthly_dataset,
+    load_verified_events,
+    terminal_snapshot,
+)
 from domestic_prices.config import load_config
 from domestic_prices.db import (
     connect,
+    load_latest_forecast_driver_contributions,
     load_latest_monthly_forecasts,
     load_latest_forecasts,
     load_market_features,
     load_spot_prices,
     load_update_runs,
 )
-from domestic_prices.model import build_feature_snapshot
-
-
 DEFAULT_DISPLAY = {
     "copper": "铜",
     "aluminum": "铝",
@@ -35,15 +47,21 @@ DEFAULT_DISPLAY = {
     "aluminum_zld104": "铸造铝合金锭(ZLD104)",
     "lithium_carbonate": "碳酸锂",
 }
-PALETTE = ["#E77A3D", "#2BB9A8", "#A66BE7", "#F0A83B", "#D8568B"]
+PALETTE = ["#8B1E2D", "#A63D2F", "#4B5563", "#B45359", "#7F1D1D"]
 METAL_COLORS = {
-    "copper_1": "#E77A3D",
-    "aluminum_a00": "#2BB9A8",
-    "silver_1": "#A66BE7",
-    "aluminum_adc12": "#F0A83B",
-    "aluminum_zld104": "#D8568B",
-    "lithium_carbonate": "#4C78A8",
+    "copper_1": "#A63D2F",
+    "aluminum_a00": "#8B1E2D",
+    "silver_1": "#4B5563",
+    "aluminum_adc12": "#B45359",
+    "aluminum_zld104": "#7F1D1D",
+    "lithium_carbonate": "#A32035",
 }
+
+
+def price_unit(metal: str) -> str:
+    return "元/千克" if metal == "silver_1" else "元/吨"
+
+
 FACTOR_CN = {
     "price_cny_per_tonne": "最新不含税现货均价",
     "lag_1": "1日前价格",
@@ -89,7 +107,15 @@ FACTOR_SOURCE_LINKS = {
     "光缆": ("国家统计局数据查询", "https://data.stats.gov.cn/"),
     "电线电缆": ("国家统计局数据查询", "https://data.stats.gov.cn/"),
     "发电量": ("国家统计局数据查询", "https://data.stats.gov.cn/"),
-    "进口": ("国家统计局数据查询", "https://data.stats.gov.cn/"),
+    "当月进口额": (
+        "海关总署统计月报",
+        "http://www.customs.gov.cn/customs/302249/zfxxgk/2799825/302274/302277/index.html",
+    ),
+    "废铝进口量": (
+        "海关总署统计月报",
+        "http://www.customs.gov.cn/customs/302249/zfxxgk/2799825/302274/302277/index.html",
+    ),
+    "汽车销量Top50": ("盖世汽车销量排行榜", "https://auto.gasgoo.com/qcxl/"),
     "汽车": ("中国汽车工业协会", "http://www.caam.org.cn/"),
     "中国贸易政策不确定性": ("经济政策不确定性指数数据库", "https://www.policyuncertainty.com/china_monthly.html"),
     "中国经济政策不确定性": ("经济政策不确定性指数数据库", "https://www.policyuncertainty.com/china_monthly.html"),
@@ -105,13 +131,32 @@ MONTHLY_EXPORT_MATERIALS = {
 }
 
 FACTOR_DISPLAY_NAMES = {
+    "SHFE铜主连收盘价_环比": "上海期货交易所（SHFE）铜主力连续合约收盘价月环比",
+    "SHFE铜仓单库存_环比": "上海期货交易所（SHFE）铜仓单库存月环比",
+    "SHFE铜主连成交量_环比": "上海期货交易所（SHFE）铜主力连续合约成交量月环比",
+    "SHFE铝主连收盘价_环比": "上海期货交易所（SHFE）铝主力连续合约收盘价月环比",
+    "SHFE铝仓单库存_环比": "上海期货交易所（SHFE）铝仓单库存月环比",
+    "电线电缆光缆及电工器材制造PPI_环比": "电线电缆、光缆及电工器材制造业工业生产者出厂价格指数（PPI）月环比",
+    "光缆产量当期值_环比": "全国光缆产量月环比",
+    "工业增加值同比增长": "全国规模以上工业增加值同比增速",
+    "制造业PMI_变化": "制造业采购经理指数（PMI）月度变化",
+    "当月进口额环比增长": "中国海关货物进口总额月度环比增速（美元计价）",
+    "汽车产量当期值_环比": "全国汽车产量月环比",
+    "新能源汽车产量当期值_环比": "全国新能源汽车产量月环比",
+    "房间空气调节器产量当期值_环比": "全国房间空气调节器产量月环比",
+    "家用电冰箱产量当期值_环比": "全国家用电冰箱产量月环比",
+    "PPI当月同比增长": "全国工业生产者出厂价格指数（PPI）同比增速",
+    "中国经济政策不确定性指数_变化": "中国经济政策不确定性指数月度变化",
+    "中国贸易政策不确定性指数_变化": "中国贸易政策不确定性指数月度变化",
     "ADC12_A00价差_滞后1期变化": "ADC12 与 A00铝的价格差",
     "ZLD104_A00价差_滞后1期变化": "ZLD104 与 A00铝的价格差",
-    "A00铝_价格月环比": "A00铝价格",
-    "发电量当期值_环比": "全国发电量",
-    "发电机组产量当期值_环比": "全国发电机组产量",
-    "企业商品价格矿产品环比增长": "矿产品企业商品价格指数",
-    "企业商品价格煤油电环比增长": "煤油电企业商品价格指数",
+    "A00铝_价格月环比": "A00铝现货月均价环比",
+    "汽车销量Top50厂商合计_环比": "盖世汽车销量榜前50家厂商销量合计月环比",
+    "废铝进口量_环比": "中国废铝进口量月环比",
+    "发电量当期值_环比": "全国发电量月环比",
+    "发电机组产量当期值_环比": "全国发电机组产量月环比",
+    "企业商品价格矿产品环比增长": "矿产品企业商品价格指数月度环比增速",
+    "企业商品价格煤油电环比增长": "煤油电企业商品价格指数月度环比增速",
 }
 
 
@@ -211,21 +256,56 @@ def load_factor_coefficients() -> pd.DataFrame:
     if not FACTOR_COEFFICIENTS.exists():
         return pd.DataFrame()
     coefficients = pd.read_csv(FACTOR_COEFFICIENTS, encoding="utf-8-sig")
-    lithium_path = Path(__file__).resolve().parent / "lithium_carbonate_prediction_outputs" / "lithium_impact_regression_screening.csv"
+    lithium_path = Path(__file__).resolve().parent / "lithium_carbonate_prediction_outputs" / "lithium_monthly_model_coefficients.csv"
     if lithium_path.exists():
         lithium = pd.read_csv(lithium_path, encoding="utf-8-sig")
-        lithium = lithium.rename(
-            columns={
-                "标准化系数": "标准化系数",
-                "影响强度_绝对值": "影响强度_绝对值",
-                "方向": "回归方向",
-            }
-        )
-        lithium["模型版本"] = "碳酸锂影响变量回归"
-        lithium["强弱排名"] = lithium.groupby("品种")["影响强度_绝对值"].rank(method="first", ascending=False).astype(int)
-        columns = ["品种", "模型版本", "目标变量", "变量", "标准化系数", "影响强度_绝对值", "p值", "显著性", "回归方向", "强弱排名"]
-        coefficients = pd.concat([coefficients, lithium[columns]], ignore_index=True)
+        if {"变量", "系数"}.issubset(lithium.columns):
+            lithium = lithium[
+                lithium["变量"].isin(
+                    {
+                        "新能源汽车产量当期值_环比",
+                        "汽车产量当期值_环比",
+                        "制造业PMI_变化",
+                        "工业增加值同比增长",
+                        "企业商品价格矿产品环比增长",
+                        "企业商品价格煤油电环比增长",
+                    }
+                )
+            ].copy()
+            lithium["品种"] = "碳酸锂"
+            lithium["模型版本"] = lithium.get("模型版本", "碳酸锂产业逻辑约束模型")
+            lithium["目标变量"] = "碳酸锂价格月环比"
+            lithium["标准化系数"] = lithium["系数"]
+            lithium["影响强度_绝对值"] = lithium["系数"].abs()
+            lithium["p值"] = np.nan
+            lithium["显著性"] = "时间序列验证"
+            lithium["回归方向"] = np.where(lithium["系数"] >= 0, "正向", "负向")
+            lithium["强弱排名"] = (
+                lithium["影响强度_绝对值"]
+                .rank(method="first", ascending=False)
+                .astype(int)
+            )
+            columns = [
+                "品种",
+                "模型版本",
+                "目标变量",
+                "变量",
+                "标准化系数",
+                "影响强度_绝对值",
+                "p值",
+                "显著性",
+                "回归方向",
+                "强弱排名",
+            ]
+            coefficients = pd.concat([coefficients, lithium[columns]], ignore_index=True)
     return coefficients
+
+
+def load_dashboard_analysis_data() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    monthly = load_monthly_dataset()
+    catalog = load_curated_factor_catalog(monthly)
+    events = load_verified_events()
+    return monthly, catalog, events
 
 
 def inject_style() -> None:
@@ -447,6 +527,40 @@ def inject_style() -> None:
             min-height: 126px;
             padding: 14px;
         }}
+        .market-card {{
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            min-height: 118px;
+            padding: 14px;
+        }}
+        .market-card-title {{
+            color: #4f5f73;
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1.35;
+            min-height: 2.7em;
+            overflow-wrap: anywhere;
+        }}
+        .market-card-value {{
+            color: var(--ink);
+            font-size: clamp(.95rem, 1.35vw, 1.45rem);
+            font-weight: 760;
+            letter-spacing: -.035em;
+            margin-top: 8px;
+            white-space: nowrap;
+        }}
+        .market-card-change {{
+            display: inline-block;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 8px;
+            padding: 3px 7px;
+        }}
+        .market-card-change.up {{ background: #fbe7e9; color: #b73745; }}
+        .market-card-change.down {{ background: #e7f5ec; color: #258553; }}
+        .market-card-change.steady {{ background: #eeeeef; color: #68686d; }}
         .future-card-title {{ color: #4f5f73; font-size: 13px; font-weight: 700; }}
         .future-card-value {{ color: var(--ink); font-size: 20px; font-weight: 760; letter-spacing: -.03em; margin-top: 12px; }}
         .future-card-meta {{ color: var(--muted); font-size: 11px; line-height: 1.5; margin-top: 5px; }}
@@ -480,6 +594,473 @@ def inject_style() -> None:
                 min-width: 0 !important;
             }}
         }}
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # The dashboard keeps Streamlit's native interaction model, while this
+    # final layer gives it a lively editorial identity without hiding data in
+    # decorative glass effects or heavy gradients.
+    st.markdown(
+        """
+        <style>
+        :root {
+            --pulse-ink: #172033;
+            --pulse-muted: #667085;
+            --pulse-line: #dce3ee;
+            --pulse-canvas: #f3f6fb;
+            --pulse-card: #ffffff;
+            --pulse-blue: #246bfd;
+            --pulse-cyan: #00a8c7;
+            --pulse-coral: #f05a47;
+            --pulse-yellow: #f3b63f;
+        }
+
+        .stApp {
+            color: var(--pulse-ink);
+            background:
+                radial-gradient(circle at 94% 5%, rgba(36,107,253,.11), transparent 23rem),
+                radial-gradient(circle at 4% 46%, rgba(0,168,199,.07), transparent 26rem),
+                var(--pulse-canvas);
+        }
+
+        .block-container {
+            max-width: 1480px;
+            padding-top: 1.35rem;
+            padding-bottom: 4rem;
+        }
+
+        section[data-testid="stSidebar"] {
+            background: linear-gradient(180deg, #17243a 0%, #1c2c47 58%, #132035 100%);
+            border-right: 0;
+            box-shadow: 16px 0 42px rgba(24, 40, 72, .12);
+        }
+
+        section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"],
+        section[data-testid="stSidebar"] label,
+        section[data-testid="stSidebar"] p,
+        section[data-testid="stSidebar"] small {
+            color: #d9e4f4;
+        }
+
+        section[data-testid="stSidebar"] .brand {
+            color: #ffffff;
+            letter-spacing: -.02em;
+        }
+
+        section[data-testid="stSidebar"] .brand::after {
+            content: "";
+            display: inline-block;
+            width: .55rem;
+            height: .55rem;
+            margin-left: .45rem;
+            border-radius: 50%;
+            background: #4fd1c5;
+            box-shadow: 0 0 0 6px rgba(79,209,197,.12);
+            animation: pulseDot 2.8s ease-in-out infinite;
+        }
+
+        section[data-testid="stSidebar"] div[role="radiogroup"] label {
+            border-radius: 10px;
+            padding: .6rem .7rem;
+            transition: transform .18s ease, background-color .18s ease;
+        }
+
+        section[data-testid="stSidebar"] div[role="radiogroup"] label:hover {
+            transform: translateX(3px);
+            background: rgba(255,255,255,.07);
+        }
+
+        section[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) {
+            background: rgba(69,126,255,.2);
+            box-shadow: inset 3px 0 0 #65d6e7;
+        }
+
+        .hero {
+            position: relative;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: minmax(0, 1.55fr) minmax(250px, .65fr);
+            align-items: end;
+            min-height: 220px;
+            padding: 2.4rem 2.6rem;
+            margin-bottom: 1.25rem;
+            border: 1px solid rgba(36,107,253,.13);
+            border-radius: 24px;
+            background:
+                linear-gradient(115deg, rgba(255,255,255,.98) 0 54%, rgba(243,248,255,.92) 54% 100%);
+            box-shadow: 0 20px 60px rgba(39, 69, 123, .10);
+            animation: riseIn .52s cubic-bezier(.2,.8,.2,1) both;
+        }
+
+        .hero::before,
+        .hero::after {
+            content: "";
+            position: absolute;
+            pointer-events: none;
+        }
+
+        .hero::before {
+            width: 310px;
+            height: 310px;
+            right: -90px;
+            top: -155px;
+            border: 34px solid rgba(36,107,253,.10);
+            border-radius: 50%;
+        }
+
+        .hero::after {
+            width: 210px;
+            height: 90px;
+            right: 8%;
+            bottom: -42px;
+            border-radius: 50%;
+            background: rgba(0,168,199,.10);
+            transform: rotate(-12deg);
+            filter: blur(2px);
+        }
+
+        .hero h1 {
+            max-width: 760px;
+            margin: .35rem 0 .65rem;
+            color: #172033;
+            font-size: clamp(2.15rem, 4vw, 3.9rem);
+            line-height: 1.04;
+            letter-spacing: -.055em;
+        }
+
+        .hero p {
+            max-width: 720px;
+            margin: 0;
+            color: #5f6f86;
+            font-size: 1rem;
+            line-height: 1.75;
+        }
+
+        .hero .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .38rem .72rem;
+            border-radius: 999px;
+            color: #1752c3;
+            background: #eaf1ff;
+            font-size: .72rem;
+            font-weight: 800;
+            letter-spacing: .09em;
+            text-transform: uppercase;
+        }
+
+        .hero .eyebrow::before {
+            content: "";
+            width: .45rem;
+            height: .45rem;
+            border-radius: 50%;
+            background: var(--pulse-coral);
+        }
+
+        .hero-meta {
+            position: relative;
+            z-index: 1;
+            align-self: center;
+            padding: 1rem 1.1rem;
+            border-left: 3px solid var(--pulse-cyan);
+            color: #34445e;
+            background: rgba(255,255,255,.7);
+            font-size: .88rem;
+            line-height: 1.8;
+        }
+
+        .section-title {
+            margin-top: 2rem;
+            padding: 0 0 .8rem;
+            border-bottom: 1px solid var(--pulse-line);
+            color: #1d2b43;
+            font-size: 1.22rem;
+            letter-spacing: -.02em;
+        }
+
+        .section-title::before {
+            content: "";
+            display: inline-block;
+            width: .55rem;
+            height: .55rem;
+            margin-right: .6rem;
+            border-radius: 3px;
+            background: linear-gradient(135deg, var(--pulse-blue), var(--pulse-cyan));
+            transform: rotate(8deg);
+        }
+
+        div[data-testid="stMetric"] {
+            position: relative;
+            overflow: hidden;
+            min-height: 112px;
+            padding: 1rem 1.05rem;
+            border: 1px solid #e1e7f0;
+            border-radius: 15px;
+            background: rgba(255,255,255,.94);
+            box-shadow: 0 10px 28px rgba(49, 72, 112, .07);
+            transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+            animation: riseIn .45s cubic-bezier(.2,.8,.2,1) both;
+        }
+
+        div[data-testid="stMetric"]::before {
+            width: 4px;
+            height: 42%;
+            left: 0;
+            top: 29%;
+            border-radius: 0 5px 5px 0;
+            background: linear-gradient(180deg, var(--pulse-blue), var(--pulse-cyan));
+        }
+
+        div[data-testid="stMetric"]:hover {
+            transform: translateY(-3px);
+            border-color: #cbd9f2;
+            box-shadow: 0 16px 34px rgba(49,72,112,.12);
+        }
+
+        div[data-testid="stMetric"] [data-testid="stMetricValue"] {
+            color: #172033;
+            font-size: clamp(1.35rem, 2vw, 1.95rem);
+            font-weight: 760;
+            letter-spacing: -.035em;
+        }
+
+        div[data-testid="stPlotlyChart"],
+        div[data-testid="stDataFrame"],
+        div[data-testid="stAlert"] {
+            overflow: hidden;
+            border: 1px solid #e1e7f0;
+            border-radius: 16px;
+            background: #ffffff;
+            box-shadow: 0 12px 34px rgba(49,72,112,.065);
+        }
+
+        div[data-baseweb="select"] > div,
+        div[data-baseweb="input"] > div,
+        div[data-testid="stDateInput"] > div > div,
+        div[role="radiogroup"] {
+            border-radius: 11px !important;
+        }
+
+        div[data-testid="stTabs"] [data-baseweb="tab-list"] {
+            gap: .35rem;
+            padding: .3rem;
+            border: 1px solid #e0e7f1;
+            border-radius: 13px;
+            background: rgba(255,255,255,.82);
+        }
+
+        div[data-testid="stTabs"] button[role="tab"] {
+            border-radius: 9px;
+            transition: background-color .18s ease, color .18s ease, transform .18s ease;
+        }
+
+        div[data-testid="stTabs"] button[role="tab"]:hover {
+            transform: translateY(-1px);
+        }
+
+        div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
+            color: #174daf;
+            background: #eaf1ff;
+        }
+
+        .stButton > button,
+        .stDownloadButton > button,
+        a[data-testid="stLinkButton"] {
+            min-height: 2.65rem;
+            border-radius: 11px;
+            font-weight: 700;
+            transition: transform .18s ease, box-shadow .18s ease;
+        }
+
+        .stButton > button:hover,
+        .stDownloadButton > button:hover,
+        a[data-testid="stLinkButton"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 9px 22px rgba(36,107,253,.14);
+        }
+
+        .future-card {
+            border: 1px solid #e1e7f0;
+            border-radius: 16px;
+            background: #ffffff;
+            box-shadow: 0 10px 28px rgba(49,72,112,.06);
+            transition: transform .2s ease, border-color .2s ease;
+        }
+
+        .future-card:hover {
+            transform: translateY(-3px);
+            border-color: #bfd1f3;
+        }
+
+        @keyframes riseIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 5px rgba(79,209,197,.10); }
+            50% { transform: scale(1.12); box-shadow: 0 0 0 9px rgba(79,209,197,.04); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                scroll-behavior: auto !important;
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: .01ms !important;
+            }
+        }
+
+        @media (max-width: 760px) {
+            .block-container { padding: .9rem .8rem 3rem; }
+            .hero {
+                grid-template-columns: 1fr;
+                min-height: auto;
+                padding: 1.55rem 1.3rem;
+                border-radius: 18px;
+            }
+            .hero h1 { font-size: 2.15rem; }
+            .hero-meta { margin-top: 1.15rem; }
+            div[data-testid="stMetric"] { min-height: 96px; }
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        """
+        <style>
+        :root {
+            --pulse-ink: #202124;
+            --pulse-muted: #6f7278;
+            --pulse-line: #dedfe2;
+            --pulse-canvas: #f5f5f4;
+            --pulse-card: #ffffff;
+            --pulse-blue: #8b1e2d;
+            --pulse-cyan: #c96f7c;
+            --pulse-coral: #8b1e2d;
+        }
+        .stApp {
+            background:
+                linear-gradient(180deg, rgba(247,229,232,.72) 0, rgba(245,245,244,0) 190px),
+                var(--pulse-canvas);
+        }
+        section[data-testid="stSidebar"] {
+            background: linear-gradient(180deg, #242426 0%, #303033 100%);
+            box-shadow: 12px 0 30px rgba(32,32,35,.10);
+        }
+        section[data-testid="stSidebar"] .brand span { color: #e4a5ae; }
+        section[data-testid="stSidebar"] .brand::after { display: none; }
+        section[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) {
+            background: #f7edef;
+            box-shadow: inset 3px 0 0 #a83345;
+        }
+        section[data-testid="stSidebar"] .stRadio label p {
+            color: #b8bac0 !important;
+        }
+        section[data-testid="stSidebar"] .stRadio label:has(input:checked) p {
+            color: #8b1e2d !important;
+        }
+        div[data-testid="stCheckbox"] label[data-baseweb="checkbox"] p {
+            color: #2a2a2d !important;
+            font-weight: 600;
+        }
+        section[data-testid="stSidebar"] div[data-testid="stButton"] button {
+            background: #39393d;
+            border-color: #55555b;
+            color: #f4f4f2;
+        }
+        section[data-testid="stSidebar"] div[data-testid="stButton"] button:hover {
+            background: #48484d;
+            border-color: #77777d;
+            color: #ffffff;
+        }
+        .dashboard-header {
+            align-items: center;
+            display: flex;
+            gap: 1rem;
+            justify-content: space-between;
+            margin: .15rem 0 .9rem;
+            padding: .25rem 0 .8rem;
+            border-bottom: 1px solid var(--pulse-line);
+        }
+        .dashboard-header h1 {
+            color: #202124;
+            font-size: clamp(1.55rem, 2.5vw, 2.15rem);
+            letter-spacing: -.035em;
+            line-height: 1.15;
+            margin: 0;
+        }
+        .dashboard-status {
+            color: #66686d;
+            font-size: .78rem;
+            line-height: 1.55;
+            text-align: right;
+        }
+        .section-title {
+            border-bottom-color: var(--pulse-line);
+            color: #252528;
+        }
+        .section-title::before {
+            background: #8b1e2d;
+            border-radius: 1px;
+            height: .72rem;
+            transform: none;
+            width: .22rem;
+        }
+        div[data-testid="stMetric"],
+        div[data-testid="stPlotlyChart"],
+        div[data-testid="stDataFrame"],
+        div[data-testid="stAlert"],
+        .market-card,
+        .future-card {
+            border-color: #dedfe2;
+            border-radius: 12px;
+            box-shadow: 0 8px 22px rgba(48,43,45,.055);
+        }
+        div[data-testid="stMetric"]::before {
+            background: #8b1e2d;
+        }
+        .stApp div[data-testid="stMetric"] [data-testid="stMetricLabel"]
+        div[data-testid="stMarkdownContainer"] p {
+            color: #68686d !important;
+            opacity: 1 !important;
+        }
+        div[data-testid="stMetric"]:hover,
+        .market-card:hover,
+        .future-card:hover {
+            border-color: #d1a7ad;
+            box-shadow: 0 12px 26px rgba(86,44,51,.09);
+        }
+        div[role="radiogroup"] label:has(input:checked) p { color: #8b1e2d !important; }
+        .st-key-overview_trend_window label[data-baseweb="radio"]:has(input:checked) {
+            background: #f7e5e8;
+            border-color: #e4bcc2;
+        }
+        span[data-baseweb="tag"] {
+            background: #2f2f32 !important;
+            color: #f7f7f5 !important;
+        }
+        span[data-baseweb="tag"] svg { fill: #e6b7be !important; }
+        .analysis-note {
+            color: #74767b;
+            font-size: .78rem;
+            margin: -.25rem 0 .75rem;
+        }
+        .balance-empty {
+            background: #faf4f5;
+            border: 1px solid #ead2d6;
+            border-radius: 10px;
+            color: #775a5f;
+            padding: .8rem .9rem;
+        }
+        @media (max-width: 760px) {
+            .dashboard-header { align-items: flex-start; flex-direction: column; }
+            .dashboard-status { text-align: left; }
+        }
         </style>
         """,
         unsafe_allow_html=True,
@@ -596,7 +1177,120 @@ def render_landing_page() -> None:
     )
 
 
-def build_trend_figure(metal_spot: pd.DataFrame, metal_forecast: pd.DataFrame, color: str) -> go.Figure:
+def _wrap_annotation(value: object, width: int = 15, max_lines: int = 3) -> str:
+    text = str(value).strip()
+    lines = [text[index : index + width] for index in range(0, len(text), width)]
+    if len(lines) > max_lines:
+        lines = lines[:max_lines]
+        lines[-1] = lines[-1][:-1] + "…"
+    return "<br>".join(html.escape(line) for line in lines)
+
+
+def add_market_event_annotations(
+    fig: go.Figure,
+    prices: pd.DataFrame,
+    events: pd.DataFrame,
+) -> None:
+    if prices.empty or events.empty:
+        return
+    marker_rows: list[dict[str, object]] = []
+    date_min = prices["trade_date"].min()
+    date_span = max(prices["trade_date"].max() - date_min, pd.Timedelta(days=1))
+    vertical_offsets = [-58, 76, 148, 230, -128]
+    horizontal_offsets = [105, 185, 90, 165, 120]
+    for number, event in enumerate(events.sort_values("event_date").head(5).itertuples(index=False), start=1):
+        nearest_index = (prices["trade_date"] - event.event_date).abs().idxmin()
+        point = prices.loc[nearest_index]
+        marker_rows.append(
+            {
+                "date": point["trade_date"],
+                "price": point["price_cny_per_tonne"],
+                "title": event.title,
+                "summary": event.summary,
+                "source": f"{event.source_name} {event.source_reference}",
+            }
+        )
+        relative_position = (point["trade_date"] - date_min) / date_span
+        horizontal_offset = horizontal_offsets[number - 1]
+        if relative_position >= 0.68:
+            ax = -horizontal_offset
+        elif relative_position <= 0.32:
+            ax = horizontal_offset
+        else:
+            ax = -horizontal_offset if number % 2 else horizontal_offset
+        ay = vertical_offsets[number - 1]
+        fig.add_annotation(
+            x=point["trade_date"],
+            y=point["price_cny_per_tonne"],
+            text=(
+                f"<b>{number}. {_wrap_annotation(event.title, 12, 2)}</b>"
+                f"<br>{event.event_date:%Y-%m-%d}"
+                f"<br>{_wrap_annotation(event.summary, 15, 2)}"
+            ),
+            showarrow=True,
+            arrowhead=0,
+            arrowwidth=1.2,
+            arrowcolor="#5f5f63",
+            ax=ax,
+            ay=ay,
+            align="left",
+            bordercolor="#5f5f63",
+            borderwidth=1,
+            borderpad=6,
+            bgcolor="rgba(255,255,255,.96)",
+            font={"size": 10, "color": "#29292c"},
+        )
+    markers = pd.DataFrame(marker_rows)
+    fig.add_trace(
+        go.Scatter(
+            x=markers["date"],
+            y=markers["price"],
+            mode="markers",
+            marker={"size": 8, "color": "#8B1E2D", "line": {"color": "white", "width": 1.5}},
+            showlegend=False,
+            customdata=np.column_stack(
+                [markers["title"], markers["summary"], markers["source"]]
+            ),
+            hovertemplate=(
+                "<b>%{customdata[0]}</b><br>%{customdata[1]}"
+                "<br>来源：%{customdata[2]}<extra></extra>"
+            ),
+        )
+    )
+
+
+def apply_compact_price_ranges(
+    fig: go.Figure,
+    dates: pd.Series,
+    values: pd.Series,
+) -> None:
+    clean_dates = pd.to_datetime(dates, errors="coerce").dropna()
+    clean_values = pd.to_numeric(values, errors="coerce").dropna()
+    if clean_dates.empty or clean_values.empty:
+        return
+    date_span_days = max((clean_dates.max() - clean_dates.min()).days, 1)
+    date_padding = pd.Timedelta(days=max(1, min(21, round(date_span_days * 0.015))))
+    value_min = float(clean_values.min())
+    value_max = float(clean_values.max())
+    value_span = max(value_max - value_min, abs(value_max) * 0.01, 1.0)
+    value_padding = value_span * 0.08
+    fig.update_xaxes(
+        range=[clean_dates.min() - date_padding, clean_dates.max() + date_padding],
+        autorange=False,
+    )
+    fig.update_yaxes(
+        range=[max(0.0, value_min - value_padding), value_max + value_padding],
+        autorange=False,
+    )
+
+
+def build_trend_figure(
+    metal_spot: pd.DataFrame,
+    metal_forecast: pd.DataFrame,
+    color: str,
+    events: pd.DataFrame | None = None,
+    unit: str = "元/吨",
+) -> go.Figure:
     fig = go.Figure()
     metal_spot = metal_spot.sort_values("trade_date").copy()
     if not metal_spot.empty:
@@ -609,9 +1303,14 @@ def build_trend_figure(metal_spot: pd.DataFrame, metal_forecast: pd.DataFrame, c
             mode="lines",
             name="最近一个月现货均价",
             line={"color": color, "width": 2.4},
-            hovertemplate="实际不含税均价<br>%{x|%Y-%m-%d}<br><b>%{y:,.0f} 元/吨</b><extra></extra>",
+            hovertemplate=(
+                f"实际不含税均价<br>%{{x|%Y-%m-%d}}<br><b>%{{y:,.0f}} {unit}</b>"
+                "<extra></extra>"
+            ),
         )
     )
+    if events is not None:
+        add_market_event_annotations(fig, metal_spot, events)
     if not metal_forecast.empty:
         metal_forecast = metal_forecast.sort_values("forecast_date").copy()
         band = widened_forecast_band(metal_forecast)
@@ -632,7 +1331,7 @@ def build_trend_figure(metal_spot: pd.DataFrame, metal_forecast: pd.DataFrame, c
             mode="lines",
             fill="tonexty",
             line={"width": 0},
-            name="80% 可能范围",
+            name="预测下限-上限",
             fillcolor="rgba(46, 120, 246, 0.13)",
             hoverinfo="skip",
         )
@@ -664,8 +1363,9 @@ def build_trend_figure(metal_spot: pd.DataFrame, metal_forecast: pd.DataFrame, c
                 ]
             ),
             hovertemplate=(
-                "预测不含税均价<br>%{x|%Y-%m-%d}<br><b>%{y:,.0f} 元/吨</b>"
-                "<br>80%预测区间：%{customdata[0]:,.0f}–%{customdata[1]:,.0f} 元/吨<extra></extra>"
+                f"预测不含税均价<br>%{{x|%Y-%m-%d}}<br><b>%{{y:,.0f}} {unit}</b>"
+                f"<br>预测下限-上限：%{{customdata[0]:,.0f}}–%{{customdata[1]:,.0f}} {unit}"
+                "<extra></extra>"
             ),
             )
         )
@@ -689,18 +1389,51 @@ def build_trend_figure(metal_spot: pd.DataFrame, metal_forecast: pd.DataFrame, c
                 bgcolor="rgba(255,255,255,0.9)",
             )
     fig.update_layout(
-        height=460,
+        height=560,
         template="plotly_white",
         paper_bgcolor="rgba(255,255,255,0)",
         plot_bgcolor="#ffffff",
         font={"color": "#64748b"},
         margin={"l": 20, "r": 20, "t": 20, "b": 20},
-        yaxis_title="元/吨（不含税）",
+        yaxis_title=f"{unit}（不含税）",
         hovermode="x unified",
-        legend={"orientation": "h", "yanchor": "bottom", "y": 1.02, "xanchor": "left", "x": 0},
+        hoverlabel={
+            "bgcolor": "#FFFFFF",
+            "bordercolor": "#CBD5E1",
+            "align": "left",
+            "font": {
+                "color": "#2A2A2D",
+                "family": "Arial, sans-serif",
+                "size": 12,
+            },
+        },
+        legend={
+            "orientation": "h",
+            "yanchor": "bottom",
+            "y": 1.02,
+            "xanchor": "left",
+            "x": 0,
+            "font": {"color": "#4B4B50"},
+        },
     )
     fig.update_xaxes(showgrid=True, gridcolor="rgba(76, 106, 146, 0.10)")
     fig.update_yaxes(showgrid=True, gridcolor="rgba(76, 106, 146, 0.10)")
+    axis_dates = [metal_spot["trade_date"]]
+    axis_values = [metal_spot["price_cny_per_tonne"]]
+    if not metal_forecast.empty:
+        axis_dates.append(metal_forecast["forecast_date"])
+        axis_values.extend(
+            [
+                metal_forecast["lower_bound"],
+                metal_forecast["upper_bound"],
+                metal_forecast["predicted_price_cny_per_tonne"],
+            ]
+        )
+    apply_compact_price_ranges(
+        fig,
+        pd.concat(axis_dates, ignore_index=True),
+        pd.concat(axis_values, ignore_index=True),
+    )
     return fig
 
 
@@ -711,41 +1444,565 @@ def widened_forecast_band(forecast: pd.DataFrame) -> pd.DataFrame:
     return band
 
 
-def render_monthly_forecast(monthly_forecast: pd.DataFrame, color: str) -> None:
-    st.markdown('<div class="section-title">月度均价预测</div>', unsafe_allow_html=True)
+def render_monthly_forecast(
+    monthly_forecast: pd.DataFrame,
+    metal_spot: pd.DataFrame,
+    color: str,
+    unit: str = "元/吨",
+) -> None:
+    st.markdown('<div class="section-title">未来12个月均价预测</div>', unsafe_allow_html=True)
     if monthly_forecast.empty:
         st.info("暂无月度均价预测。请先运行数据更新任务。")
         return
-    data = monthly_forecast.sort_values("forecast_month").copy()
-    fig = go.Figure(
+    data = ensure_monthly_horizon(monthly_forecast, metal_spot, periods=12)
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
+    fig.add_trace(
         go.Scatter(
-            x=data["forecast_month"].dt.strftime("%Y-%m"),
+            x=data["forecast_month"],
+            y=data["upper_bound"],
+            mode="lines",
+            line={"width": 0},
+            hoverinfo="skip",
+            showlegend=False,
+        ),
+        secondary_y=False,
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=data["forecast_month"],
+            y=data["lower_bound"],
+            mode="lines",
+            line={"width": 0},
+            fill="tonexty",
+            fillcolor="rgba(158, 174, 183, 0.22)",
+            name="预测下限-上限",
+            hoverinfo="skip",
+        ),
+        secondary_y=False,
+    )
+    fig.add_trace(
+        go.Bar(
+            x=data["forecast_month"],
             y=data["predicted_price_cny_per_tonne"],
+            marker_color="#7F9FBE",
+            name="预测月均价",
+            customdata=np.column_stack(
+                [
+                    data["predicted_change_pct"].map(lambda value: f"{value:+.2%}"),
+                    data["lower_bound"].map(lambda value: f"{value:,.0f}"),
+                    data["upper_bound"].map(lambda value: f"{value:,.0f}"),
+                ]
+            ),
+            hovertemplate=(
+                f"<b>%{{x|%Y-%m}}</b><br>预测月均价：%{{y:,.0f}} {unit}"
+                "<br>预测月环比：%{customdata[0]}"
+                f"<br>预测下限-上限：%{{customdata[1]}} - %{{customdata[2]}} {unit}"
+                "<extra></extra>"
+            ),
+        ),
+        secondary_y=False,
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=data["forecast_month"],
+            y=data["predicted_change_pct"] * 100,
             mode="lines+markers",
             marker_color=color,
-            line={"color": color, "width": 3},
-            marker={"size": 8},
-            name="预测月均价",
-            hovertemplate="预测不含税月均价<br>%{x}<br><b>%{y:,.0f} 元/吨</b><extra></extra>",
-        )
+            line={"color": color, "width": 2.6},
+            marker={"size": 6},
+            name="预测月环比",
+            hoverinfo="skip",
+        ),
+        secondary_y=True,
     )
     fig.update_layout(
-        height=280,
+        height=360,
         template="plotly_white",
         paper_bgcolor="rgba(255,255,255,0)",
         plot_bgcolor="#ffffff",
         font={"color": "#64748b"},
-        margin={"l": 20, "r": 20, "t": 20, "b": 20},
-        yaxis_title="元/吨（不含税）",
-        showlegend=False,
+        margin={"l": 20, "r": 20, "t": 58, "b": 20},
+        legend={
+            "orientation": "h",
+            "yanchor": "bottom",
+            "y": 1.03,
+            "x": 0,
+            "font": {"color": "#4B4B50"},
+        },
+        hovermode="x unified",
+        hoverlabel={
+            "bgcolor": "#FFFFFF",
+            "bordercolor": "#CBD5E1",
+            "align": "left",
+            "font": {
+                "color": "#2A2A2D",
+                "family": "Arial, sans-serif",
+                "size": 12,
+            },
+        },
     )
-    fig.update_yaxes(showgrid=True, gridcolor="rgba(76, 106, 146, 0.10)")
+    fig.update_yaxes(
+        title_text=f"{unit}（不含税）",
+        showgrid=True,
+        gridcolor="rgba(76, 106, 146, 0.10)",
+        secondary_y=False,
+    )
+    fig.update_yaxes(
+        title_text="预测月环比（%）",
+        showgrid=False,
+        secondary_y=True,
+    )
     st.plotly_chart(fig, width="stretch")
     st.dataframe(
         data.assign(
             预测月份=data["forecast_month"].dt.strftime("%Y-%m"),
-            预测月均价=data["predicted_price_cny_per_tonne"].map(lambda value: f"{value:,.0f} 元/吨"),
-        )[["预测月份", "预测月均价"]],
+            预测月均价=data["predicted_price_cny_per_tonne"].map(
+                lambda value: f"{value:,.0f} {unit}"
+            ),
+            预测下限=data["lower_bound"].map(lambda value: f"{value:,.0f}"),
+            预测上限=data["upper_bound"].map(lambda value: f"{value:,.0f}"),
+            预测月环比=data["predicted_change_pct"].map(lambda value: f"{value:+.2%}"),
+        )[["预测月份", "预测月均价", "预测下限", "预测上限", "预测月环比", "direction"]].rename(
+            columns={"direction": "方向"}
+        ),
+        width="stretch",
+        hide_index=True,
+    )
+    st.caption("柱形表示预测月均价，折线表示预测月环比；阴影表示预测下限-上限。")
+
+
+def build_price_history_figure(
+    prices: pd.DataFrame,
+    events: pd.DataFrame,
+    color: str,
+    unit: str = "元/吨",
+) -> go.Figure:
+    fig = go.Figure(
+        go.Scatter(
+            x=prices["trade_date"],
+            y=prices["price_cny_per_tonne"],
+            mode="lines",
+            line={"color": color, "width": 2.7},
+            name="不含税现货均价",
+            hovertemplate=(
+                f"%{{x|%Y-%m-%d}}<br><b>%{{y:,.0f}} {unit}</b><extra></extra>"
+            ),
+        )
+    )
+    add_market_event_annotations(fig, prices, events)
+    fig.update_layout(
+        height=510,
+        template="plotly_white",
+        paper_bgcolor="rgba(255,255,255,0)",
+        plot_bgcolor="#ffffff",
+        font={"color": "#64748b"},
+        margin={"l": 20, "r": 20, "t": 150, "b": 20},
+        yaxis_title=f"{unit}（不含税）",
+        hovermode="x unified",
+        hoverlabel={
+            "bgcolor": "#FFFFFF",
+            "bordercolor": "#CBD5E1",
+            "align": "left",
+            "font": {
+                "color": "#2A2A2D",
+                "family": "Arial, sans-serif",
+                "size": 12,
+            },
+        },
+        legend={
+            "orientation": "h",
+            "yanchor": "bottom",
+            "y": 1.02,
+            "x": 0,
+            "font": {"color": "#4B4B50"},
+        },
+    )
+    fig.update_xaxes(showgrid=True, gridcolor="rgba(76, 106, 146, 0.10)")
+    fig.update_yaxes(showgrid=True, gridcolor="rgba(76, 106, 146, 0.10)")
+    apply_compact_price_ranges(
+        fig,
+        prices["trade_date"],
+        prices["price_cny_per_tonne"],
+    )
+    return fig
+
+
+def render_verified_event_details(events: pd.DataFrame) -> None:
+    if events.empty:
+        return
+    st.markdown('<div class="section-title">变动分析</div>', unsafe_allow_html=True)
+    for number, event in enumerate(events.itertuples(index=False), start=1):
+        source_url = str(event.source_url).strip() if pd.notna(event.source_url) else ""
+        source_label = f"{event.source_name}（{event.source_date}，{event.source_reference}）"
+        source_text = (
+            f'<a href="{html.escape(source_url, quote=True)}" target="_blank" '
+            f'rel="noopener noreferrer">打开来源：{html.escape(source_label)}</a>'
+            if source_url.startswith(("https://", "http://"))
+            else html.escape(source_label)
+        )
+        st.markdown(
+            f"<p><strong>{number}. {html.escape(str(event.title))}</strong>　"
+            f"{event.event_date:%Y-%m-%d}<br>"
+            f"{html.escape(str(event.summary))}<br>{source_text}</p>",
+            unsafe_allow_html=True,
+        )
+
+
+def render_impact_analysis(
+    metal: str,
+    monthly_data: pd.DataFrame,
+    catalog: pd.DataFrame,
+    color: str,
+    key_prefix: str,
+) -> None:
+    material_catalog = catalog[catalog["metal"] == metal].copy()
+    if material_catalog.empty or monthly_data.empty:
+        return
+    material_catalog["sort_strength"] = material_catalog["impact_strength"].fillna(-1)
+    material_catalog = material_catalog.sort_values("sort_strength", ascending=False)
+    st.markdown('<div class="section-title">影响分析</div>', unsafe_allow_html=True)
+    category_titles = {
+        "供应": "供应端因子分析",
+        "需求": "需求端因子分析",
+        "库存": "库存端影响因子分析",
+        "成本": "成本端影响因子分析",
+        "宏观": "宏观端影响因子分析",
+        "价格": "市场价格联动因子分析",
+    }
+    for category, title in category_titles.items():
+        category_data = material_catalog[material_catalog["category"] == category]
+        if category_data.empty:
+            continue
+        st.markdown(f"#### {title}")
+        chart_columns = st.columns(2)
+        for index, metadata in enumerate(category_data.itertuples(index=False)):
+            factor = metadata.factor
+            history = factor_series(monthly_data, factor)
+            if history.empty:
+                continue
+            plot_data = history.assign(
+                year=history["month"].dt.year,
+                month_number=history["month"].dt.month,
+            )
+            current_year = int(plot_data["year"].max())
+            years = sorted(plot_data["year"].unique())
+            with chart_columns[index % 2]:
+                fig = go.Figure()
+                factor_name = plain_factor_name(factor)
+                for year, year_data in plot_data.groupby("year"):
+                    if year == current_year:
+                        line_color, line_width, opacity = "#8B1E2D", 2.8, 1
+                    elif year == current_year - 1:
+                        line_color, line_width, opacity = "#D9A4AC", 1.8, .9
+                    else:
+                        line_color, line_width, opacity = "#B8B8BC", 1.15, .48
+                    fig.add_trace(
+                        go.Scatter(
+                            x=year_data["month_number"],
+                            y=year_data["value"],
+                            mode="lines+markers" if year == current_year else "lines",
+                            name=f"{int(year)}年",
+                            line={"color": line_color, "width": line_width},
+                            marker={"size": 4},
+                            opacity=opacity,
+                            customdata=np.column_stack(
+                                [year_data["month"].dt.strftime("%Y-%m")]
+                            ),
+                            hovertemplate=(
+                                f"<b>{html.escape(factor_name)}</b>"
+                                "<br>月份：%{customdata[0]}"
+                                "<br>数值：%{y:,.2f}<extra></extra>"
+                            ),
+                        )
+                    )
+                strength_text = (
+                    f"{metadata.impact_strength:.2f}"
+                    if pd.notna(metadata.impact_strength)
+                    else "待验证"
+                )
+                fig.update_layout(
+                    title={
+                        "text": (
+                            f"{factor_name}"
+                            f"<br><sup>历史统计关联：{metadata.direction}　影响强度：{strength_text}</sup>"
+                        ),
+                        "font": {"size": 14, "color": "#2A2A2D"},
+                    },
+                    height=300,
+                    template="plotly_white",
+                    paper_bgcolor="rgba(255,255,255,0)",
+                    plot_bgcolor="#ffffff",
+                    margin={"l": 30, "r": 15, "t": 82, "b": 28},
+                    showlegend=True,
+                    hovermode="closest",
+                    hoverlabel={"bgcolor": "#FFFFFF", "font": {"color": "#2A2A2D"}},
+                    legend={
+                        "orientation": "h",
+                        "yanchor": "bottom",
+                        "y": 1.01,
+                        "xanchor": "left",
+                        "x": 0,
+                        "font": {"size": 9, "color": "#4B4B50"},
+                    },
+                )
+                fig.update_xaxes(
+                    tickmode="array",
+                    tickvals=list(range(1, 13)),
+                    ticktext=[f"{month}月" for month in range(1, 13)],
+                    showgrid=False,
+                )
+                fig.update_yaxes(showgrid=True, gridcolor="rgba(80,80,84,.10)")
+                st.plotly_chart(
+                    fig,
+                    width="stretch",
+                    key=f"{key_prefix}_{category}_{factor}_chart",
+                )
+                source_name, source_url = factor_source(factor)
+                source_text = f"[{source_name}]({source_url})" if source_url else source_name
+                st.caption(f"来源：{source_text}")
+
+
+def render_full_factor_strength_overview(
+    metal: str,
+    catalog: pd.DataFrame,
+    key_prefix: str,
+) -> None:
+    significant = catalog[
+        (catalog["metal"] == metal) & catalog["impact_strength"].notna()
+    ].copy()
+    if significant.empty:
+        return
+
+    st.markdown(
+        '<div class="section-title">全部变量影响强度排序</div>',
+        unsafe_allow_html=True,
+    )
+
+    significant["significance_rank"] = significant["impact_strength"].rank(
+        method="first", ascending=False
+    ).astype(int)
+    significant = significant.sort_values("impact_strength")
+    st.caption(
+        f"共纳入 {len(significant)} 个变量，按影响强度绝对值从高到低排序；"
+        "横向条越长、蓝色越深，影响强度越高。"
+    )
+    max_strength = float(significant["impact_strength"].max())
+    min_strength = float(significant["impact_strength"].min())
+    strength_span = max(max_strength - min_strength, 1e-12)
+    bar_colors = significant["impact_strength"].map(
+        lambda value: (
+            "rgba(79, 119, 154, "
+            f"{0.46 + 0.44 * (float(value) - min_strength) / strength_span:.2f})"
+        )
+    )
+    fig = go.Figure(
+        go.Bar(
+            x=significant["impact_strength"],
+            y=significant["factor"].map(plain_factor_name),
+            orientation="h",
+            marker_color=bar_colors,
+            text=significant["impact_strength"].map(lambda value: f"{value:.2f}"),
+            textposition="outside",
+            customdata=np.column_stack(
+                [
+                    significant["significance_rank"],
+                    significant["direction"],
+                    significant["category"],
+                    significant["p_value"],
+                ]
+            ),
+            hovertemplate=(
+                "<b>%{y}</b><br>显著影响排序：第 %{customdata[0]} 位"
+                "<br>影响强度：%{x:.2f}<br>类别：%{customdata[2]}"
+                "<br>方向：%{customdata[1]}<br>p值：%{customdata[3]:.4f}<extra></extra>"
+            ),
+        )
+    )
+    fig.update_layout(
+        height=max(360, 46 * len(significant) + 95),
+        template="plotly_white",
+        paper_bgcolor="rgba(255,255,255,0)",
+        plot_bgcolor="#ffffff",
+        font={"color": "#4B4B50"},
+        margin={"l": 360, "r": 70, "t": 20, "b": 40},
+        showlegend=False,
+        xaxis_title="影响强度（绝对系数）",
+        hoverlabel={
+            "bgcolor": "#FFFFFF",
+            "bordercolor": "#CBD5E1",
+            "font": {"color": "#2A2A2D", "size": 12},
+        },
+    )
+    fig.update_xaxes(
+        showgrid=True,
+        gridcolor="rgba(80,80,84,.10)",
+        range=[0, max_strength * 1.16 if max_strength > 0 else 1],
+    )
+    fig.update_yaxes(tickfont={"color": "#343438", "size": 11}, automargin=True)
+    st.plotly_chart(fig, width="stretch", key=f"{key_prefix}_full_factor_strength")
+
+
+def render_supply_demand_relationship(
+    metal: str,
+    monthly_data: pd.DataFrame,
+    catalog: pd.DataFrame,
+    key_prefix: str,
+) -> None:
+    del key_prefix
+    snapshot = build_market_relationship_snapshot(monthly_data, catalog, metal)
+    if snapshot.empty:
+        return
+    st.markdown('<div class="section-title">供需关系分析</div>', unsafe_allow_html=True)
+    group_names = ["供应", "需求", "成本", "库存"]
+    for start in range(0, len(group_names), 2):
+        columns = st.columns(2)
+        for column, category in zip(columns, group_names[start : start + 2]):
+            with column:
+                st.markdown(f"#### {category}")
+                group = snapshot[snapshot["category"] == category].copy()
+                if group.empty:
+                    st.markdown(
+                        '<div class="balance-empty">暂无适用于该材料的真实指标。</div>',
+                        unsafe_allow_html=True,
+                    )
+                    continue
+                group["指标"] = group["factor"].map(plain_factor_name)
+                group["环比"] = group["mom"].map(
+                    lambda value: f"{value:+.2%}" if pd.notna(value) else "暂无"
+                )
+                group["同比"] = group["yoy"].map(
+                    lambda value: f"{value:+.2%}" if pd.notna(value) else "暂无"
+                )
+                group["方向"] = group["direction"].map(
+                    {"上升": "↑ 上升", "下降": "↓ 下降", "持平": "→ 持平"}
+                )
+                group["月份"] = group["latest_month"].dt.strftime("%Y-%m")
+                group["来源"] = group["factor"].map(lambda value: factor_source(value)[0])
+                st.dataframe(
+                    group[["指标", "环比", "同比", "方向", "月份", "来源"]],
+                    width="stretch",
+                    hide_index=True,
+                )
+    st.info("暂无真实供需平衡量数据。现有预测月环比不作为供需平衡吨数展示。")
+
+
+def render_terminal_demand(
+    metal: str,
+    monthly_data: pd.DataFrame,
+    color: str,
+    key_prefix: str,
+) -> None:
+    snapshot, histories = terminal_snapshot(monthly_data, metal)
+    if snapshot.empty:
+        return
+    st.markdown('<div class="section-title">终端消费变化汇总</div>', unsafe_allow_html=True)
+    for start in range(0, len(snapshot), 3):
+        columns = st.columns(min(3, len(snapshot) - start))
+        for column, (_, row) in zip(columns, snapshot.iloc[start : start + 3].iterrows()):
+            delta = f"{row['mom']:+.2%} 环比" if pd.notna(row["mom"]) else "环比暂无"
+            column.metric(
+                row["indicator"],
+                f"{row['latest_value']:,.1f} {row['unit']}",
+                delta,
+            )
+            if pd.isna(row["mom"]):
+                column.caption("环比暂无可比数据。")
+            elif row["mom"] > 0:
+                column.caption(f"环比 {row['mom']:+.2%} 表示本月较上月增加 {abs(row['mom']):.2%}。")
+            elif row["mom"] < 0:
+                column.caption(f"环比 {row['mom']:+.2%} 表示本月较上月减少 {abs(row['mom']):.2%}。")
+            else:
+                column.caption("环比 0.00% 表示本月与上月持平。")
+    st.markdown("#### 终端消费指标历史走势")
+    chart_columns = st.columns(2)
+    snapshot_by_indicator = snapshot.set_index("indicator")
+    for index, (indicator, history) in enumerate(histories.items()):
+        row = snapshot_by_indicator.loc[indicator]
+        with chart_columns[index % 2]:
+            fig = go.Figure(
+                go.Scatter(
+                    x=history["month"],
+                    y=history["value"],
+                    mode="lines+markers",
+                    line={"color": color, "width": 2.4},
+                    marker={"size": 4},
+                    name=indicator,
+                    customdata=np.column_stack(
+                        [history["month"].dt.strftime("%Y-%m")]
+                    ),
+                    hovertemplate=(
+                        f"<b>{html.escape(indicator)}</b>"
+                        "<br>月份：%{customdata[0]}"
+                        f"<br>数值：%{{y:,.2f}} {html.escape(str(row['unit']))}<extra></extra>"
+                    ),
+                )
+            )
+            fig.update_layout(
+                title={"text": indicator, "font": {"size": 14, "color": "#2A2A2D"}},
+                height=285,
+                template="plotly_white",
+                paper_bgcolor="rgba(255,255,255,0)",
+                plot_bgcolor="#ffffff",
+                margin={"l": 30, "r": 15, "t": 42, "b": 25},
+                showlegend=False,
+                yaxis_title=row["unit"],
+            )
+            fig.update_yaxes(showgrid=True, gridcolor="rgba(80,80,84,.10)")
+            st.plotly_chart(
+                fig,
+                width="stretch",
+                key=f"{key_prefix}_terminal_{indicator}_chart",
+            )
+            st.caption(f"来源：{row['source']}")
+
+
+def render_forecast_driver_analysis(
+    metal: str,
+    monthly_data: pd.DataFrame,
+    catalog: pd.DataFrame,
+    stored_contributions: pd.DataFrame,
+) -> None:
+    contributions = stored_contributions[stored_contributions["metal"] == metal].copy()
+    if not contributions.empty:
+        contributions["absolute_contribution"] = contributions["contribution"].abs()
+        first_period = contributions["forecast_period"].min()
+        contributions = (
+            contributions[contributions["forecast_period"] == first_period]
+            .sort_values("absolute_contribution", ascending=False)
+            .head(5)
+            .rename(
+                columns={
+                    "factor_category": "category",
+                    "source_period": "source_period",
+                }
+            )
+        )
+    else:
+        contributions = build_driver_snapshot(monthly_data, catalog, metal, limit=5)
+    if contributions.empty:
+        return
+    contributions["absolute_contribution"] = pd.to_numeric(
+        contributions["contribution"], errors="coerce"
+    ).abs()
+    contributions = contributions.sort_values(
+        "absolute_contribution", ascending=False
+    ).head(5)
+    st.markdown('<div class="section-title">最显著影响因子</div>', unsafe_allow_html=True)
+    display_data = contributions.copy()
+    display_data["影响因子"] = display_data["factor"].map(plain_factor_name)
+    display_data["类别"] = display_data["category"]
+    numeric_contribution = pd.to_numeric(display_data["contribution"], errors="coerce")
+    display_data["影响方向"] = np.select(
+        [
+            numeric_contribution > 0,
+            numeric_contribution < 0,
+        ],
+        ["正向", "负向"],
+        default="无方向",
+    )
+    display_data["贡献强度"] = display_data["contribution"].map(lambda value: f"{value:+.3f}")
+    st.dataframe(
+        display_data[["类别", "影响因子", "影响方向", "贡献强度"]],
         width="stretch",
         hide_index=True,
     )
@@ -812,87 +2069,55 @@ def render_market_cards(spot: pd.DataFrame, metals: list[str], display: dict[str
     cards = st.columns(len(metals))
     for column, metal in zip(cards, metals):
         metal_spot = spot[spot["metal"] == metal].sort_values("trade_date")
+        if metal_spot.empty:
+            continue
         latest_price = metal_spot.iloc[-1]["price_cny_per_tonne"]
         change_5d = metal_spot["price_cny_per_tonne"].pct_change(5).iloc[-1]
-        column.metric(
-            display.get(metal, metal),
-            f"{latest_price:,.0f}",
-            f"{change_5d * 100:.2f}%" if pd.notna(change_5d) else "暂无",
-            delta_color="inverse",
+        if pd.isna(change_5d) or abs(float(change_5d)) < 0.00005:
+            change_text, direction_class = "暂无" if pd.isna(change_5d) else "0.00%", "steady"
+        elif change_5d > 0:
+            change_text, direction_class = f"↑ {change_5d:.2%}", "up"
+        else:
+            change_text, direction_class = f"↓ {abs(change_5d):.2%}", "down"
+        column.markdown(
+            f'''<div class="market-card">
+                <div class="market-card-title">{html.escape(display.get(metal, metal))}</div>
+                <div class="market-card-value">{latest_price:,.0f} {price_unit(metal)}</div>
+                <div class="market-card-change {direction_class}">{change_text}</div>
+            </div>''',
+            unsafe_allow_html=True,
         )
 
 
-def render_home_overview(
-    spot: pd.DataFrame,
+def render_forecast_summary_cards(
     forecasts: pd.DataFrame,
     metals: list[str],
     display: dict[str, str],
-    colors: dict[str, str],
 ) -> None:
-    st.markdown('<div class="section-title">市场概览</div>', unsafe_allow_html=True)
-    render_market_cards(spot, metals, display)
-    st.caption("数值表示最新不含税现货均价相较 5 个交易日前的变化。")
-
-    trend_title, trend_window = st.columns([3, 2])
-    trend_title.markdown('<div class="section-title">综合价格趋势</div>', unsafe_allow_html=True)
-    selected_window = trend_window.radio(
-        "趋势区间",
-        ["近7日", "近30日", "近60日"],
-        index=2,
-        horizontal=True,
-        label_visibility="collapsed",
-        key="overview_trend_window",
-    )
-    lookback_days = {"近7日": 7, "近30日": 30, "近60日": 60}[selected_window]
-    fig = go.Figure()
-    normalized_values: list[float] = []
-    for metal in metals:
-        series = spot[spot["metal"] == metal].sort_values("trade_date").tail(lookback_days).copy()
-        base_price = float(series.iloc[0]["price_cny_per_tonne"])
-        series["price_index"] = series["price_cny_per_tonne"] / base_price * 100
-        normalized_values.extend(series["price_index"].tolist())
-        fig.add_trace(
-            go.Scatter(
-                x=series["trade_date"],
-                y=series["price_index"],
-                mode="lines",
-                name=display.get(metal, metal),
-                line={"color": colors[metal], "width": 2.3},
-                customdata=np.column_stack([series["price_cny_per_tonne"]]),
-                hovertemplate="%{x|%Y-%m-%d}<br>价格指数：%{y:.2f}<br>实际价格：%{customdata[0]:,.0f} 元/吨<extra></extra>",
-            )
-        )
-    y_padding = max((max(normalized_values) - min(normalized_values)) * 0.15, 0.5)
-    fig.update_layout(
-        height=390,
-        template="plotly_white",
-        paper_bgcolor="rgba(255,255,255,0)",
-        plot_bgcolor="#ffffff",
-        font={"color": "#64748b", "size": 12},
-        margin={"l": 45, "r": 20, "t": 22, "b": 25},
-        legend={"orientation": "h", "yanchor": "bottom", "y": 1.02, "xanchor": "left", "x": 0},
-    )
-    fig.update_xaxes(showgrid=True, gridcolor="rgba(76, 106, 146, 0.10)")
-    fig.update_yaxes(
-        showgrid=True,
-        gridcolor="rgba(76, 106, 146, 0.10)",
-        title="价格指数（首日=100）",
-        range=[min(normalized_values) - y_padding, max(normalized_values) + y_padding],
-    )
-    st.plotly_chart(fig, width="stretch")
-    st.caption("为便于比较不同价格量级的材料，曲线已按所选区间首日价格标准化为 100；悬停可查看实际元/吨价格。")
-
-    forecast_summaries: list[tuple[str, float, float, float]] = []
+    forecast_summaries: list[tuple[str, str, float, float, float]] = []
     for metal in metals:
         forecast = forecasts[forecasts["metal"] == metal].sort_values("forecast_date")
-        if len(forecast) >= 2:
-            first_price = float(forecast.iloc[0]["predicted_price_cny_per_tonne"])
-            last_price = float(forecast.iloc[-1]["predicted_price_cny_per_tonne"])
-            forecast_summaries.append((display.get(metal, metal), first_price, last_price, last_price / first_price - 1))
+        if len(forecast) < 2:
+            continue
+        first_price = float(forecast.iloc[0]["predicted_price_cny_per_tonne"])
+        last_price = float(forecast.iloc[-1]["predicted_price_cny_per_tonne"])
+        forecast_summaries.append(
+            (
+                metal,
+                display.get(metal, metal),
+                first_price,
+                last_price,
+                last_price / first_price - 1,
+            )
+        )
+    if not forecast_summaries:
+        return
 
     st.markdown('<div class="section-title">第 30 日预测价格</div>', unsafe_allow_html=True)
     future_cards = st.columns(len(forecast_summaries))
-    for column, (name, first_price, last_price, change) in zip(future_cards, forecast_summaries):
+    for column, (metal, name, first_price, last_price, change) in zip(
+        future_cards, forecast_summaries
+    ):
         if abs(change) < 0.005:
             direction, direction_class = "平稳", "steady"
         elif change > 0:
@@ -901,13 +2126,80 @@ def render_home_overview(
             direction, direction_class = "下行", "down"
         column.markdown(
             f'''<div class="future-card">
-                <div class="future-card-title">{name}</div>
-                <div class="future-card-value">{last_price:,.0f} 元/吨</div>
+                <div class="future-card-title">{html.escape(name)}</div>
+                <div class="future-card-value">{last_price:,.0f} {price_unit(metal)}</div>
                 <div class="future-card-meta">第 30 日预测价格<br>相对首日预测：{change:+.2%}</div>
                 <div class="future-card-trend {direction_class}">{direction}</div>
             </div>''',
             unsafe_allow_html=True,
         )
+
+
+def render_home_overview(
+    spot: pd.DataFrame,
+    metals: list[str],
+    display: dict[str, str],
+    colors: dict[str, str],
+    verified_events: pd.DataFrame,
+) -> None:
+    st.markdown('<div class="section-title">市场概览</div>', unsafe_allow_html=True)
+    render_market_cards(spot, metals, display)
+    st.caption("数值表示最新不含税现货均价相较 5 个交易日前的变化。")
+
+    st.markdown('<div class="section-title">综合价格趋势</div>', unsafe_allow_html=True)
+    material_column, window_column = st.columns([2, 3])
+    default_metal = "aluminum_a00" if "aluminum_a00" in metals else metals[0]
+    selected_trend_metal = material_column.selectbox(
+        "原材料",
+        metals,
+        index=metals.index(default_metal),
+        format_func=lambda item: display.get(item, item),
+        key="overview_trend_metal",
+    )
+    selected_window = window_column.radio(
+        "趋势区间",
+        ["近7日", "近30日", "近60日", "全部历史"],
+        index=2,
+        horizontal=True,
+        key="overview_trend_window",
+    )
+    full_history = spot[spot["metal"] == selected_trend_metal].sort_values("trade_date")
+    selected_history = filter_price_history(full_history, selected_window)
+    selected_events = events_in_range(
+        verified_events,
+        selected_trend_metal,
+        selected_history["trade_date"].min(),
+        selected_history["trade_date"].max(),
+    )
+    start_price = float(selected_history.iloc[0]["price_cny_per_tonne"])
+    latest_price = float(selected_history.iloc[-1]["price_cny_per_tonne"])
+    selected_unit = price_unit(selected_trend_metal)
+    stats = st.columns(4)
+    stats[0].metric("最新价格", f"{latest_price:,.0f} {selected_unit}")
+    stats[1].metric("区间变化", f"{latest_price / start_price - 1:+.2%}")
+    stats[2].metric(
+        "区间最高",
+        f"{selected_history['price_cny_per_tonne'].max():,.0f} {selected_unit}",
+    )
+    stats[3].metric(
+        "区间最低",
+        f"{selected_history['price_cny_per_tonne'].min():,.0f} {selected_unit}",
+    )
+    st.plotly_chart(
+        build_price_history_figure(
+            selected_history,
+            selected_events,
+            colors[selected_trend_metal],
+            selected_unit,
+        ),
+        width="stretch",
+        key="overview_single_price_trend",
+    )
+    st.caption(
+        f"数据截止 {selected_history['trade_date'].max():%Y-%m-%d}，"
+        f"价格口径为不含税{selected_unit}。"
+    )
+    render_verified_event_details(selected_events)
 
 
 def render_report_center(
@@ -985,6 +2277,7 @@ def render_report_center(
 
 def render_range_stats(metal: str, metal_spot: pd.DataFrame, color: str) -> None:
     with st.expander("区间统计", expanded=False):
+        unit = price_unit(metal)
         min_date = metal_spot["trade_date"].min().date()
         max_date = metal_spot["trade_date"].max().date()
         state_prefix = f"range_{metal}"
@@ -1032,21 +2325,25 @@ def render_range_stats(metal: str, metal_spot: pd.DataFrame, color: str) -> None
         pct_change = (last_price / first_price - 1) * 100 if first_price else np.nan
         daily_vol = values.pct_change(fill_method=None).std() * 100
         stat_cols = st.columns(4)
-        stat_cols[0].metric("区间均价", f"{values.mean():,.2f}")
-        stat_cols[1].metric("最高价", f"{values.max():,.2f}")
-        stat_cols[2].metric("最低价", f"{values.min():,.2f}")
+        stat_cols[0].metric("区间均价", f"{values.mean():,.2f} {unit}")
+        stat_cols[1].metric("最高价", f"{values.max():,.2f} {unit}")
+        stat_cols[2].metric("最低价", f"{values.min():,.2f} {unit}")
         stat_cols[3].metric("有效天数", f"{len(selected)}")
         stat_cols2 = st.columns(4)
-        stat_cols2[0].metric("区间首日价", f"{first_price:,.2f}")
-        stat_cols2[1].metric("区间末日价", f"{last_price:,.2f}")
+        stat_cols2[0].metric("区间首日价", f"{first_price:,.2f} {unit}")
+        stat_cols2[1].metric("区间末日价", f"{last_price:,.2f} {unit}")
         stat_cols2[2].metric("区间涨跌幅", f"{pct_change:.2f}%")
-        stat_cols2[3].metric("价格极差", f"{price_range:,.2f}")
+        stat_cols2[3].metric("价格极差", f"{price_range:,.2f} {unit}")
         stat_cols3 = st.columns(4)
         stat_cols3[0].metric("日度波动率", f"{daily_vol:.2f}%" if pd.notna(daily_vol) else "暂无")
-        stat_cols3[1].metric("中位数", f"{values.median():,.2f}")
-        stat_cols3[2].metric("标准差", f"{values.std():,.2f}")
+        stat_cols3[1].metric("中位数", f"{values.median():,.2f} {unit}")
+        stat_cols3[2].metric("标准差", f"{values.std():,.2f} {unit}")
         stat_cols3[3].metric("变异系数", f"{values.std() / values.mean() * 100:.2f}%")
-        st.caption("变异系数 = 标准差 ÷ 区间均价，用于衡量价格相对波动程度；数值越大，说明该区间内价格波动越明显。")
+        st.caption(
+            "日度波动率 = 所选区间每日涨跌幅的样本标准差 × 100%；"
+            "每日涨跌幅 = 当日价格 ÷ 前一交易日价格 - 1。"
+            "变异系数 = 价格标准差 ÷ 区间均价 × 100%。"
+        )
 
         fig = go.Figure()
         fig.add_trace(
@@ -1056,9 +2353,22 @@ def render_range_stats(metal: str, metal_spot: pd.DataFrame, color: str) -> None
                 mode="lines",
                 name="所选区间",
                 line={"color": color, "width": 2},
+                hovertemplate=(
+                    f"<b>%{{x|%Y-%m-%d}}</b>"
+                    f"<br>不含税均价：%{{y:,.2f}} {unit}<extra></extra>"
+                ),
             )
         )
-        fig.add_hline(y=values.mean(), line_dash="dash", line_color="#4A4A4A", annotation_text="均价")
+        fig.add_trace(
+            go.Scatter(
+                x=[selected["trade_date"].min(), selected["trade_date"].max()],
+                y=[values.mean(), values.mean()],
+                mode="lines",
+                name="区间均价",
+                line={"dash": "dash", "color": "#4A4A4A", "width": 1.4},
+                hoverinfo="skip",
+            )
+        )
         fig.update_layout(
             height=260,
             template="plotly_white",
@@ -1066,7 +2376,15 @@ def render_range_stats(metal: str, metal_spot: pd.DataFrame, color: str) -> None
             plot_bgcolor="#ffffff",
             font={"color": "#64748b"},
             margin={"l": 20, "r": 20, "t": 10, "b": 20},
-            yaxis_title="元/吨",
+            yaxis_title=unit,
+            hovermode="closest",
+            legend={
+                "orientation": "h",
+                "yanchor": "bottom",
+                "y": 1.02,
+                "x": 0,
+                "font": {"color": "#4B4B50"},
+            },
         )
         st.plotly_chart(fig, width="stretch")
 
@@ -1081,6 +2399,7 @@ def render_daily_backtest_legacy(
 ) -> None:
     st.subheader("历史截断预测对比")
     selected_metal = st.selectbox("选择品种", metals, format_func=lambda item: display.get(item, item))
+    unit = price_unit(selected_metal)
     metal_spot = spot[spot["metal"] == selected_metal].sort_values("trade_date")
     metal_features = (
         market_features[market_features["metal"] == selected_metal].sort_values("trade_date")
@@ -1149,7 +2468,7 @@ def render_daily_backtest_legacy(
     metric_cols[2].metric("RMSE", f"{rmse:,.2f}")
     metric_cols[3].metric("平均偏差", f"{bias:,.2f}")
     st.markdown(
-        '<div class="comparison-note">指标说明：平均绝对误差表示预测价与真实价平均相差多少元/吨；MAPE 是平均误差率，越低越好；RMSE 会更重视较大的预测错误；平均偏差为正表示整体预测偏高，为负表示整体预测偏低。</div>',
+        f'<div class="comparison-note">指标说明：平均绝对误差表示预测价与真实价平均相差多少{unit}；MAPE 是平均误差率，越低越好；RMSE 会更重视较大的预测错误；平均偏差为正表示整体预测偏高，为负表示整体预测偏低。</div>',
         unsafe_allow_html=True,
     )
 
@@ -1200,7 +2519,7 @@ def render_daily_backtest_legacy(
         plot_bgcolor="#ffffff",
         font={"color": "#64748b"},
         margin={"l": 20, "r": 20, "t": 10, "b": 20},
-        yaxis_title="元/吨",
+        yaxis_title=unit,
     )
     st.plotly_chart(recent_fig, width="stretch")
 
@@ -1262,7 +2581,7 @@ def render_daily_backtest_legacy(
         plot_bgcolor="#ffffff",
         font={"color": "#64748b"},
         margin={"l": 20, "r": 20, "t": 20, "b": 20},
-        yaxis_title="元/吨",
+        yaxis_title=unit,
         hovermode="x unified",
     )
     st.plotly_chart(fig, width="stretch")
@@ -1284,7 +2603,7 @@ def render_daily_backtest_legacy(
         plot_bgcolor="#ffffff",
         font={"color": "#64748b"},
         margin={"l": 20, "r": 20, "t": 10, "b": 20},
-        yaxis_title="预测 - 真实",
+        yaxis_title=f"预测 - 真实（{unit}）",
     )
     st.plotly_chart(error_fig, width="stretch")
 
@@ -1383,7 +2702,6 @@ def render_backtest(
     market_features: pd.DataFrame,
     metals: list[str],
     display: dict[str, str],
-    colors: dict[str, str],
     model_version: str,
 ) -> None:
     del spot, market_features, model_version
@@ -1400,6 +2718,7 @@ def render_backtest(
         format_func=lambda item: display.get(item, item),
         key="monthly_history_metal",
     )
+    unit = price_unit(selected_metal)
     series = history[history["metal"] == selected_metal].copy().sort_values("month")
     min_month = series["month"].min().date()
     max_month = series["month"].max().date()
@@ -1439,7 +2758,7 @@ def render_backtest(
     metrics[2].metric("MAPE", f"{mape:.2f}%")
     metrics[3].metric("RMSE", f"{rmse:,.2f}")
     st.markdown(
-        '<div class="comparison-note">指标说明：MAE（平均绝对误差）表示每个月的预测价格平均相差多少元/吨；MAPE（平均绝对百分比误差）表示平均相差真实价格的百分之多少；RMSE（均方根误差）会对较大的偏差给予更高权重。三项指标均为越低越好。</div>',
+        f'<div class="comparison-note">指标说明：MAE（平均绝对误差）表示每个月的预测价格平均相差多少{unit}；MAPE（平均绝对百分比误差）表示平均相差真实价格的百分之多少；RMSE（均方根误差）会对较大的偏差给予更高权重。三项指标均为越低越好。</div>',
         unsafe_allow_html=True,
     )
     fig = go.Figure()
@@ -1449,8 +2768,8 @@ def render_backtest(
             y=selected["actual_monthly_price"],
             mode="lines+markers",
             name="历史月度均价",
-            line={"color": colors.get(selected_metal, "#2E78F6"), "width": 2.6},
-            marker={"size": 5},
+            line={"color": "#D97745", "width": 2.8},
+            marker={"color": "#D97745", "size": 5},
         )
     )
     fig.add_trace(
@@ -1459,8 +2778,8 @@ def render_backtest(
             y=selected["predicted_monthly_price"],
             mode="lines+markers",
             name="模型预测值",
-            line={"color": "#c9372c", "width": 2, "dash": "dash"},
-            marker={"size": 4},
+            line={"color": "#A32035", "width": 2.2, "dash": "dash"},
+            marker={"color": "#A32035", "size": 4, "symbol": "diamond"},
         )
     )
     fig.update_layout(
@@ -1470,19 +2789,29 @@ def render_backtest(
         plot_bgcolor="#ffffff",
         font={"color": "#64748b"},
         margin={"l": 20, "r": 20, "t": 20, "b": 20},
-        yaxis_title="元/吨",
+        yaxis_title=unit,
         hovermode="x unified",
-        legend={"orientation": "h", "y": 1.12},
+        legend={"orientation": "h", "y": 1.12, "font": {"color": "#4B4B50"}},
     )
     st.plotly_chart(fig, width="stretch")
 
     table = selected.assign(
         月份=selected["month"].dt.strftime("%Y-%m"),
-        历史月度均价=selected["actual_monthly_price"],
-        模型预测值=selected["predicted_monthly_price"],
-        预测误差=error,
+        **{
+            f"历史月度均价（{unit}）": selected["actual_monthly_price"],
+            f"模型预测值（{unit}）": selected["predicted_monthly_price"],
+            f"预测误差（{unit}）": error,
+        },
         误差率=error / selected["actual_monthly_price"] * 100,
-    )[["月份", "历史月度均价", "模型预测值", "预测误差", "误差率"]]
+    )[
+        [
+            "月份",
+            f"历史月度均价（{unit}）",
+            f"模型预测值（{unit}）",
+            f"预测误差（{unit}）",
+            "误差率",
+        ]
+    ]
     table["误差率"] = table["误差率"].map(lambda value: f"{value:.2f}%")
     st.markdown('<div class="section-title">月度价格明细</div>', unsafe_allow_html=True)
     st.dataframe(table, width="stretch", hide_index=True)
@@ -1528,15 +2857,15 @@ def render_model_formula() -> None:
     st.markdown('<div class="section-title">4. 预测区间</div>', unsafe_allow_html=True)
     st.markdown(
         """
-        每个预测日期都会给出一个最可能的价格和一个合理范围。该范围覆盖模型认为有约 80% 可能出现的价格区间，
-        不代表价格一定会落在其中。鼠标停在预测点上可查看该日的预测均价与完整范围，单位统一为元/吨。
+        每个预测日期都会给出预测价格、预测下限和预测上限。区间宽度依据历史误差和预测期限计算，
+        预测越远通常越宽，价格不一定落在该范围内。鼠标停在预测点上可查看该日预测值及完整下限-上限；白银单位为元/千克，其余材料单位为元/吨。
         """
     )
 
     st.markdown('<div class="section-title">5. 如何评估预测是否可靠</div>', unsafe_allow_html=True)
     st.markdown("以下指标将预测价格与之后实际公布的价格逐日或逐月对比。n 为对比次数，ŷᵢ 为第 i 次预测价格，yᵢ 为对应的实际价格。三项指标均越低越好。")
     st.latex(r"MAE=\frac{1}{n}\sum_{i=1}^{n}|\hat{y}_i-y_i|")
-    st.caption("MAE：平均每次预测相差多少元/吨。")
+    st.caption("MAE：平均每次预测相差多少价格单位；白银为元/千克，其余材料为元/吨。")
     st.latex(r"MAPE=\frac{100\%}{n}\sum_{i=1}^{n}\left|\frac{\hat{y}_i-y_i}{y_i}\right|")
     st.caption("MAPE：平均误差占实际价格的百分之多少。")
     st.latex(r"RMSE=\sqrt{\frac{1}{n}\sum_{i=1}^{n}(\hat{y}_i-y_i)^2}")
@@ -1604,16 +2933,6 @@ def main() -> None:
         return
 
     inject_style()
-    st.markdown(
-        """
-        <div class="hero">
-            <div class="eyebrow">Metal intelligence · tax-exclusive basis</div>
-            <h1>国内原材料采购价格预测</h1>
-            <p>基于长江有色金属网公开日度价格与碳酸锂广州期货结算价，统一按不含税价格进行 1#铜、A00铝、1#白银、铝ADC12、ZLD104 和碳酸锂的历史趋势分析与未来价格预测。</p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
 
     config = load_config()
     display = {**DEFAULT_DISPLAY, **{metal: name for metal, name in config.excel.columns.items()}}
@@ -1624,12 +2943,14 @@ def main() -> None:
         market_features = load_market_features(conn)
         forecasts = load_latest_forecasts(conn)
         monthly_forecasts = load_latest_monthly_forecasts(conn)
+        driver_contributions = load_latest_forecast_driver_contributions(conn)
         runs = load_update_runs(conn, limit=5)
     except sqlite3.DatabaseError as exc:
         st.error(f"数据库读取失败：{exc}")
         st.stop()
     finally:
         conn.close()
+    monthly_analysis, factor_catalog, verified_events = load_dashboard_analysis_data()
 
     if spot.empty:
         st.warning("暂无价格数据。请先运行 `python update_hybrid_price_database.py` 更新数据库。")
@@ -1647,7 +2968,18 @@ def main() -> None:
         latest_generated = pd.to_datetime(forecasts["generated_at"]).max().strftime("%Y-%m-%d %H:%M")
         latest_model_version = str(forecasts.sort_values("generated_at").iloc[-1]["model_version"])
 
-    st.caption(f"数据截至 {latest_date} · 预测生成于 {latest_generated or '暂无'} · 模型 {latest_model_version}")
+    st.markdown(
+        f"""
+        <div class="dashboard-header">
+            <h1>国内原材料采购价格预测</h1>
+            <div class="dashboard-status">
+                数据截至 {html.escape(latest_date)}<br>
+                预测生成于 {html.escape(latest_generated or "暂无")}　模型 {html.escape(latest_model_version)}
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     if latest_run is not None and latest_run["status"] in {"failed", "error"}:
         st.warning(f"最近一次更新失败：{latest_run.get('error_summary', '')}")
@@ -1663,7 +2995,11 @@ def main() -> None:
             st.session_state["show_landing"] = True
             st.query_params.clear()
             st.rerun()
-        page = st.radio("导航", ["首页概览", "预测总览", "历史回测", "模型说明", "报告中心", "更新记录"], label_visibility="collapsed")
+        page = st.radio(
+            "导航",
+            ["首页概览", "预测总览", "影响分析", "历史回测", "模型说明", "报告中心", "更新记录"],
+            label_visibility="collapsed",
+        )
         st.markdown("---")
         selected_metal = st.selectbox("跟踪品种", metals, format_func=lambda item: display.get(item, item))
         st.markdown(
@@ -1672,7 +3008,13 @@ def main() -> None:
         )
 
     if page == "首页概览":
-        render_home_overview(spot, forecasts, metals, display, colors)
+        render_home_overview(
+            spot,
+            metals,
+            display,
+            colors,
+            verified_events,
+        )
 
     elif page == "预测总览":
         metal = selected_metal
@@ -1685,53 +3027,80 @@ def main() -> None:
 
         latest_price = metal_spot.iloc[-1]["price_cny_per_tonne"]
         change_5d = metal_spot["price_cny_per_tonne"].pct_change(5).iloc[-1]
-        st.markdown('<div class="section-title">市场概览</div>', unsafe_allow_html=True)
-        render_market_cards(spot, metals, display)
-        st.caption("数值表示最新不含税现货均价相较 5 个交易日前的变化。")
+        unit = price_unit(metal)
+        render_forecast_summary_cards(forecasts, metals, display)
 
-        fig = build_trend_figure(metal_spot, metal_forecast, colors[metal])
+        recent_history = metal_spot[
+            metal_spot["trade_date"]
+            >= metal_spot["trade_date"].max() - pd.Timedelta(days=31)
+        ]
+        recent_events = events_in_range(
+            verified_events,
+            metal,
+            recent_history["trade_date"].min(),
+            recent_history["trade_date"].max(),
+        )
+        fig = build_trend_figure(
+            metal_spot,
+            metal_forecast,
+            colors[metal],
+            recent_events,
+            unit,
+        )
         chart_column, model_column = st.columns([3, 1])
         with chart_column:
             st.markdown('<div class="section-title">价格趋势 · ' + display.get(metal, metal) + '</div>', unsafe_allow_html=True)
             st.plotly_chart(fig, width="stretch")
             st.markdown(
-                '<div class="forecast-note"><b>读图方式：</b>实线为已公布的不含税现货均价；蓝线为未来 30 天每天的预测价格；浅蓝阴影是预测的合理范围，意思是价格大约有 80% 的概率落在这两条边界之间。</div>',
+                '<div class="forecast-note"><b>读图方式：</b>实线为已公布的不含税现货均价；蓝线为未来 30 天每天的预测价格；浅蓝阴影表示每日预测下限与预测上限之间的范围。</div>',
                 unsafe_allow_html=True,
             )
         with model_column:
             st.markdown('<div class="section-title">模型评估</div>', unsafe_allow_html=True)
-            model_column.metric("最新现货均价", f"{latest_price:,.0f} 元/吨")
+            model_column.metric("最新现货均价", f"{latest_price:,.0f} {unit}")
             model_column.metric("近5日变化", f"{change_5d * 100:.2f}%" if pd.notna(change_5d) else "暂无")
             if not metal_forecast.empty:
                 forecast_end = metal_forecast.iloc[-1]["predicted_price_cny_per_tonne"]
-                model_column.metric("30日预测末值", f"{forecast_end:,.0f} 元/吨")
+                model_column.metric("30日预测末值", f"{forecast_end:,.0f} {unit}")
                 model_column.metric("预测期变化", f"{forecast_end / latest_price - 1:.2%}")
-        render_monthly_forecast(metal_monthly_forecast, colors[metal])
-        render_top_impact_factors(metal)
+        render_verified_event_details(recent_events)
+        render_monthly_forecast(metal_monthly_forecast, metal_spot, colors[metal], unit)
         render_range_stats(metal, metal_spot, colors[metal])
 
-        feature_snapshot = build_feature_snapshot(spot, market_features)
-        feature_snapshot = feature_snapshot[feature_snapshot["metal"] == metal].copy()
-        feature_snapshot["latest_value"] = pd.to_numeric(feature_snapshot["latest_value"], errors="coerce")
-        feature_snapshot = feature_snapshot[
-            feature_snapshot["latest_value"].notna() & (feature_snapshot["latest_value"].abs() > 1e-12)
-        ]
-        feature_snapshot["factor"] = feature_snapshot["factor"].map(FACTOR_CN).fillna(feature_snapshot["factor"])
-        percentage_factors = {"1日涨跌幅", "5日涨跌幅", "偏离5日均线", "偏离10日均线", "偏离20日均线", "10日波动率", "20日波动率"}
-        feature_snapshot["latest_value"] = feature_snapshot.apply(
-            lambda row: f"{row['latest_value']:.2%}"
-            if row["factor"] in percentage_factors
-            else f"{row['latest_value']:,.2f} 元/吨",
-            axis=1,
+    elif page == "影响分析":
+        render_impact_analysis(
+            selected_metal,
+            monthly_analysis,
+            factor_catalog,
+            colors.get(selected_metal, "#A32035"),
+            "impact",
         )
-        st.dataframe(
-            feature_snapshot.rename(columns={"factor": "因子", "latest_value": "最新值"})[["因子", "最新值"]],
-            width="stretch",
-            hide_index=True,
+        render_forecast_driver_analysis(
+            selected_metal,
+            monthly_analysis,
+            factor_catalog,
+            driver_contributions,
+        )
+        render_terminal_demand(
+            selected_metal,
+            monthly_analysis,
+            colors.get(selected_metal, "#A32035"),
+            "impact",
+        )
+        render_full_factor_strength_overview(
+            selected_metal,
+            factor_catalog,
+            "impact",
         )
 
     elif page == "历史回测":
-        render_backtest(spot, market_features, metals, display, colors, config.model_version)
+        render_backtest(
+            spot,
+            market_features,
+            metals,
+            display,
+            config.model_version,
+        )
 
     elif page == "模型说明":
         render_model_formula()

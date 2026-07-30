@@ -45,10 +45,30 @@ CREATE TABLE IF NOT EXISTS monthly_forecasts (
     metal TEXT NOT NULL,
     forecast_month TEXT NOT NULL,
     predicted_price_cny_per_tonne REAL NOT NULL,
+    lower_bound REAL,
+    upper_bound REAL,
+    direction TEXT,
+    predicted_change_pct REAL,
     source TEXT NOT NULL,
     model_version TEXT NOT NULL,
     generated_at TEXT NOT NULL,
     PRIMARY KEY (metal, forecast_month, model_version, generated_at)
+);
+
+CREATE TABLE IF NOT EXISTS forecast_driver_contributions (
+    metal TEXT NOT NULL,
+    forecast_period TEXT NOT NULL,
+    horizon_type TEXT NOT NULL,
+    factor TEXT NOT NULL,
+    factor_category TEXT NOT NULL,
+    contribution REAL NOT NULL,
+    direction TEXT NOT NULL,
+    source_period TEXT,
+    model_version TEXT NOT NULL,
+    generated_at TEXT NOT NULL,
+    PRIMARY KEY (
+        metal, forecast_period, horizon_type, factor, model_version, generated_at
+    )
 );
 
 CREATE TABLE IF NOT EXISTS update_runs (
@@ -83,7 +103,21 @@ def connect(database_path: str | Path, *, read_only: bool = False) -> sqlite3.Co
 
 def initialize(conn: sqlite3.Connection) -> None:
     conn.executescript(SCHEMA)
+    _add_column_if_missing(conn, "monthly_forecasts", "lower_bound", "REAL")
+    _add_column_if_missing(conn, "monthly_forecasts", "upper_bound", "REAL")
+    _add_column_if_missing(conn, "monthly_forecasts", "direction", "TEXT")
+    _add_column_if_missing(conn, "monthly_forecasts", "predicted_change_pct", "REAL")
     conn.commit()
+
+
+def _add_column_if_missing(
+    conn: sqlite3.Connection, table: str, column: str, definition: str
+) -> None:
+    existing = {
+        str(row[1]) for row in conn.execute(f"PRAGMA table_info({table})").fetchall()
+    }
+    if column not in existing:
+        conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
 
 
 def upsert_spot_prices(conn: sqlite3.Connection, prices: pd.DataFrame) -> int:
@@ -198,24 +232,73 @@ def replace_latest_monthly_forecasts(
             "DELETE FROM monthly_forecasts WHERE metal = ? AND model_version = ?",
             (metal, model_version),
         )
-    rows = forecasts[
-        [
-            "metal",
-            "forecast_month",
-            "predicted_price_cny_per_tonne",
-            "source",
-            "model_version",
-            "generated_at",
-        ]
-    ].copy()
+    expected = [
+        "metal",
+        "forecast_month",
+        "predicted_price_cny_per_tonne",
+        "lower_bound",
+        "upper_bound",
+        "direction",
+        "predicted_change_pct",
+        "source",
+        "model_version",
+        "generated_at",
+    ]
+    rows = forecasts.copy()
+    for column in expected:
+        if column not in rows:
+            rows[column] = None
+    rows = rows[expected].copy()
     rows["forecast_month"] = pd.to_datetime(rows["forecast_month"]).dt.strftime("%Y-%m")
     payload = rows.to_records(index=False).tolist()
     conn.executemany(
         """
         INSERT INTO monthly_forecasts (
-            metal, forecast_month, predicted_price_cny_per_tonne, source,
-            model_version, generated_at
-        ) VALUES (?, ?, ?, ?, ?, ?)
+            metal, forecast_month, predicted_price_cny_per_tonne, lower_bound,
+            upper_bound, direction, predicted_change_pct, source, model_version,
+            generated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        payload,
+    )
+    conn.commit()
+    return len(payload)
+
+
+def replace_forecast_driver_contributions(
+    conn: sqlite3.Connection, contributions: pd.DataFrame, model_version: str
+) -> int:
+    if contributions.empty:
+        return 0
+    metals = sorted(contributions["metal"].dropna().unique().tolist())
+    for metal in metals:
+        conn.execute(
+            "DELETE FROM forecast_driver_contributions WHERE metal = ? AND model_version = ?",
+            (metal, model_version),
+        )
+    expected = [
+        "metal",
+        "forecast_period",
+        "horizon_type",
+        "factor",
+        "factor_category",
+        "contribution",
+        "direction",
+        "source_period",
+        "model_version",
+        "generated_at",
+    ]
+    rows = contributions.copy()
+    for column in expected:
+        if column not in rows:
+            rows[column] = None
+    payload = rows[expected].to_records(index=False).tolist()
+    conn.executemany(
+        """
+        INSERT INTO forecast_driver_contributions (
+            metal, forecast_period, horizon_type, factor, factor_category,
+            contribution, direction, source_period, model_version, generated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         payload,
     )
@@ -271,6 +354,25 @@ def load_latest_monthly_forecasts(conn: sqlite3.Connection) -> pd.DataFrame:
     ORDER BY f.metal, f.forecast_month
     """
     return pd.read_sql_query(query, conn, parse_dates=["forecast_month", "generated_at"])
+
+
+def load_latest_forecast_driver_contributions(
+    conn: sqlite3.Connection,
+) -> pd.DataFrame:
+    query = """
+    WITH latest AS (
+        SELECT metal, MAX(generated_at) AS generated_at
+        FROM forecast_driver_contributions
+        GROUP BY metal
+    )
+    SELECT c.*
+    FROM forecast_driver_contributions c
+    JOIN latest l
+      ON c.metal = l.metal
+     AND c.generated_at = l.generated_at
+    ORDER BY c.metal, c.forecast_period, ABS(c.contribution) DESC
+    """
+    return pd.read_sql_query(query, conn, parse_dates=["generated_at"])
 
 
 def load_update_runs(conn: sqlite3.Connection, limit: int = 20) -> pd.DataFrame:

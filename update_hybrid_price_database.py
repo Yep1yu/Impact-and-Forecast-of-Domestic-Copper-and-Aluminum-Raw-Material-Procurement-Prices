@@ -13,6 +13,7 @@ import pandas as pd
 import requests
 
 from domestic_prices.config import load_config
+from domestic_prices.analytics import ensure_monthly_horizon
 from domestic_prices.db import (
     connect,
     finish_run,
@@ -125,7 +126,9 @@ def main() -> None:
             spot_prices,
         )
         rows_forecast = replace_latest_forecasts(conn, forecasts, args.model_version)
-        monthly_forecasts = load_monthly_forecasts_for_db(args.monthly_workbook, args.model_version)
+        monthly_forecasts = load_monthly_forecasts_for_db(
+            args.monthly_workbook, args.model_version, spot_prices
+        )
         rows_monthly_forecast = replace_latest_monthly_forecasts(conn, monthly_forecasts, args.model_version)
         finish_run(
             conn,
@@ -275,7 +278,9 @@ def load_hybrid_forecasts_for_db(path: Path, model_version: str, spot_prices: pd
     return pd.DataFrame(rows)
 
 
-def load_monthly_forecasts_for_db(path: Path, model_version: str) -> pd.DataFrame:
+def load_monthly_forecasts_for_db(
+    path: Path, model_version: str, spot_prices: pd.DataFrame
+) -> pd.DataFrame:
     if not path.exists():
         raise FileNotFoundError(path)
     raw = pd.read_excel(path, sheet_name="未来月份预测")
@@ -301,11 +306,20 @@ def load_monthly_forecasts_for_db(path: Path, model_version: str) -> pd.DataFram
     out["source"] = "monthly-variable-model"
     out["model_version"] = model_version
     out["generated_at"] = datetime.now(UTC).replace(microsecond=0).isoformat()
+    extended = []
+    for metal, group in out.groupby("metal"):
+        metal_spot = spot_prices[spot_prices["metal"] == metal].copy()
+        extended.append(ensure_monthly_horizon(group, metal_spot, periods=12))
+    out = pd.concat(extended, ignore_index=True) if extended else out
     return out[
         [
             "metal",
             "forecast_month",
             "predicted_price_cny_per_tonne",
+            "lower_bound",
+            "upper_bound",
+            "direction",
+            "predicted_change_pct",
             "source",
             "model_version",
             "generated_at",
