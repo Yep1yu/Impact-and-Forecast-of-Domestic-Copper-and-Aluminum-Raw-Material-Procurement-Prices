@@ -1734,8 +1734,14 @@ def render_impact_analysis(
                     plot_bgcolor="#ffffff",
                     margin={"l": 30, "r": 15, "t": 82, "b": 28},
                     showlegend=True,
-                    hovermode="closest",
-                    hoverlabel={"bgcolor": "#FFFFFF", "font": {"color": "#2A2A2D"}},
+                    dragmode=False,
+                    hovermode="x unified",
+                    hoverlabel={
+                        "bgcolor": "#FFFFFF",
+                        "bordercolor": "#8B1E2D",
+                        "align": "left",
+                        "font": {"color": "#2A2A2D", "size": 12},
+                    },
                     legend={
                         "orientation": "h",
                         "yanchor": "bottom",
@@ -1756,6 +1762,7 @@ def render_impact_analysis(
                     fig,
                     width="stretch",
                     key=f"{key_prefix}_{category}_{factor}_chart",
+                    config={"displayModeBar": False, "scrollZoom": False},
                 )
                 source_name, source_url = factor_source(factor)
                 source_text = f"[{source_name}]({source_url})" if source_url else source_name
@@ -1946,12 +1953,21 @@ def render_terminal_demand(
                 margin={"l": 30, "r": 15, "t": 42, "b": 25},
                 showlegend=False,
                 yaxis_title=row["unit"],
+                dragmode=False,
+                hovermode="x unified",
+                hoverlabel={
+                    "bgcolor": "#FFFFFF",
+                    "bordercolor": "#8B1E2D",
+                    "align": "left",
+                    "font": {"color": "#2A2A2D", "size": 12},
+                },
             )
             fig.update_yaxes(showgrid=True, gridcolor="rgba(80,80,84,.10)")
             st.plotly_chart(
                 fig,
                 width="stretch",
                 key=f"{key_prefix}_terminal_{indicator}_chart",
+                config={"displayModeBar": False, "scrollZoom": False},
             )
             st.caption(f"来源：{row['source']}")
 
