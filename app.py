@@ -1648,7 +1648,7 @@ def build_price_history_figure(
         paper_bgcolor="rgba(255,255,255,0)",
         plot_bgcolor="#ffffff",
         font={"color": "#64748b"},
-        margin={"l": 20, "r": 20, "t": 150, "b": 20},
+        margin={"l": 20, "r": 20, "t": 35, "b": 20},
         yaxis_title=f"{unit}（不含税）",
         hovermode="x unified",
         hoverlabel={
