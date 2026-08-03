@@ -2909,55 +2909,59 @@ def render_model_formula() -> None:
     st.subheader("模型说明")
     st.markdown(
         """
-        看板使用的是组合预测模型，而不是只依赖一种算法。它会同时参考近期价格变化、历史价格规律和月度影响因素，
-        再用过去的实际结果检验不同方法，选择在相近情形下误差较小的结果。所有价格均为不含税价格；预测用于辅助判断，并非对未来价格的保证。
+        平台采用“日度组合预测 + 月度价格校准”的方法，不依赖单一算法。系统先根据历史价格生成未来 30 天的日度预测，
+        再结合月度模型的判断进行校准，并通过历史回测选择表现更稳定的结果。所有价格均为不含税价格，预测结果仅用于辅助判断。
         """
     )
 
-    st.markdown('<div class="section-title">1. 日度候选模型</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">1. 日度组合预测</div>', unsafe_allow_html=True)
     st.markdown(
         """
-        系统会为每种原材料同时计算多种预测：以最近价格为基准、根据近期变化速度推演、根据历史规律推演，以及把多种结果综合起来。
-        每种方法都会用过去一段时间的真实价格反复检验，表现更稳定的方法会获得更高权重。
+        系统会同时计算多种结果：以最近价格为基准、根据近期变化速度推演、根据历史价格规律推演，
+        以及使用 Ridge 回归等方法。对同一天的多种预测取中间值，可以减少单一方法异常造成的影响。
         """
     )
     st.latex(r"P^{daily}_{t+h}=\operatorname{median}(P^{recent}_{t+h},P^{trend}_{t+h},P^{history}_{t+h})")
-    st.caption("上式表示：对同一天的多种预测结果取中间值，避免单一方法出现异常时对结果造成过大影响。P 表示价格，t 表示当前日期，h 表示预测到未来第几天。")
+    st.caption("P 表示价格，t 表示当前日期，h 表示预测到未来第几天。")
 
-    st.markdown('<div class="section-title">2. 与月度判断保持一致</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">2. 月度价格校准</div>', unsafe_allow_html=True)
     st.markdown(
         """
-        当月度模型能够给出可靠的月均价判断时，系统会适度校准日度预测，使同一个月内的每日预测与月度判断不互相矛盾。
-        越靠近预测起点，越保留近期日度价格信号；预测日期越远，越多参考月度信息。
+        月度模型会根据期货、库存、宏观经济和下游需求等因素判断未来月均价格。
+        日度预测与该月判断存在差距时，系统会进行适度校准：近期日期更多保留价格走势，远期日期更多参考月度判断。
         """
     )
     st.latex(r"P^{final}_{t+h}=P^{daily}_{t+h}+w_h\,(T_m-\overline{P}^{daily}_m)")
-    st.caption("上式表示：最终预测价格 = 日度预测价格 + 校准值。Tₘ 是该月的月均价判断，P̄ᵈᵃⁱˡʸₘ 是日度预测在该月的平均值；两者的差距会按权重 wₕ 逐步加入最终结果。")
+    st.caption("Tₘ 是月度模型判断的月均价格，P̄ᵈᵃⁱˡʸₘ 是日度预测的月均值，wₕ 是随预测期限变化的校准权重。")
 
-    st.markdown('<div class="section-title">3. 自适应择优</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">3. 影响因素与显著性</div>', unsafe_allow_html=True)
     st.markdown(
         """
-        系统会按“原材料种类”和“预测到第几天”分别比较历史表现。只有某种方法过去的平均误差更低时，才会采用它；否则保留另一种方法的结果。
-        因此不同原材料、不同预测日期采用的计算路径可能不同。
+        影响因素分析以“价格月环比”为目标，候选因素包括期货价格、库存、PPI、PMI、下游行业和进口等指标。
+        系统将数据按月对齐并标准化后进行多元回归：
+        """
+    )
+    st.latex(r"Z(Y)=\beta_0+\beta_1Z(X_1)+\beta_2Z(X_2)+\cdots+\varepsilon")
+    st.markdown(
+        """
+        标准化系数的正负表示影响方向，绝对值越大表示相对影响越强。显著性按 p 值判断：p＜0.01 为极显著，
+        p＜0.05 为显著，p＜0.10 为边际显著。需要注意，显著因子主要用于解释历史变化，
+        不等于它会直接作为日度预测公式的固定权重；部分因素会通过月度模型间接参与校准。
         """
     )
 
-    st.markdown('<div class="section-title">4. 预测区间</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">4. 回测与预测区间</div>', unsafe_allow_html=True)
     st.markdown(
         """
-        每个预测日期都会给出预测价格、预测下限和预测上限。区间宽度依据历史误差和预测期限计算，
-        预测越远通常越宽，价格不一定落在该范围内。鼠标停在预测点上可查看该日预测值及完整下限-上限；白银单位为元/千克，其余材料单位为元/吨。
+        系统会用过去的真实价格反复回测不同方法，并按“原材料种类”和“预测天数”比较误差。
+        页面中的预测下限和上限反映历史误差带，预测越远通常越宽。
         """
     )
-
-    st.markdown('<div class="section-title">5. 如何评估预测是否可靠</div>', unsafe_allow_html=True)
-    st.markdown("以下指标将预测价格与之后实际公布的价格逐日或逐月对比。n 为对比次数，ŷᵢ 为第 i 次预测价格，yᵢ 为对应的实际价格。三项指标均越低越好。")
+    st.markdown("MAE、MAPE 和 RMSE 均用于衡量预测误差，数值越低表示历史表现越好。")
     st.latex(r"MAE=\frac{1}{n}\sum_{i=1}^{n}|\hat{y}_i-y_i|")
-    st.caption("MAE：平均每次预测相差多少价格单位；白银为元/千克，其余材料为元/吨。")
     st.latex(r"MAPE=\frac{100\%}{n}\sum_{i=1}^{n}\left|\frac{\hat{y}_i-y_i}{y_i}\right|")
-    st.caption("MAPE：平均误差占实际价格的百分之多少。")
     st.latex(r"RMSE=\sqrt{\frac{1}{n}\sum_{i=1}^{n}(\hat{y}_i-y_i)^2}")
-    st.caption("RMSE：会更重视偏差特别大的预测，用于识别是否存在较明显的单次失准。")
+    st.caption("MAE 表示平均差多少；MAPE 表示平均误差占实际价格的比例；RMSE 对较大的单次误差更敏感。")
 
 
 @st.cache_data(show_spinner=False)
