@@ -497,6 +497,7 @@ def inject_style() -> None:
         div[data-testid="stMetricValue"] {{
             color: var(--ink);
             font-size: 1.55rem;
+            white-space: normal;
         }}
         .comparison-note {{
             background: #f0f6ff;
@@ -849,15 +850,32 @@ def inject_style() -> None:
 
         div[data-testid="stMetric"] [data-testid="stMetricValue"] {
             color: #172033;
-            font-size: clamp(1.35rem, 2vw, 1.95rem);
+            font-size: clamp(1.18rem, 1.75vw, 1.65rem);
             font-weight: 760;
             letter-spacing: -.035em;
+            line-height: 1.18;
+            white-space: normal !important;
         }
 
-        div[data-testid="stPlotlyChart"],
+        div[data-testid="stMetric"] [data-testid="stMetricValue"] > div,
+        div[data-testid="stMetric"] [data-testid="stMetricValue"] p {
+            overflow: visible !important;
+            text-overflow: clip !important;
+            white-space: normal !important;
+            word-break: keep-all;
+        }
+
         div[data-testid="stDataFrame"],
         div[data-testid="stAlert"] {
             overflow: hidden;
+            border: 1px solid #e1e7f0;
+            border-radius: 16px;
+            background: #ffffff;
+            box-shadow: 0 12px 34px rgba(49,72,112,.065);
+        }
+
+        div[data-testid="stPlotlyChart"] {
+            overflow: visible;
             border: 1px solid #e1e7f0;
             border-radius: 16px;
             background: #ffffff;
@@ -2104,6 +2122,13 @@ def render_top_impact_factors(metal: str) -> None:
         margin={"l": 210, "r": 55, "t": 10, "b": 28},
         showlegend=False,
         xaxis_title="影响强度",
+        hovermode="closest",
+        hoverlabel={
+            "bgcolor": "#FFFFFF",
+            "bordercolor": "#CBD5E1",
+            "align": "left",
+            "font": {"color": "#2A2A2D", "size": 12},
+        },
     )
     fig.update_xaxes(
         showgrid=True,
