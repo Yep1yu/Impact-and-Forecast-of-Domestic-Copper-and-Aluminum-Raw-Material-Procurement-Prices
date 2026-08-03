@@ -1250,6 +1250,11 @@ def add_market_event_annotations(
     date_span = max(prices["trade_date"].max() - date_min, pd.Timedelta(days=1))
     vertical_offsets = [-58, 76, 148, 230, -128]
     horizontal_offsets = [105, 185, 90, 165, 120]
+    metal_key = str(prices["metal"].iloc[0]) if "metal" in prices.columns and not prices.empty else ""
+    if metal_key == "copper_1":
+        # 铜的事件日期集中在图表右侧，使用上下交错的位置，避免说明框遮住价格曲线。
+        vertical_offsets = [-100, 100, 150, -150, -110]
+        horizontal_offsets = [110, 125, 110, 125, 110]
     for number, event in enumerate(events.sort_values("event_date").head(5).itertuples(index=False), start=1):
         nearest_index = (prices["trade_date"] - event.event_date).abs().idxmin()
         point = prices.loc[nearest_index]
