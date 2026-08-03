@@ -2923,6 +2923,37 @@ def render_model_formula() -> None:
     )
     st.latex(r"P^{daily}_{t+h}=\operatorname{median}(P^{recent}_{t+h},P^{trend}_{t+h},P^{history}_{t+h})")
     st.caption("P 表示价格，t 表示当前日期，h 表示预测到未来第几天。")
+    st.table(
+        pd.DataFrame(
+            [
+                {
+                    "模型": "最近价格基准（Naive_last）",
+                    "核心思路": "将当前最新价格作为未来价格的基准",
+                    "作用": "提供最稳妥的基准结果",
+                },
+                {
+                    "模型": "滚动对数趋势（5/20/60/120天）",
+                    "核心思路": "按不同时间窗口的近期涨跌速度推演未来",
+                    "作用": "捕捉短期、中期和较长期趋势",
+                },
+                {
+                    "模型": "Ridge直接多步回归（Ridge_direct_h）",
+                    "核心思路": "使用滞后价格、均线、涨跌幅和波动率等特征，分别预测第1～30天",
+                    "作用": "利用多个历史特征进行结构化预测",
+                },
+                {
+                    "模型": "ARIMA对数价格模型（ARIMA_log）",
+                    "核心思路": "根据价格序列自身的趋势和时间相关性进行预测",
+                    "作用": "补充时间序列规律，按配置启用",
+                },
+                {
+                    "模型": "中位数组合（Median_ensemble）",
+                    "核心思路": "对多个候选模型的同日预测取中位数",
+                    "作用": "降低单个模型异常值对结果的影响",
+                },
+            ]
+        ),
+    )
 
     st.markdown('<div class="section-title">2. 月度价格校准</div>', unsafe_allow_html=True)
     st.markdown(
