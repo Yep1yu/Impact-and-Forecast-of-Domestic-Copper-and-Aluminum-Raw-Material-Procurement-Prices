@@ -1251,10 +1251,12 @@ def add_market_event_annotations(
     vertical_offsets = [-58, 76, 148, 230, -128]
     horizontal_offsets = [105, 185, 90, 165, 120]
     metal_key = str(prices["metal"].iloc[0]) if "metal" in prices.columns and not prices.empty else ""
-    if metal_key == "copper_1":
-        # 铜的事件日期集中在图表右侧，使用上下交错的位置，避免说明框遮住价格曲线。
-        vertical_offsets = [-100, 100, 150, -150, -110]
-        horizontal_offsets = [110, 125, 110, 125, 110]
+    is_copper = metal_key == "copper_1"
+    if is_copper:
+        value_min = float(pd.to_numeric(prices["price_cny_per_tonne"], errors="coerce").min())
+        value_max = float(pd.to_numeric(prices["price_cny_per_tonne"], errors="coerce").max())
+        value_span = max(value_max - value_min, 1.0)
+        copper_lane_ratios = [0.88, 0.66, 0.44, 0.22, 0.10]
     for number, event in enumerate(events.sort_values("event_date").head(5).itertuples(index=False), start=1):
         nearest_index = (prices["trade_date"] - event.event_date).abs().idxmin()
         point = prices.loc[nearest_index]
@@ -1276,6 +1278,15 @@ def add_market_event_annotations(
         else:
             ax = -horizontal_offset if number % 2 else horizontal_offset
         ay = vertical_offsets[number - 1]
+        annotation_position = {"ax": ax, "ay": ay}
+        if is_copper:
+            lane_index = min(number - 1, len(copper_lane_ratios) - 1)
+            annotation_position = {
+                "ax": point["trade_date"] - pd.Timedelta(days=45 + 15 * lane_index),
+                "ay": value_min + value_span * copper_lane_ratios[lane_index],
+                "axref": "x",
+                "ayref": "y",
+            }
         fig.add_annotation(
             x=point["trade_date"],
             y=point["price_cny_per_tonne"],
@@ -1288,8 +1299,7 @@ def add_market_event_annotations(
             arrowhead=0,
             arrowwidth=1.2,
             arrowcolor="#5f5f63",
-            ax=ax,
-            ay=ay,
+            **annotation_position,
             align="left",
             bordercolor="#5f5f63",
             borderwidth=1,
