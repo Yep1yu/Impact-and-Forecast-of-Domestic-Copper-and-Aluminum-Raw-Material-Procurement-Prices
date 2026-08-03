@@ -1789,7 +1789,7 @@ def render_impact_analysis(
                     margin={"l": 30, "r": 15, "t": 96, "b": 28},
                     showlegend=True,
                     dragmode=False,
-                    hovermode="closest",
+                    hovermode="x unified",
                     hoverlabel={
                         "bgcolor": "#FFFFFF",
                         "bordercolor": "#8B1E2D",
