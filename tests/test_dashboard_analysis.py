@@ -10,7 +10,10 @@ import pandas as pd
 import plotly.graph_objects as go
 
 from app import (
+    NAVIGATION_PAGES,
+    PAGE_DESCRIPTIONS,
     apply_compact_price_ranges,
+    build_factor_strength_figure,
     build_price_history_figure,
     build_trend_figure,
     plain_factor_name,
@@ -39,6 +42,52 @@ from domestic_prices.lithium_model import (
 
 
 class DashboardAnalysisTest(unittest.TestCase):
+    def test_navigation_and_core_page_descriptions(self) -> None:
+        self.assertEqual(
+            NAVIGATION_PAGES,
+            [
+                "历史行情",
+                "影响分析",
+                "预测总览",
+                "模型评估",
+                "模型说明",
+                "报告中心",
+                "更新记录",
+            ],
+        )
+        self.assertEqual(
+            set(PAGE_DESCRIPTIONS),
+            {"历史行情", "影响分析", "预测总览", "模型评估"},
+        )
+        self.assertIn("历史不含税现货均价", PAGE_DESCRIPTIONS["历史行情"])
+        self.assertIn("筛选出的显著因子作为预测模型的输入", PAGE_DESCRIPTIONS["影响分析"])
+        self.assertIn("未来30天日度预测", PAGE_DESCRIPTIONS["预测总览"])
+        self.assertIn("MAE、MAPE和RMSE", PAGE_DESCRIPTIONS["模型评估"])
+
+    def test_factor_strength_hover_is_left_aligned_and_neutral(self) -> None:
+        factors = pd.DataFrame(
+            [
+                {
+                    "factor": "制造业PMI_变化",
+                    "impact_strength": 0.42,
+                    "direction": "正向",
+                    "category": "宏观",
+                    "p_value": 0.03,
+                },
+                {
+                    "factor": "SHFE铝仓单库存_环比",
+                    "impact_strength": 0.28,
+                    "direction": "负向",
+                    "category": "库存",
+                    "p_value": 0.08,
+                },
+            ]
+        )
+        fig = build_factor_strength_figure(factors)
+        self.assertEqual(fig.layout.hoverlabel.align, "left")
+        self.assertIn("影响强度排序", fig.data[0].hovertemplate)
+        self.assertNotIn("显著影响排序", fig.data[0].hovertemplate)
+
     def test_silver_uses_price_per_kilogram(self) -> None:
         self.assertEqual(price_unit("silver_1"), "元/千克")
         self.assertEqual(price_unit("copper_1"), "元/吨")

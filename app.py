@@ -56,6 +56,33 @@ METAL_COLORS = {
     "aluminum_zld104": "#7F1D1D",
     "lithium_carbonate": "#A32035",
 }
+NAVIGATION_PAGES = [
+    "历史行情",
+    "影响分析",
+    "预测总览",
+    "模型评估",
+    "模型说明",
+    "报告中心",
+    "更新记录",
+]
+PAGE_DESCRIPTIONS = {
+    "历史行情": (
+        "汇总各原材料历史不含税现货均价，查看最新价格、历史走势和关键市场事件，"
+        "并自选时间区间比较均价、最高价、最低价和波动情况，判断当前价格在历史中的位置。"
+    ),
+    "影响分析": (
+        "围绕供应、需求、库存、成本、政策和市场价格等方面，收集可能影响原材料价格的指标，"
+        "并结合多元回归显著性检验和时间序列验证筛选有效因子，将筛选出的显著因子作为预测模型的输入。"
+    ),
+    "预测总览": (
+        "展示当前原材料的最新现货价和未来价格判断，包括未来30天日度预测、预测上下限和月度均价趋势，"
+        "帮助了解价格可能的变化方向和幅度。"
+    ),
+    "模型评估": (
+        "将模型预测结果与真实价格进行比较。通过MAE、MAPE和RMSE了解平均偏差及较大误差情况；"
+        "三项指标越低，代表模型在所选历史区间内的预测效果越好。"
+    ),
+}
 
 
 def price_unit(metal: str) -> str:
@@ -1000,6 +1027,13 @@ def inject_style() -> None:
             line-height: 1.55;
             text-align: right;
         }
+        .page-description {
+            color: #252528;
+            font-size: .94rem;
+            line-height: 1.75;
+            margin: 0 0 1rem;
+            max-width: 72rem;
+        }
         .section-title {
             border-bottom-color: var(--pulse-line);
             color: #252528;
@@ -1134,7 +1168,7 @@ def render_landing_page() -> None:
             <div class="landing-copy">
                 <div class="landing-kicker">Material price intelligence</div>
                 <h1>让采购判断，建立在清晰的价格信号上。</h1>
-                <p>以统一的不含税口径，连接现货价格、预测区间与历史回测，为原材料采购提供可追溯的日度判断依据。</p>
+                <p>以统一的不含税口径，连接现货价格、预测区间与模型评估，为原材料采购提供可追溯的日度判断依据。</p>
                 <a class="landing-cta" href="?view=dashboard">进入预测平台</a>
             </div>
             <img class="landing-visual" src="{hero_image}" alt="铜材与铝锭的原材料采购场景">
@@ -1152,7 +1186,7 @@ def render_landing_page() -> None:
                 <div class="detail-points">
                     <div class="detail-point"><strong>多品种同步跟踪</strong><span>覆盖 1#铜、A00铝、1#白银、铝 ADC12、ZLD104 与碳酸锂。</span></div>
                     <div class="detail-point"><strong>预测区间可见</strong><span>使用 P10 至 P90 区间表达价格判断的边界，而非单一结论。</span></div>
-                    <div class="detail-point"><strong>历史表现可复核</strong><span>保留历史回测，以相同口径检查模型的实际表现。</span></div>
+                    <div class="detail-point"><strong>历史表现可复核</strong><span>保留模型评估，以相同口径检查模型的实际表现。</span></div>
                 </div>
             </div>
         </section>
@@ -1162,7 +1196,7 @@ def render_landing_page() -> None:
             <div class="landing-capabilities">
                 <div class="capability-main"><h3>价格预测总览</h3><p>将已公布现货均价、未来预测曲线和预测区间组合呈现，快速识别趋势变化。</p></div>
                 <div class="capability-stack">
-                    <div class="capability-small"><h3>历史回测</h3><p>用真实价格检查预测表现，让模型结果可被持续验证。</p></div>
+                    <div class="capability-small"><h3>模型评估</h3><p>用真实价格检查预测表现，让模型结果可被持续验证。</p></div>
                     <div class="capability-small"><h3>模型说明</h3><p>用通俗语言说明数据来源、价格范围和预测逻辑，方便内部协作与复盘。</p></div>
                 </div>
             </div>
@@ -1771,34 +1805,16 @@ def render_impact_analysis(
                 st.caption(f"来源：{source_text}")
 
 
-def render_full_factor_strength_overview(
-    metal: str,
-    catalog: pd.DataFrame,
-    key_prefix: str,
-) -> None:
-    significant = catalog[
-        (catalog["metal"] == metal) & catalog["impact_strength"].notna()
-    ].copy()
-    if significant.empty:
-        return
-
-    st.markdown(
-        '<div class="section-title">全部变量影响强度排序</div>',
-        unsafe_allow_html=True,
-    )
-
-    significant["significance_rank"] = significant["impact_strength"].rank(
+def build_factor_strength_figure(factors: pd.DataFrame) -> go.Figure:
+    factors = factors.copy()
+    factors["strength_rank"] = factors["impact_strength"].rank(
         method="first", ascending=False
     ).astype(int)
-    significant = significant.sort_values("impact_strength")
-    st.caption(
-        f"共纳入 {len(significant)} 个变量，按影响强度绝对值从高到低排序；"
-        "横向条越长、蓝色越深，影响强度越高。"
-    )
-    max_strength = float(significant["impact_strength"].max())
-    min_strength = float(significant["impact_strength"].min())
+    factors = factors.sort_values("impact_strength")
+    max_strength = float(factors["impact_strength"].max())
+    min_strength = float(factors["impact_strength"].min())
     strength_span = max(max_strength - min_strength, 1e-12)
-    bar_colors = significant["impact_strength"].map(
+    bar_colors = factors["impact_strength"].map(
         lambda value: (
             "rgba(79, 119, 154, "
             f"{0.46 + 0.44 * (float(value) - min_strength) / strength_span:.2f})"
@@ -1806,29 +1822,29 @@ def render_full_factor_strength_overview(
     )
     fig = go.Figure(
         go.Bar(
-            x=significant["impact_strength"],
-            y=significant["factor"].map(plain_factor_name),
+            x=factors["impact_strength"],
+            y=factors["factor"].map(plain_factor_name),
             orientation="h",
             marker_color=bar_colors,
-            text=significant["impact_strength"].map(lambda value: f"{value:.2f}"),
+            text=factors["impact_strength"].map(lambda value: f"{value:.2f}"),
             textposition="outside",
             customdata=np.column_stack(
                 [
-                    significant["significance_rank"],
-                    significant["direction"],
-                    significant["category"],
-                    significant["p_value"],
+                    factors["strength_rank"],
+                    factors["direction"],
+                    factors["category"],
+                    factors["p_value"],
                 ]
             ),
             hovertemplate=(
-                "<b>%{y}</b><br>显著影响排序：第 %{customdata[0]} 位"
+                "<b>%{y}</b><br>影响强度排序：第 %{customdata[0]} 位"
                 "<br>影响强度：%{x:.2f}<br>类别：%{customdata[2]}"
                 "<br>方向：%{customdata[1]}<br>p值：%{customdata[3]:.4f}<extra></extra>"
             ),
         )
     )
     fig.update_layout(
-        height=max(360, 46 * len(significant) + 95),
+        height=max(360, 46 * len(factors) + 95),
         template="plotly_white",
         paper_bgcolor="rgba(255,255,255,0)",
         plot_bgcolor="#ffffff",
@@ -1839,6 +1855,7 @@ def render_full_factor_strength_overview(
         hoverlabel={
             "bgcolor": "#FFFFFF",
             "bordercolor": "#CBD5E1",
+            "align": "left",
             "font": {"color": "#2A2A2D", "size": 12},
         },
     )
@@ -1848,6 +1865,29 @@ def render_full_factor_strength_overview(
         range=[0, max_strength * 1.16 if max_strength > 0 else 1],
     )
     fig.update_yaxes(tickfont={"color": "#343438", "size": 11}, automargin=True)
+    return fig
+
+
+def render_full_factor_strength_overview(
+    metal: str,
+    catalog: pd.DataFrame,
+    key_prefix: str,
+) -> None:
+    factors = catalog[
+        (catalog["metal"] == metal) & catalog["impact_strength"].notna()
+    ].copy()
+    if factors.empty:
+        return
+
+    st.markdown(
+        '<div class="section-title">全部变量影响强度排序</div>',
+        unsafe_allow_html=True,
+    )
+    st.caption(
+        f"共纳入 {len(factors)} 个变量，按影响强度绝对值从高到低排序；"
+        "横向条越长、蓝色越深，影响强度越高。"
+    )
+    fig = build_factor_strength_figure(factors)
     st.plotly_chart(fig, width="stretch", key=f"{key_prefix}_full_factor_strength")
 
 
@@ -2005,7 +2045,7 @@ def render_forecast_driver_analysis(
     contributions = contributions.sort_values(
         "absolute_contribution", ascending=False
     ).head(5)
-    st.markdown('<div class="section-title">最显著影响因子</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">主要影响因子</div>', unsafe_allow_html=True)
     display_data = contributions.copy()
     display_data["影响因子"] = display_data["factor"].map(plain_factor_name)
     display_data["类别"] = display_data["category"]
@@ -2216,6 +2256,11 @@ def render_home_overview(
     st.caption(
         f"数据截止 {selected_history['trade_date'].max():%Y-%m-%d}，"
         f"价格口径为不含税{selected_unit}。"
+    )
+    render_range_stats(
+        selected_trend_metal,
+        full_history,
+        colors[selected_trend_metal],
     )
     render_verified_event_details(selected_events)
 
@@ -2986,22 +3031,6 @@ def main() -> None:
         latest_generated = pd.to_datetime(forecasts["generated_at"]).max().strftime("%Y-%m-%d %H:%M")
         latest_model_version = str(forecasts.sort_values("generated_at").iloc[-1]["model_version"])
 
-    st.markdown(
-        f"""
-        <div class="dashboard-header">
-            <h1>国内原材料采购价格预测</h1>
-            <div class="dashboard-status">
-                数据截至 {html.escape(latest_date)}<br>
-                预测生成于 {html.escape(latest_generated or "暂无")}　模型 {html.escape(latest_model_version)}
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    if latest_run is not None and latest_run["status"] in {"failed", "error"}:
-        st.warning(f"最近一次更新失败：{latest_run.get('error_summary', '')}")
-
     metals = sorted(
         spot["metal"].dropna().unique().tolist(),
         key=lambda item: list(display).index(item) if item in display else 999,
@@ -3015,7 +3044,7 @@ def main() -> None:
             st.rerun()
         page = st.radio(
             "导航",
-            ["首页概览", "预测总览", "影响分析", "历史回测", "模型说明", "报告中心", "更新记录"],
+            NAVIGATION_PAGES,
             label_visibility="collapsed",
         )
         st.markdown("---")
@@ -3025,7 +3054,29 @@ def main() -> None:
             unsafe_allow_html=True,
         )
 
-    if page == "首页概览":
+    st.markdown(
+        f"""
+        <div class="dashboard-header">
+            <h1>国内原材料采购价格预测</h1>
+            <div class="dashboard-status">
+                数据截至 {html.escape(latest_date)}<br>
+                预测生成于 {html.escape(latest_generated or "暂无")}　模型 {html.escape(latest_model_version)}
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    page_description = PAGE_DESCRIPTIONS.get(page)
+    if page_description:
+        st.markdown(
+            f'<p class="page-description">{html.escape(page_description)}</p>',
+            unsafe_allow_html=True,
+        )
+
+    if latest_run is not None and latest_run["status"] in {"failed", "error"}:
+        st.warning(f"最近一次更新失败：{latest_run.get('error_summary', '')}")
+
+    if page == "历史行情":
         render_home_overview(
             spot,
             metals,
@@ -3074,7 +3125,7 @@ def main() -> None:
                 unsafe_allow_html=True,
             )
         with model_column:
-            st.markdown('<div class="section-title">模型评估</div>', unsafe_allow_html=True)
+            st.markdown('<div class="section-title">预测摘要</div>', unsafe_allow_html=True)
             model_column.metric("最新现货均价", f"{latest_price:,.0f} {unit}")
             model_column.metric("近5日变化", f"{change_5d * 100:.2f}%" if pd.notna(change_5d) else "暂无")
             if not metal_forecast.empty:
@@ -3083,7 +3134,6 @@ def main() -> None:
                 model_column.metric("预测期变化", f"{forecast_end / latest_price - 1:.2%}")
         render_verified_event_details(recent_events)
         render_monthly_forecast(metal_monthly_forecast, metal_spot, colors[metal], unit)
-        render_range_stats(metal, metal_spot, colors[metal])
 
     elif page == "影响分析":
         render_impact_analysis(
@@ -3111,7 +3161,7 @@ def main() -> None:
             "impact",
         )
 
-    elif page == "历史回测":
+    elif page == "模型评估":
         render_backtest(
             spot,
             market_features,
