@@ -2913,6 +2913,9 @@ def render_model_formula() -> None:
         再结合月度模型的判断进行校准，并通过历史回测选择表现更稳定的结果。所有价格均为不含税价格，预测结果仅用于辅助判断。
         """
     )
+    st.markdown(
+        "[查看或下载详细版《模型方法与显著因子筛选说明》](https://github.com/Yep1yu/Impact-and-Forecast-of-Domestic-Copper-and-Aluminum-Raw-Material-Procurement-Prices/raw/refs/heads/main/%E5%8E%9F%E6%9D%90%E6%96%99%E4%BB%B7%E6%A0%BC%E9%A2%84%E6%B5%8B%E5%B9%B3%E5%8F%B0_%E6%A8%A1%E5%9E%8B%E6%96%B9%E6%B3%95%E4%B8%8E%E6%98%BE%E8%91%97%E5%9B%A0%E5%AD%90%E7%AD%9B%E9%80%89%E8%AF%B4%E6%98%8E.docx)"
+    )
 
     st.markdown('<div class="section-title">1. 日度组合预测</div>', unsafe_allow_html=True)
     st.markdown(
