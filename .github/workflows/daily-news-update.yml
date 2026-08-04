@@ -1,0 +1,41 @@
+name: Daily metals news update
+
+on:
+  schedule:
+    # Asia/Shanghai 09:00, every day.
+    - cron: "0 1 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-news-update
+  cancel-in-progress: false
+
+jobs:
+  update-news:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Fetch relevant metals news
+        run: python -m domestic_prices.news --output daily_news.json --limit 5
+
+      - name: Commit refreshed news cache
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add daily_news.json
+          git diff --cached --quiet && exit 0
+          git commit -m "Update daily metals news"
+          git push

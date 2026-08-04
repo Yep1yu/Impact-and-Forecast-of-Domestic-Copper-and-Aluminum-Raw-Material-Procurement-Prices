@@ -3,6 +3,7 @@ numpy
 scikit-learn
 streamlit
 requests
+beautifulsoup4
 PyYAML
 plotly
 akshare

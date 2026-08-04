@@ -37,6 +37,7 @@ from domestic_prices.db import (
     load_spot_prices,
     load_update_runs,
 )
+from domestic_prices.news import load_news_cache
 DEFAULT_DISPLAY = {
     "copper": "铜",
     "aluminum": "铝",
@@ -57,7 +58,7 @@ METAL_COLORS = {
     "lithium_carbonate": "#A32035",
 }
 NAVIGATION_PAGES = [
-    "历史行情",
+    "首页概览",
     "影响分析",
     "预测总览",
     "模型评估",
@@ -66,9 +67,9 @@ NAVIGATION_PAGES = [
     "更新记录",
 ]
 PAGE_DESCRIPTIONS = {
-    "历史行情": (
-        "汇总各原材料历史不含税现货均价，查看最新价格、历史走势和关键市场事件，"
-        "并自选时间区间比较均价、最高价、最低价和波动情况，判断当前价格在历史中的位置。"
+    "首页概览": (
+        "汇总各原材料最新价格、历史不含税现货均价、价格走势和关键市场事件，"
+        "并展示每日更新的铜、铝、白银和碳酸锂等相关资讯。"
     ),
     "影响分析": (
         "围绕供应、需求、库存、成本、政策和市场价格等方面，收集可能影响原材料价格的指标，"
@@ -116,6 +117,7 @@ LANDING_HERO_IMAGE = Path(__file__).resolve().parent / "assets" / "metalpulse_la
 LANDING_DETAIL_IMAGE = Path(__file__).resolve().parent / "assets" / "metalpulse_landing_detail.png"
 FACTOR_COEFFICIENTS = Path(__file__).resolve().parent / "domestic_material_factor_coefficients_v1.csv"
 MONTHLY_RAW_DATA = Path(__file__).resolve().parent / "domestic_material_monthly_dataset_v1.csv"
+NEWS_CACHE = Path(__file__).resolve().parent / "daily_news.json"
 FACTOR_MATERIAL = {
     "copper_1": "1#铜",
     "aluminum_a00": "A00铝",
@@ -507,6 +509,23 @@ def inject_style() -> None:
             padding: 10px 14px;
             margin: 8px 0 12px;
         }}
+        .daily-news-item {{
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            margin: 8px 0;
+            padding: 11px 14px;
+        }}
+        .daily-news-title {{
+            color: var(--ink);
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.45;
+            text-decoration: none;
+        }}
+        .daily-news-title:hover {{ color: var(--accent); }}
+        .daily-news-meta {{ color: var(--muted); font-size: 11px; margin-top: 5px; }}
+        .daily-news-summary {{ color: #64748b; font-size: 12px; line-height: 1.55; margin-top: 5px; }}
         div[data-baseweb="tab-list"] {{
             gap: 5px;
             background: #ffffff;
@@ -1722,6 +1741,36 @@ def render_verified_event_details(events: pd.DataFrame) -> None:
         )
 
 
+def render_daily_news(news_payload: dict[str, object]) -> None:
+    st.markdown('<div class="section-title">每日资讯</div>', unsafe_allow_html=True)
+    items = news_payload.get("items", []) if isinstance(news_payload, dict) else []
+    if not isinstance(items, list) or not items:
+        st.info("暂无可展示的原材料相关资讯，等待定时更新。")
+        return
+    for item in items[:5]:
+        if not isinstance(item, dict):
+            continue
+        title = html.escape(str(item.get("title", "")))
+        url = str(item.get("url", "")).strip()
+        if not title or not url.startswith(("https://", "http://")):
+            continue
+        source = html.escape(str(item.get("source", "")))
+        published = html.escape(str(item.get("published", "")).strip())
+        updated_at = html.escape(str(news_payload.get("updated_at", "")).replace("T", " ")[:16])
+        meta = " · ".join(value for value in [source, published or updated_at] if value)
+        summary = html.escape(str(item.get("summary", "")).strip())
+        summary_html = f'<div class="daily-news-summary">{summary}</div>' if summary else ""
+        st.markdown(
+            f'''<div class="daily-news-item">
+                <a class="daily-news-title" href="{html.escape(url, quote=True)}" target="_blank" rel="noopener noreferrer">{title}</a>
+                <div class="daily-news-meta">{meta}</div>
+                {summary_html}
+            </div>''',
+            unsafe_allow_html=True,
+        )
+    st.caption("资讯来自长江有色和 SMM，展示标题及摘要；点击标题查看原文。")
+
+
 def render_impact_analysis(
     metal: str,
     monthly_data: pd.DataFrame,
@@ -2246,6 +2295,7 @@ def render_home_overview(
     display: dict[str, str],
     colors: dict[str, str],
     verified_events: pd.DataFrame,
+    news_payload: dict[str, object] | None = None,
 ) -> None:
     st.markdown('<div class="section-title">市场概览</div>', unsafe_allow_html=True)
     render_market_cards(spot, metals, display)
@@ -2310,6 +2360,7 @@ def render_home_overview(
         colors[selected_trend_metal],
     )
     render_verified_event_details(selected_events)
+    render_daily_news(news_payload or {})
 
 
 def render_report_center(
@@ -3099,6 +3150,7 @@ def main() -> None:
     finally:
         conn.close()
     monthly_analysis, factor_catalog, verified_events = load_dashboard_analysis_data()
+    daily_news = load_news_cache(NEWS_CACHE)
 
     if spot.empty:
         st.warning("暂无价格数据。请先运行 `python update_hybrid_price_database.py` 更新数据库。")
@@ -3161,13 +3213,14 @@ def main() -> None:
     if latest_run is not None and latest_run["status"] in {"failed", "error"}:
         st.warning(f"最近一次更新失败：{latest_run.get('error_summary', '')}")
 
-    if page == "历史行情":
+    if page == "首页概览":
         render_home_overview(
             spot,
             metals,
             display,
             colors,
             verified_events,
+            daily_news,
         )
 
     elif page == "预测总览":
