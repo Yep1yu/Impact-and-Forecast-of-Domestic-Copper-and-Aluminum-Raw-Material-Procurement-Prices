@@ -30,15 +30,6 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Check CCMN credentials
-        env:
-          CCMN_COOKIE: ${{ secrets.CCMN_COOKIE }}
-        run: |
-          if [ -z "$CCMN_COOKIE" ]; then
-            echo "CCMN_COOKIE is missing. Add it in GitHub repository Settings > Secrets and variables > Actions."
-            exit 1
-          fi
-
       - name: Prepare isolated database copy
         run: |
           mkdir -p .tmp
@@ -46,11 +37,11 @@ jobs:
 
       - name: Fetch prices and rebuild forecasts
         env:
-          CCMN_COOKIE: ${{ secrets.CCMN_COOKIE }}
           PYTHONUNBUFFERED: "1"
         run: >
           python update_hybrid_price_database.py
           --database .tmp/dashboard-update.sqlite
+          --current-only
           --monthly-workbook "monthly_price_prediction_outputs/drop_limited_vars/引入变量结果分析.xlsx"
 
       - name: Validate and publish database

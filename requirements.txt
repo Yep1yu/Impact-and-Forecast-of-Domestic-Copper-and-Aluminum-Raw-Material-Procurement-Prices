@@ -4,6 +4,7 @@ scikit-learn
 streamlit
 requests
 beautifulsoup4
+cryptography
 PyYAML
 plotly
 akshare

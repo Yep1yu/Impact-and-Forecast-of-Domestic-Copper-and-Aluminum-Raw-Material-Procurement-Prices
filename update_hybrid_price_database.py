@@ -23,6 +23,7 @@ from domestic_prices.db import (
     start_run,
     upsert_spot_prices,
 )
+from domestic_prices.ccmn_current import current_row, fetch_current_prices
 from scripts.fetch_ccmn_changjiang_avg_prices import (
     BASE_URL,
     MARKET_VM_ID,
@@ -63,6 +64,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--monthly-workbook", type=Path, default=DEFAULT_MONTHLY_WORKBOOK)
     parser.add_argument("--lookback-days", type=int, default=21, help="Recent CCMN days to refetch.")
     parser.add_argument("--cookie-env", default="CCMN_COOKIE")
+    parser.add_argument(
+        "--current-only",
+        action="store_true",
+        help="Fetch only the current public CCMN quote page; do not call the historical endpoint.",
+    )
     parser.add_argument("--skip-fetch", action="store_true", help="Use the existing price CSV without CCMN fetch.")
     parser.add_argument(
         "--reuse-model-files",
@@ -94,6 +100,16 @@ def main() -> None:
     try:
         if args.skip_fetch:
             messages.append("Skipped CCMN fetch; using existing price CSV.")
+        elif args.current_only:
+            current_payload = fetch_current_prices()
+            current = pd.DataFrame([current_row(current_payload)])
+            existing = pd.read_csv(args.price_csv, encoding="utf-8-sig") if args.price_csv.exists() else pd.DataFrame()
+            merged = merge_wide_price_frames(existing, current)
+            merged.to_csv(args.price_csv, index=False, encoding="utf-8-sig")
+            messages.append(
+                f"Fetched current public CCMN quotes for {current_payload['date']} "
+                f"({len(current_payload['items'])} supported products)."
+            )
         else:
             fetched_rows = update_price_csv_from_ccmn(args.price_csv, args.lookback_days, args.cookie_env)
             messages.append(f"Fetched/merged {fetched_rows} recent CCMN date rows.")
