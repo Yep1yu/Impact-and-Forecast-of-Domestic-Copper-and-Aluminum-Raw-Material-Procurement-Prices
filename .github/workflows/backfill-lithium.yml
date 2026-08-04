@@ -33,6 +33,7 @@ jobs:
       - name: Backfill lithium prices
         env:
           CCMN_COOKIE: ${{ secrets.CCMN_COOKIE }}
+          PYTHONPATH: .
         run: >
           python scripts/backfill_ccmn_lithium.py
           --start "${{ inputs.start }}"
