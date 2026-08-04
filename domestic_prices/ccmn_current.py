@@ -14,6 +14,7 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 CURRENT_URL = "https://www.ccmn.cn/shop/historyData/getCjysAndCjysw"
 AES_KEY = b"ccmnCjysw1455881"
 CURRENT_MARKET = "长江现货"
+LITHIUM_MARKET = "长江综合"
 PRODUCTS = (
     "1#铜",
     "A00铝",
@@ -21,6 +22,7 @@ PRODUCTS = (
     "铝合金ADC12",
     "铸造铝合金锭(ZLD104)",
 )
+LITHIUM_PRODUCT = "电池级碳酸锂99.5%"
 
 
 def _decrypt_json(value: str) -> Any:
@@ -65,10 +67,14 @@ def fetch_current_prices(
         if not isinstance(table, list):
             continue
         for item in table:
-            if not isinstance(item, dict) or item.get("marketName") != CURRENT_MARKET:
+            if not isinstance(item, dict):
                 continue
             product = str(item.get("productSortName") or "").strip()
-            if product not in PRODUCTS:
+            if product in PRODUCTS and item.get("marketName") != CURRENT_MARKET:
+                continue
+            if product == LITHIUM_PRODUCT and item.get("marketName") != LITHIUM_MARKET:
+                continue
+            if product not in (*PRODUCTS, LITHIUM_PRODUCT):
                 continue
             if item.get("avgPrice") in (None, ""):
                 continue
@@ -92,3 +98,16 @@ def current_row(payload: dict[str, Any]) -> dict[str, Any]:
         if item is not None:
             row[product] = item.get("avgPrice")
     return row
+
+
+def current_lithium_row(payload: dict[str, Any]) -> dict[str, Any]:
+    item = payload["items"].get(LITHIUM_PRODUCT)
+    if item is None:
+        return {}
+    return {
+        "trade_date": payload["date"],
+        "metal": "lithium_carbonate",
+        "price_cny_per_tonne": item.get("avgPrice"),
+        "source": "CCMN Changjiang public current quote",
+        "raw_symbol": LITHIUM_PRODUCT,
+    }

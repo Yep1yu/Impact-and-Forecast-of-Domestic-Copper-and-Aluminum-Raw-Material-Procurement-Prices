@@ -6,7 +6,7 @@ from unittest.mock import Mock
 from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
-from domestic_prices.ccmn_current import AES_KEY, current_row, fetch_current_prices
+from domestic_prices.ccmn_current import AES_KEY, current_lithium_row, current_row, fetch_current_prices
 
 
 def encrypt_payload(value):
@@ -36,6 +36,12 @@ class CcmnCurrentTests(unittest.TestCase):
                             "avgPrice": 23720,
                             "publishDate": "2026-08-04",
                         },
+                        {
+                            "marketName": "长江综合",
+                            "productSortName": "电池级碳酸锂99.5%",
+                            "avgPrice": 139000,
+                            "publishDate": "2026-08-04",
+                        },
                     ]]
                 )
             },
@@ -48,6 +54,7 @@ class CcmnCurrentTests(unittest.TestCase):
         self.assertEqual(payload["date"], "2026-08-04")
         self.assertEqual(current_row(payload)["1#铜"], 106940)
         self.assertEqual(current_row(payload)["A00铝"], 23720)
+        self.assertEqual(current_lithium_row(payload)["price_cny_per_tonne"], 139000)
 
 
 if __name__ == "__main__":
