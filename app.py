@@ -562,7 +562,9 @@ def inject_style() -> None:
             background: var(--surface);
             border: 1px solid var(--line);
             border-radius: 10px;
+            box-sizing: border-box;
             min-height: 118px;
+            min-width: 0;
             padding: 14px;
         }}
         .market-card-title {{
@@ -571,7 +573,9 @@ def inject_style() -> None:
             font-weight: 700;
             line-height: 1.35;
             min-height: 2.7em;
-            overflow-wrap: anywhere;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }}
         .market-card-value {{
             color: var(--ink);
@@ -2215,27 +2219,25 @@ def render_forecast_summary_cards(
         return
 
     st.markdown('<div class="section-title">第 30 日预测价格</div>', unsafe_allow_html=True)
-    # 固定为三列两行，避免不同屏幕宽度下六列挤压造成文字换行和卡片高度不一致。
-    for start in range(0, len(forecast_summaries), 3):
-        row_cards = st.columns(3)
-        for column, (metal, name, first_price, last_price, change) in zip(
-            row_cards, forecast_summaries[start : start + 3]
-        ):
-            if abs(change) < 0.005:
-                direction, direction_class = "平稳", "steady"
-            elif change > 0:
-                direction, direction_class = "上行", "up"
-            else:
-                direction, direction_class = "下行", "down"
-            column.markdown(
-                f'''<div class="future-card">
-                    <div class="future-card-title">{html.escape(name)}</div>
-                    <div class="future-card-value">{last_price:,.0f} {price_unit(metal)}</div>
-                    <div class="future-card-meta">第 30 日预测价格<br>相对首日预测：{change:+.2%}</div>
-                    <div class="future-card-trend {direction_class}">{direction}</div>
-                </div>''',
-                unsafe_allow_html=True,
-            )
+    future_cards = st.columns(len(forecast_summaries))
+    for column, (metal, name, first_price, last_price, change) in zip(
+        future_cards, forecast_summaries
+    ):
+        if abs(change) < 0.00005:
+            change_text, direction_class = "0.00%", "steady"
+        elif change > 0:
+            change_text, direction_class = f"↑ {change:.2%}", "up"
+        else:
+            change_text, direction_class = f"↓ {abs(change):.2%}", "down"
+        column.markdown(
+            f'''<div class="market-card">
+                <div class="market-card-title">{html.escape(name)}</div>
+                <div class="market-card-value">{last_price:,.0f} {price_unit(metal)}</div>
+                <div class="market-card-change {direction_class}">{change_text}</div>
+            </div>''',
+            unsafe_allow_html=True,
+        )
+    st.caption("数值表示相对首日预测的变化。")
 
 
 def render_home_overview(
