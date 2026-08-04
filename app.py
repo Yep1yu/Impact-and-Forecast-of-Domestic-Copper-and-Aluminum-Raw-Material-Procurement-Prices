@@ -517,33 +517,28 @@ def inject_style() -> None:
             margin: 8px 0;
             padding: 11px 14px;
         }}
-        .daily-news-layout {{
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-        }}
-        .daily-news-image {{
-            width: 112px;
-            height: 72px;
-            flex: 0 0 112px;
-            object-fit: cover;
-            border-radius: 8px;
-            background: #f1f5f9;
-        }}
-        .daily-news-content {{
-            min-width: 0;
-            flex: 1;
-        }}
         .daily-news-title {{
             color: var(--ink);
             font-size: 14px;
             font-weight: 700;
             line-height: 1.45;
             text-decoration: none;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }}
         .daily-news-title:hover {{ color: var(--accent); }}
         .daily-news-meta {{ color: var(--muted); font-size: 11px; margin-top: 5px; }}
-        .daily-news-summary {{ color: #64748b; font-size: 12px; line-height: 1.55; margin-top: 5px; }}
+        .daily-news-summary {{
+            color: #64748b;
+            font-size: 12px;
+            line-height: 1.55;
+            margin-top: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }}
         div[data-baseweb="tab-list"] {{
             gap: 5px;
             background: #ffffff;
@@ -1780,21 +1775,12 @@ def render_daily_news(news_payload: dict[str, object]) -> None:
         raw_summary = re.sub(r"<[^>]*>", " ", str(item.get("summary", "")))
         summary = html.escape(" ".join(raw_summary.split()).strip())
         summary_html = f'<div class="daily-news-summary">{summary}</div>' if summary else ""
-        image_url = str(item.get("image_url", "")).strip()
-        image_html = ""
-        if image_url.startswith(("https://", "http://")):
-            safe_image_url = html.escape(image_url, quote=True)
-            image_html = (
-                f'<img class="daily-news-image" src="{safe_image_url}" alt="" '
-                'loading="lazy" onerror="this.style.display=\'none\';">'
-            )
         card_html = (
-            '<div class="daily-news-item"><div class="daily-news-layout">'
-            f'{image_html}<div class="daily-news-content">'
+            '<div class="daily-news-item">'
             f'<a class="daily-news-title" href="{html.escape(url, quote=True)}" '
             f'target="_blank" rel="noopener noreferrer">{title}</a>'
-            f'<div class="daily-news-meta">{meta}</div>{summary_html}'
-            '</div></div></div>'
+            f'{summary_html}<div class="daily-news-meta">{meta}</div>'
+            '</div>'
         )
         st.markdown(card_html, unsafe_allow_html=True)
     st.caption("资讯来自长江有色和 SMM，展示标题及摘要；点击标题查看原文。")
@@ -2326,6 +2312,7 @@ def render_home_overview(
     verified_events: pd.DataFrame,
     news_payload: dict[str, object] | None = None,
 ) -> None:
+    render_daily_news(news_payload or {})
     st.markdown('<div class="section-title">市场概览</div>', unsafe_allow_html=True)
     render_market_cards(spot, metals, display)
     st.caption("数值表示最新不含税现货均价相较 5 个交易日前的变化。")
@@ -2389,7 +2376,6 @@ def render_home_overview(
         colors[selected_trend_metal],
     )
     render_verified_event_details(selected_events)
-    render_daily_news(news_payload or {})
 
 
 def render_report_center(

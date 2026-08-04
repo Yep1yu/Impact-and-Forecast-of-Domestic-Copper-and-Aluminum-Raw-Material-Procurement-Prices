@@ -76,10 +76,13 @@ def _parse_ccmn(html: bytes) -> list[dict[str, str]]:
         seen.add(url)
         summary = ""
         parent = anchor.parent
-        if parent is not None and "bulletion_new" in parent.get("class", []):
-            detail = parent.find_next_sibling("p", class_="bulletion_detial")
-            if detail is not None:
-                summary = _clean(detail.get_text(" ", strip=True))
+        if parent is not None:
+            for summary_class in ("bulletion_detial", "artical_p2"):
+                detail = parent.find_next_sibling("p", class_=summary_class)
+                if detail is not None:
+                    summary = _clean(detail.get_text(" ", strip=True))
+                    if summary:
+                        break
         rows.append(
             {
                 "source": "长江有色",
@@ -131,6 +134,28 @@ def _parse_smm(html: bytes) -> list[dict[str, str]]:
     return rows
 
 
+def _fetch_article_summary(url: str) -> str:
+    try:
+        response = requests.get(url, headers=HEADERS, timeout=15)
+        response.raise_for_status()
+    except requests.RequestException:
+        return ""
+    text = _clean(BeautifulSoup(response.content, "html.parser").get_text(" ", strip=True))
+    for marker in ("文章摘要：", "摘要："):
+        start = text.find(marker)
+        if start < 0:
+            continue
+        fragment = text[start + len(marker):]
+        stop_positions = [fragment.find(stop) for stop in ("信息来源：", "发布时间：", "内容加载中", "点击查看全文", "【免责声明】")]
+        stop_positions = [position for position in stop_positions if position >= 0]
+        if stop_positions:
+            fragment = fragment[:min(stop_positions)]
+        fragment = _clean(fragment)
+        if fragment:
+            return fragment[:180]
+    return ""
+
+
 def _relevance_score(item: dict[str, str]) -> int:
     text = f"{item.get('title', '')} {item.get('summary', '')}".lower()
     score = sum(3 for keyword in MATERIAL_KEYWORDS if keyword.lower() in text)
@@ -174,7 +199,11 @@ def fetch_daily_news(limit: int = 5) -> tuple[list[dict[str, str]], list[str]]:
             items.extend(parser(response.content))
         except Exception as exc:
             errors.append(f"{source}: {exc}")
-    return select_relevant_news(items, limit), errors
+    selected = select_relevant_news(items, limit)
+    for item in selected:
+        if item.get("source") == "长江有色" and not item.get("summary"):
+            item["summary"] = _fetch_article_summary(item.get("url", ""))
+    return selected, errors
 
 
 def write_news_cache(path: Path, items: list[dict[str, str]], errors: list[str] | None = None) -> None:
