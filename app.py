@@ -1788,18 +1788,15 @@ def render_daily_news(news_payload: dict[str, object]) -> None:
                 f'<img class="daily-news-image" src="{safe_image_url}" alt="" '
                 'loading="lazy" onerror="this.style.display=\'none\';">'
             )
-        st.markdown(
-            f'''<div class="daily-news-item"><div class="daily-news-layout">
-                {image_html}
-                <div class="daily-news-content">
-                    <a class="daily-news-title" href="{html.escape(url, quote=True)}" target="_blank" rel="noopener noreferrer">{title}</a>
-                    <div class="daily-news-meta">{meta}</div>
-                    {summary_html}
-                </div>
-                </div>
-            </div>''',
-            unsafe_allow_html=True,
+        card_html = (
+            '<div class="daily-news-item"><div class="daily-news-layout">'
+            f'{image_html}<div class="daily-news-content">'
+            f'<a class="daily-news-title" href="{html.escape(url, quote=True)}" '
+            f'target="_blank" rel="noopener noreferrer">{title}</a>'
+            f'<div class="daily-news-meta">{meta}</div>{summary_html}'
+            '</div></div></div>'
         )
+        st.markdown(card_html, unsafe_allow_html=True)
     st.caption("资讯来自长江有色和 SMM，展示标题及摘要；点击标题查看原文。")
 
 
