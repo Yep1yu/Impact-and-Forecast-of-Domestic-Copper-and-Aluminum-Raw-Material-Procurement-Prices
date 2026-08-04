@@ -26,11 +26,11 @@
     {
       "series": "1#铜",
       "sample_start": "2021-07-01",
-      "sample_end": "2026-07-21",
-      "sample_rows": 1225,
+      "sample_end": "2026-08-04",
+      "sample_rows": 1235,
       "validation_origin_count": 120,
-      "validation_start_origin": "2025-12-05",
-      "validation_end_origin": "2026-06-08",
+      "validation_start_origin": "2025-12-19",
+      "validation_end_origin": "2026-06-23",
       "arima_spec": {
         "order": [
           0,
@@ -39,50 +39,50 @@
         ],
         "trend": "t"
       },
-      "mean_final_MAE": 2887.883480825959,
-      "mean_naive_MAE": 2887.883480825959,
+      "mean_final_MAE": 2502.1878072763043,
+      "mean_naive_MAE": 2502.1878072763043,
       "beats_naive_horizon_count": 0,
       "checkpoint_horizons": {
         "1": {
-          "final_MAE": 871.9026548672572,
-          "naive_MAE": 871.9026548672572,
-          "final_MAPE_%": 0.9768218567940008,
-          "naive_MAPE_%": 0.9768218567940008,
+          "final_MAE": 881.932153392331,
+          "naive_MAE": 881.932153392331,
+          "final_MAPE_%": 0.9812403775640349,
+          "naive_MAPE_%": 0.9812403775640349,
           "beats_naive": false
         },
         "7": {
-          "final_MAE": 1993.7315634218287,
-          "naive_MAE": 1993.7315634218287,
-          "final_MAPE_%": 2.231096610929572,
-          "naive_MAPE_%": 2.231096610929572,
+          "final_MAE": 1986.5044247787605,
+          "naive_MAE": 1986.5044247787605,
+          "final_MAPE_%": 2.214589912949293,
+          "naive_MAPE_%": 2.214589912949293,
           "beats_naive": false
         },
         "14": {
-          "final_MAE": 3040.4129793510324,
-          "naive_MAE": 3040.4129793510324,
-          "final_MAPE_%": 3.3969241459163677,
-          "naive_MAPE_%": 3.3969241459163677,
+          "final_MAE": 2578.244837758112,
+          "naive_MAE": 2578.244837758112,
+          "final_MAPE_%": 2.877767064882543,
+          "naive_MAPE_%": 2.877767064882543,
           "beats_naive": false
         },
         "30": {
-          "final_MAE": 3779.3510324483777,
-          "naive_MAE": 3779.3510324483777,
-          "final_MAPE_%": 4.189552514317341,
-          "naive_MAPE_%": 4.189552514317341,
+          "final_MAE": 3198.3775811209434,
+          "naive_MAE": 3198.3775811209434,
+          "final_MAPE_%": 3.5399411298837378,
+          "naive_MAPE_%": 3.5399411298837378,
           "beats_naive": false
         }
       },
-      "forecast_start": "2026-07-22",
-      "forecast_end": "2026-09-01"
+      "forecast_start": "2026-08-05",
+      "forecast_end": "2026-09-15"
     },
     {
       "series": "A00铝",
       "sample_start": "2021-07-01",
-      "sample_end": "2026-07-21",
-      "sample_rows": 1225,
+      "sample_end": "2026-08-04",
+      "sample_rows": 1235,
       "validation_origin_count": 120,
-      "validation_start_origin": "2025-12-05",
-      "validation_end_origin": "2026-06-08",
+      "validation_start_origin": "2025-12-19",
+      "validation_end_origin": "2026-06-23",
       "arima_spec": {
         "order": [
           0,
@@ -91,50 +91,50 @@
         ],
         "trend": "n"
       },
-      "mean_final_MAE": 614.3094471287317,
-      "mean_naive_MAE": 639.3411996066864,
-      "beats_naive_horizon_count": 13,
+      "mean_final_MAE": 598.1158364506434,
+      "mean_naive_MAE": 598.1588003933138,
+      "beats_naive_horizon_count": 1,
       "checkpoint_horizons": {
         "1": {
-          "final_MAE": 196.38643067846576,
-          "naive_MAE": 196.38643067846576,
-          "final_MAPE_%": 0.9258363012378392,
-          "naive_MAPE_%": 0.9258363012378392,
+          "final_MAE": 196.68141592920338,
+          "naive_MAE": 196.68141592920338,
+          "final_MAPE_%": 0.9232789017756238,
+          "naive_MAPE_%": 0.9232789017756238,
           "beats_naive": false
         },
         "7": {
-          "final_MAE": 499.3362831858406,
-          "naive_MAE": 499.3362831858406,
-          "final_MAPE_%": 2.344660003606213,
-          "naive_MAPE_%": 2.344660003606213,
+          "final_MAE": 540.4129793510325,
+          "naive_MAE": 540.4129793510325,
+          "final_MAPE_%": 2.545748429713341,
+          "naive_MAPE_%": 2.545748429713341,
           "beats_naive": false
         },
         "14": {
-          "final_MAE": 611.9636223318204,
-          "naive_MAE": 693.2890855457229,
-          "final_MAPE_%": 2.867990535074592,
-          "naive_MAPE_%": 3.249006149171289,
-          "beats_naive": true
+          "final_MAE": 684.8820058997051,
+          "naive_MAE": 684.8820058997051,
+          "final_MAPE_%": 3.2255368459735383,
+          "naive_MAPE_%": 3.2255368459735383,
+          "beats_naive": false
         },
         "30": {
-          "final_MAE": 814.8230088495577,
-          "naive_MAE": 814.8230088495577,
-          "final_MAPE_%": 3.8578844517816577,
-          "naive_MAPE_%": 3.8578844517816577,
+          "final_MAE": 689.6017699115043,
+          "naive_MAE": 689.6017699115043,
+          "final_MAPE_%": 3.278463408840245,
+          "naive_MAPE_%": 3.278463408840245,
           "beats_naive": false
         }
       },
-      "forecast_start": "2026-07-22",
-      "forecast_end": "2026-09-01"
+      "forecast_start": "2026-08-05",
+      "forecast_end": "2026-09-15"
     },
     {
       "series": "1#白银",
       "sample_start": "2021-07-01",
-      "sample_end": "2026-07-21",
-      "sample_rows": 1225,
+      "sample_end": "2026-08-04",
+      "sample_rows": 1235,
       "validation_origin_count": 120,
-      "validation_start_origin": "2025-12-05",
-      "validation_end_origin": "2026-06-08",
+      "validation_start_origin": "2025-12-19",
+      "validation_end_origin": "2026-06-23",
       "arima_spec": {
         "order": [
           1,
@@ -143,50 +143,50 @@
         ],
         "trend": "t"
       },
-      "mean_final_MAE": 2659.4081171521707,
-      "mean_naive_MAE": 2660.558013765978,
-      "beats_naive_horizon_count": 3,
+      "mean_final_MAE": 2394.070701892831,
+      "mean_naive_MAE": 2394.459193706981,
+      "beats_naive_horizon_count": 2,
       "checkpoint_horizons": {
         "1": {
-          "final_MAE": 655.4805037650531,
-          "naive_MAE": 665.5604719764013,
-          "final_MAPE_%": 3.5447238532673286,
-          "naive_MAPE_%": 3.600047960790532,
+          "final_MAE": 673.4242536622603,
+          "naive_MAE": 682.6696165191742,
+          "final_MAPE_%": 3.661837576530544,
+          "naive_MAPE_%": 3.7102125748064756,
           "beats_naive": true
         },
         "7": {
-          "final_MAE": 1886.7625368731567,
-          "naive_MAE": 1886.7625368731567,
-          "final_MAPE_%": 10.359929041890084,
-          "naive_MAPE_%": 10.359929041890084,
+          "final_MAE": 1849.225663716814,
+          "naive_MAE": 1849.225663716814,
+          "final_MAPE_%": 10.26197948071581,
+          "naive_MAPE_%": 10.26197948071581,
           "beats_naive": false
         },
         "14": {
-          "final_MAE": 2636.5412979351026,
-          "naive_MAE": 2636.5412979351026,
-          "final_MAPE_%": 14.635030267145439,
-          "naive_MAPE_%": 14.635030267145439,
+          "final_MAE": 2439.048672566372,
+          "naive_MAE": 2439.048672566372,
+          "final_MAPE_%": 13.649388760775405,
+          "naive_MAPE_%": 13.649388760775405,
           "beats_naive": false
         },
         "30": {
-          "final_MAE": 3951.880530973452,
-          "naive_MAE": 3951.880530973452,
-          "final_MAPE_%": 22.916742685729233,
-          "naive_MAPE_%": 22.916742685729233,
+          "final_MAE": 3190.0073746312682,
+          "naive_MAE": 3190.0073746312682,
+          "final_MAPE_%": 20.2244798769802,
+          "naive_MAPE_%": 20.2244798769802,
           "beats_naive": false
         }
       },
-      "forecast_start": "2026-07-22",
-      "forecast_end": "2026-09-01"
+      "forecast_start": "2026-08-05",
+      "forecast_end": "2026-09-15"
     },
     {
       "series": "铝合金ADC12",
       "sample_start": "2021-07-01",
-      "sample_end": "2026-07-21",
-      "sample_rows": 1225,
+      "sample_end": "2026-08-04",
+      "sample_rows": 1235,
       "validation_origin_count": 120,
-      "validation_start_origin": "2025-12-05",
-      "validation_end_origin": "2026-06-08",
+      "validation_start_origin": "2025-12-19",
+      "validation_end_origin": "2026-06-23",
       "arima_spec": {
         "order": [
           1,
@@ -195,93 +195,93 @@
         ],
         "trend": "t"
       },
-      "mean_final_MAE": 537.16814159292,
-      "mean_naive_MAE": 537.16814159292,
+      "mean_final_MAE": 460.8652900688294,
+      "mean_naive_MAE": 460.8652900688294,
       "beats_naive_horizon_count": 0,
       "checkpoint_horizons": {
         "1": {
-          "final_MAE": 98.08259587020679,
-          "naive_MAE": 98.08259587020679,
-          "final_MAPE_%": 0.4670016139019608,
-          "naive_MAPE_%": 0.4670016139019608,
+          "final_MAE": 98.0825958702066,
+          "naive_MAE": 98.0825958702066,
+          "final_MAPE_%": 0.46488832978761163,
+          "naive_MAPE_%": 0.46488832978761163,
           "beats_naive": false
         },
         "7": {
-          "final_MAE": 351.76991150442444,
-          "naive_MAE": 351.76991150442444,
-          "final_MAPE_%": 1.6656599419566482,
-          "naive_MAPE_%": 1.6656599419566482,
+          "final_MAE": 364.30678466076637,
+          "naive_MAE": 364.30678466076637,
+          "final_MAPE_%": 1.720664595205865,
+          "naive_MAPE_%": 1.720664595205865,
           "beats_naive": false
         },
         "14": {
-          "final_MAE": 539.8230088495571,
-          "naive_MAE": 539.8230088495571,
-          "final_MAPE_%": 2.556135702023442,
-          "naive_MAPE_%": 2.556135702023442,
+          "final_MAE": 467.5516224188786,
+          "naive_MAE": 467.5516224188786,
+          "final_MAPE_%": 2.2004345513863774,
+          "naive_MAPE_%": 2.2004345513863774,
           "beats_naive": false
         },
         "30": {
-          "final_MAE": 787.6106194690262,
-          "naive_MAE": 787.6106194690262,
-          "final_MAPE_%": 3.7119909713912667,
-          "naive_MAPE_%": 3.7119909713912667,
+          "final_MAE": 639.3805309734508,
+          "naive_MAE": 639.3805309734508,
+          "final_MAPE_%": 3.0076735819939175,
+          "naive_MAPE_%": 3.0076735819939175,
           "beats_naive": false
         }
       },
-      "forecast_start": "2026-07-22",
-      "forecast_end": "2026-09-01"
+      "forecast_start": "2026-08-05",
+      "forecast_end": "2026-09-15"
     },
     {
       "series": "铸造铝合金锭(ZLD104)",
       "sample_start": "2022-04-01",
-      "sample_end": "2026-07-21",
-      "sample_rows": 1042,
+      "sample_end": "2026-08-04",
+      "sample_rows": 1052,
       "validation_origin_count": 120,
-      "validation_start_origin": "2025-12-05",
-      "validation_end_origin": "2026-06-08",
+      "validation_start_origin": "2025-12-19",
+      "validation_end_origin": "2026-06-23",
       "arima_spec": {
         "order": [
-          1,
+          0,
           1,
           0
         ],
         "trend": "n"
       },
-      "mean_final_MAE": 704.3756145526053,
-      "mean_naive_MAE": 704.3756145526053,
+      "mean_final_MAE": 641.2241887905602,
+      "mean_naive_MAE": 641.2241887905602,
       "beats_naive_horizon_count": 0,
       "checkpoint_horizons": {
         "1": {
-          "final_MAE": 162.24188790560464,
-          "naive_MAE": 162.24188790560464,
-          "final_MAPE_%": 0.7322202813027712,
-          "naive_MAPE_%": 0.7322202813027712,
+          "final_MAE": 164.45427728613566,
+          "naive_MAE": 164.45427728613566,
+          "final_MAPE_%": 0.7401432949500795,
+          "naive_MAPE_%": 0.7401432949500795,
           "beats_naive": false
         },
         "7": {
-          "final_MAE": 478.6135693215337,
-          "naive_MAE": 478.6135693215337,
-          "final_MAPE_%": 2.147328085311393,
-          "naive_MAPE_%": 2.147328085311393,
+          "final_MAE": 514.0117994100295,
+          "naive_MAE": 514.0117994100295,
+          "final_MAPE_%": 2.317915567185825,
+          "naive_MAPE_%": 2.317915567185825,
           "beats_naive": false
         },
         "14": {
-          "final_MAE": 688.790560471976,
-          "naive_MAE": 688.790560471976,
-          "final_MAPE_%": 3.0976283023695905,
-          "naive_MAPE_%": 3.0976283023695905,
+          "final_MAE": 666.6666666666664,
+          "naive_MAE": 666.6666666666664,
+          "final_MAPE_%": 3.017647054657857,
+          "naive_MAPE_%": 3.017647054657857,
           "beats_naive": false
         },
         "30": {
-          "final_MAE": 1033.9233038348075,
-          "naive_MAE": 1033.9233038348075,
-          "final_MAPE_%": 4.7028850754526355,
-          "naive_MAPE_%": 4.7028850754526355,
+          "final_MAE": 856.1946902654862,
+          "naive_MAE": 856.1946902654862,
+          "final_MAPE_%": 3.927065509491043,
+          "naive_MAPE_%": 3.927065509491043,
           "beats_naive": false
         }
       },
-      "forecast_start": "2026-07-22",
-      "forecast_end": "2026-09-01"
+      "forecast_start": "2026-08-05",
+      "forecast_end": "2026-09-15"
     }
   ]
 }
