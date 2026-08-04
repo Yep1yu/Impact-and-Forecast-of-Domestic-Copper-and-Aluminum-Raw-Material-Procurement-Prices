@@ -47,6 +47,7 @@ def load_settlement_prices(input_dir: Path) -> pd.DataFrame:
         frame = frame.rename(
             columns={
                 frame.columns[0]: "date",
+                frame.columns[1]: "product",
                 frame.columns[3]: "contract",
                 frame.columns[9]: "settlement_price",
                 frame.columns[12]: "volume",
@@ -54,6 +55,7 @@ def load_settlement_prices(input_dir: Path) -> pd.DataFrame:
                 frame.columns[14]: "open_interest_change",
             }
         )
+        frame = frame[frame["product"].astype(str).str.strip() == "碳酸锂"]
         frame["date"] = pd.to_datetime(
             frame["date"].astype(str), format="%Y%m%d", errors="coerce"
         )

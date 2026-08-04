@@ -23,7 +23,7 @@ from domestic_prices.db import (
     start_run,
     upsert_spot_prices,
 )
-from domestic_prices.ccmn_current import current_lithium_row, current_row, fetch_current_prices
+from domestic_prices.ccmn_current import current_row, fetch_current_prices
 from scripts.fetch_ccmn_changjiang_avg_prices import (
     BASE_URL,
     MARKET_VM_ID,
@@ -119,11 +119,6 @@ def main() -> None:
         messages.append(f"Generated tax-exclusive daily price CSV: {args.tax_exclusive_price_csv.name}.")
         spot_prices = load_wide_price_csv_for_db(args.tax_exclusive_price_csv)
         rows_spot = upsert_spot_prices(conn, spot_prices)
-        if current_payload is not None:
-            lithium_row = current_lithium_row(current_payload)
-            if lithium_row:
-                rows_spot += upsert_spot_prices(conn, pd.DataFrame([lithium_row]))
-
         if args.refresh_monthly_model:
             run_command([sys.executable, "build_monthly_price_prediction_models.py"])
         if not args.reuse_model_files:
