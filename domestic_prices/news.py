@@ -33,7 +33,16 @@ MATERIAL_KEYWORDS = (
 
 
 def _clean(value: object) -> str:
-    return " ".join(str(value or "").split()).strip()
+    text = BeautifulSoup(str(value or ""), "html.parser").get_text(" ", strip=True)
+    return " ".join(text.split()).strip()
+
+
+def _image_url(node: Any, base_url: str) -> str:
+    image = node.find("img")
+    if image is None:
+        return ""
+    source = image.get("src") or image.get("data-src") or image.get("data-original") or ""
+    return urljoin(base_url, str(source).strip()) if source else ""
 
 
 def _class_text(node: Any, fragment: str) -> str:
@@ -72,6 +81,7 @@ def _parse_ccmn(html: bytes) -> list[dict[str, str]]:
                 "summary": summary[:180],
                 "published": "",
                 "url": url,
+                "image_url": _image_url(anchor, CCMN_URL),
             }
         )
     return rows
@@ -81,19 +91,27 @@ def _parse_smm(html: bytes) -> list[dict[str, str]]:
     soup = BeautifulSoup(html, "html.parser")
     rows: list[dict[str, str]] = []
     seen: set[str] = set()
+    image_by_url: dict[str, str] = {}
+    for image_anchor in soup.find_all("a", href=True):
+        href = str(image_anchor.get("href", ""))
+        if "/en/newscontent/" not in href:
+            continue
+        image_url = _image_url(image_anchor, SMM_URL)
+        if image_url:
+            image_by_url.setdefault(urljoin(SMM_URL, href), image_url)
     for anchor in soup.find_all("a", href=True):
         href = str(anchor.get("href", ""))
         if "/en/newscontent/" not in href:
             continue
         url = urljoin(SMM_URL, href)
-        if url in seen:
-            continue
-        seen.add(url)
         title = _class_text(anchor, "__title") or _clean(anchor.get_text(" ", strip=True))
         summary = _class_text(anchor, "__summary")
         published = _class_text(anchor, "__time")
         if len(title) < 8:
             continue
+        if url in seen:
+            continue
+        seen.add(url)
         rows.append(
             {
                 "source": "SMM",
@@ -101,6 +119,7 @@ def _parse_smm(html: bytes) -> list[dict[str, str]]:
                 "summary": summary[:180],
                 "published": published,
                 "url": url,
+                "image_url": _image_url(anchor, SMM_URL) or image_by_url.get(url, ""),
             }
         )
     return rows

@@ -4,6 +4,7 @@ import random
 import sqlite3
 import base64
 import html
+import re
 from io import BytesIO
 from datetime import date, timedelta
 from pathlib import Path
@@ -515,6 +516,23 @@ def inject_style() -> None:
             border-radius: 10px;
             margin: 8px 0;
             padding: 11px 14px;
+        }}
+        .daily-news-layout {{
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }}
+        .daily-news-image {{
+            width: 112px;
+            height: 72px;
+            flex: 0 0 112px;
+            object-fit: cover;
+            border-radius: 8px;
+            background: #f1f5f9;
+        }}
+        .daily-news-content {{
+            min-width: 0;
+            flex: 1;
         }}
         .daily-news-title {{
             color: var(--ink);
@@ -1758,13 +1776,27 @@ def render_daily_news(news_payload: dict[str, object]) -> None:
         published = html.escape(str(item.get("published", "")).strip())
         updated_at = html.escape(str(news_payload.get("updated_at", "")).replace("T", " ")[:16])
         meta = " · ".join(value for value in [source, published or updated_at] if value)
-        summary = html.escape(str(item.get("summary", "")).strip())
+        # 旧缓存中可能保留了网页片段，显示前再次清理，避免将 HTML 标签当作摘要文本。
+        raw_summary = re.sub(r"<[^>]*>", " ", str(item.get("summary", "")))
+        summary = html.escape(" ".join(raw_summary.split()).strip())
         summary_html = f'<div class="daily-news-summary">{summary}</div>' if summary else ""
+        image_url = str(item.get("image_url", "")).strip()
+        image_html = ""
+        if image_url.startswith(("https://", "http://")):
+            safe_image_url = html.escape(image_url, quote=True)
+            image_html = (
+                f'<img class="daily-news-image" src="{safe_image_url}" alt="" '
+                'loading="lazy" onerror="this.style.display=\'none\';">'
+            )
         st.markdown(
-            f'''<div class="daily-news-item">
-                <a class="daily-news-title" href="{html.escape(url, quote=True)}" target="_blank" rel="noopener noreferrer">{title}</a>
-                <div class="daily-news-meta">{meta}</div>
-                {summary_html}
+            f'''<div class="daily-news-item"><div class="daily-news-layout">
+                {image_html}
+                <div class="daily-news-content">
+                    <a class="daily-news-title" href="{html.escape(url, quote=True)}" target="_blank" rel="noopener noreferrer">{title}</a>
+                    <div class="daily-news-meta">{meta}</div>
+                    {summary_html}
+                </div>
+                </div>
             </div>''',
             unsafe_allow_html=True,
         )
