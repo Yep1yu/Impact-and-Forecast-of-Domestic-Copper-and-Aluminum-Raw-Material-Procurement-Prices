@@ -96,11 +96,12 @@ def fetch_product_range(
     product_id: str,
     start: date,
     end: date,
+    market_vmid: str = MARKET_VM_ID,
 ) -> list[dict[str, Any]]:
     response = session.post(
         f"{BASE_URL}/shop/historyData/getPriceListStartAndEndTime",
         data={
-            "marketVmid": MARKET_VM_ID,
+            "marketVmid": market_vmid,
             "productSortVmid": product_id,
             "startTime": start.strftime("%Y-%m-%d"),
             "endTime": end.strftime("%Y-%m-%d"),
