@@ -42,7 +42,13 @@ def _image_url(node: Any, base_url: str) -> str:
     if image is None:
         return ""
     source = image.get("src") or image.get("data-src") or image.get("data-original") or ""
-    return urljoin(base_url, str(source).strip()) if source else ""
+    if not source:
+        return ""
+    source_text = str(source).strip()
+    lowered = source_text.lower()
+    if any(marker in lowered for marker in ("/icon/", "adbar", "logo", "avatar")):
+        return ""
+    return urljoin(base_url, source_text)
 
 
 def _class_text(node: Any, fragment: str) -> str:
@@ -127,7 +133,9 @@ def _parse_smm(html: bytes) -> list[dict[str, str]]:
 
 def _relevance_score(item: dict[str, str]) -> int:
     text = f"{item.get('title', '')} {item.get('summary', '')}".lower()
-    return sum(3 for keyword in MATERIAL_KEYWORDS if keyword.lower() in text)
+    score = sum(3 for keyword in MATERIAL_KEYWORDS if keyword.lower() in text)
+    # 同等相关度下优先保留来源页面提供的缩略图，避免资讯卡片全部没有视觉预览。
+    return score + (3 if item.get("image_url") else 0)
 
 
 def select_relevant_news(items: list[dict[str, str]], limit: int = 5) -> list[dict[str, str]]:
