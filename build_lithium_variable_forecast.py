@@ -4,7 +4,11 @@ import argparse
 import json
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
+from sklearn.linear_model import Ridge
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 
 from build_daily_ensemble_price_model import Args as DailyEnsembleArgs
 from build_daily_ensemble_price_model import model_one_series
@@ -214,28 +218,83 @@ def build_shared_daily_forecast(main_prices: pd.DataFrame, periods: int) -> pd.D
 
 
 def build_monthly_rolling_baseline(main_prices: pd.DataFrame) -> pd.DataFrame:
-    """Build a one-step-ahead lithium trend baseline for the evaluation page.
+    """Build a rolling daily-feature model for next-month average prices.
 
-    The prediction uses only months that were already available at the forecast
-    origin.  A clipped fraction of the latest month-to-month change reduces the
-    systematic lag of a pure last-value forecast while limiting regime-change
-    overshoot.
+    Each training example is formed at a daily forecast origin and targets the
+    following calendar month's average settlement price.  For each historical
+    month, the model is refit using only origins before that month, so the
+    evaluation does not use information from the month being predicted.
     """
-    monthly = (
-        main_prices.assign(month=main_prices["date"].dt.to_period("M").dt.start_time)
-        .groupby("month", as_index=False)["settlement_price"]
-        .mean()
-        .rename(columns={"settlement_price": "target_price"})
-        .sort_values("month")
+    daily = main_prices.copy().sort_values("date").reset_index(drop=True)
+    daily["date"] = pd.to_datetime(daily["date"])
+    daily["settlement_price"] = pd.to_numeric(daily["settlement_price"], errors="coerce")
+    for column in ["volume", "open_interest"]:
+        if column not in daily:
+            daily[column] = 0.0
+        daily[column] = pd.to_numeric(daily[column], errors="coerce").fillna(0.0)
+    daily["month"] = daily["date"].dt.to_period("M")
+    price = daily["settlement_price"]
+    daily_return = price.pct_change()
+    features = pd.DataFrame(
+        {
+            "price": price,
+            "return_1": daily_return,
+            "return_5": price.pct_change(5),
+            "return_20": price.pct_change(20),
+            "volatility_10": daily_return.rolling(10).std(),
+            "volatility_20": daily_return.rolling(20).std(),
+            "volume_change": daily["volume"].pct_change(),
+            "open_interest_change": daily["open_interest"].pct_change(),
+            "contract_roll": (
+                daily["contract"].astype(str).ne(daily["contract"].astype(str).shift()).astype(float)
+                if "contract" in daily
+                else 0.0
+            ),
+        }
     )
-    fitted = monthly.copy()
-    previous = fitted["target_price"].shift(1)
-    previous_change = fitted["target_price"].shift(1) - fitted["target_price"].shift(2)
-    trend_adjustment = previous_change.clip(lower=-30000.0, upper=30000.0) * 0.5
-    fitted["predicted_monthly_price"] = previous + trend_adjustment.fillna(0.0)
-    return fitted.dropna(subset=["predicted_monthly_price"])[
-        ["target_price", "month", "predicted_monthly_price"]
-    ].reset_index(drop=True)
+    for window in [5, 10, 20, 60]:
+        features[f"ma_gap_{window}"] = price / price.rolling(window).mean() - 1
+    feature_columns = [column for column in features.columns if column != "price"]
+    monthly_target = daily.groupby("month")["settlement_price"].mean().sort_index()
+
+    training_rows: list[tuple[int, float]] = []
+    for origin in range(60, len(daily)):
+        next_month = daily.loc[origin, "month"] + 1
+        next_prices = daily.loc[daily["month"] == next_month, "settlement_price"]
+        if next_prices.empty or features.loc[origin, feature_columns].isna().any():
+            continue
+        target_return = float(next_prices.mean() / price.iloc[origin] - 1)
+        training_rows.append((origin, target_return))
+
+    fitted_rows: list[dict[str, object]] = []
+    for target_month, target_price in monthly_target.iloc[1:].items():
+        previous_month = target_month - 1
+        origins = daily.index[daily["month"] == previous_month]
+        if len(origins) == 0:
+            continue
+        origin = int(origins[-1])
+        previous_price = float(price.iloc[origin])
+        prior_rows = [(index, value) for index, value in training_rows if index < origin]
+        predicted_price = previous_price
+        if len(prior_rows) >= 120 and not features.loc[origin, feature_columns].isna().any():
+            train_index = [index for index, _ in prior_rows]
+            train_target = [value for _, value in prior_rows]
+            model = Pipeline(
+                [("scale", StandardScaler()), ("model", Ridge(alpha=30.0))]
+            )
+            model.fit(features.loc[train_index, feature_columns].clip(-5, 5), train_target)
+            predicted_return = float(
+                model.predict(features.loc[[origin], feature_columns].clip(-5, 5))[0]
+            )
+            predicted_price = previous_price * (1 + float(np.clip(predicted_return, -0.2, 0.2)))
+        fitted_rows.append(
+            {
+                "target_price": float(target_price),
+                "month": target_month.to_timestamp(),
+                "predicted_monthly_price": float(predicted_price),
+            }
+        )
+    return pd.DataFrame(fitted_rows, columns=["target_price", "month", "predicted_monthly_price"])
 
 
 def build_lithium_monthly_features(
@@ -333,7 +392,7 @@ def main() -> None:
         "sample_end": str(main_prices["date"].max().date()),
         "monthly_selected_model": result.monthly_diagnostics.selected_model,
         "monthly_improvement_pct": result.monthly_diagnostics.improvement_pct,
-        "historical_evaluation_model": "lithium-trend-adjusted-one-step-baseline",
+        "historical_evaluation_model": "lithium-daily-feature-ridge-monthly-v1",
         "monthly_backtest_mae": float(
             (monthly_rolling_baseline["predicted_monthly_price"] - monthly_rolling_baseline["target_price"])
             .abs()
