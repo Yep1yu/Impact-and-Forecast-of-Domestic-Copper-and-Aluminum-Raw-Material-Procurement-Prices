@@ -2844,6 +2844,61 @@ def load_monthly_history_predictions() -> pd.DataFrame:
                 )
             )
 
+    # The legacy monthly workbook is refreshed less often than the spot-price
+    # database.  Extend each of the five legacy series with the newest complete
+    # months from SQLite so the date controls do not stop at the workbook's
+    # last month (currently 2026-05).  These appended values use a transparent
+    # one-month-lag baseline and are kept separate from the original OLS sample.
+    try:
+        config = load_config()
+        database_path = Path(config.database_path)
+        if not database_path.is_absolute():
+            database_path = Path(__file__).resolve().parent / database_path
+        if database_path.exists():
+            conn = connect(database_path, read_only=True)
+            current_spot = load_spot_prices(conn)
+            conn.close()
+            if not current_spot.empty:
+                current_spot["trade_date"] = pd.to_datetime(current_spot["trade_date"])
+                current_spot["month"] = current_spot["trade_date"].dt.to_period("M").dt.start_time
+                monthly_spot = (
+                    current_spot.groupby(["metal", "month"], as_index=False)["price_cny_per_tonne"]
+                    .mean()
+                    .rename(columns={"price_cny_per_tonne": "actual_monthly_price"})
+                )
+                for metal in sample_metals.values():
+                    existing = next(
+                        (row for row in output_rows if not row.empty and row.iloc[0]["metal"] == metal),
+                        None,
+                    )
+                    if existing is None or existing.empty:
+                        continue
+                    last_month = pd.to_datetime(existing["month"]).max()
+                    extra = monthly_spot[
+                        (monthly_spot["metal"] == metal) & (monthly_spot["month"] > last_month)
+                    ].sort_values("month")
+                    if extra.empty:
+                        continue
+                    previous_actual = float(
+                        existing.loc[existing["month"].idxmax(), "actual_monthly_price"]
+                    )
+                    extra_rows = []
+                    for row in extra.itertuples(index=False):
+                        extra_rows.append(
+                            {
+                                "metal": metal,
+                                "month": row.month,
+                                "actual_monthly_price": float(row.actual_monthly_price),
+                                "predicted_monthly_price": previous_actual,
+                            }
+                        )
+                        previous_actual = float(row.actual_monthly_price)
+                    output_rows.append(pd.DataFrame(extra_rows))
+    except (OSError, sqlite3.DatabaseError, ValueError):
+        # The static workbook remains available if the optional extension
+        # source is unavailable during a deployment.
+        pass
+
     lithium_dir = Path(__file__).resolve().parent / "lithium_carbonate_prediction_outputs"
     lithium_file = next(iter(sorted(lithium_dir.glob("*monthly*fitted*.csv"))), None)
     if lithium_file is not None:
