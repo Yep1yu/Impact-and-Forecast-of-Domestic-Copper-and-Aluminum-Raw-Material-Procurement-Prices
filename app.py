@@ -2793,7 +2793,7 @@ def render_daily_backtest_legacy(
     )
 
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False, ttl=300)
 def load_monthly_history_predictions() -> pd.DataFrame:
     output_rows: list[pd.DataFrame] = []
     output_dir = Path(__file__).resolve().parent / "monthly_price_prediction_outputs" / "drop_limited_vars"
