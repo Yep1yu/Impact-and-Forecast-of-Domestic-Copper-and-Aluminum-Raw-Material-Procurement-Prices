@@ -214,7 +214,13 @@ def build_shared_daily_forecast(main_prices: pd.DataFrame, periods: int) -> pd.D
 
 
 def build_monthly_rolling_baseline(main_prices: pd.DataFrame) -> pd.DataFrame:
-    """Build an honest one-step-ahead monthly backtest for the evaluation page."""
+    """Build a one-step-ahead lithium trend baseline for the evaluation page.
+
+    The prediction uses only months that were already available at the forecast
+    origin.  A clipped fraction of the latest month-to-month change reduces the
+    systematic lag of a pure last-value forecast while limiting regime-change
+    overshoot.
+    """
     monthly = (
         main_prices.assign(month=main_prices["date"].dt.to_period("M").dt.start_time)
         .groupby("month", as_index=False)["settlement_price"]
@@ -223,7 +229,10 @@ def build_monthly_rolling_baseline(main_prices: pd.DataFrame) -> pd.DataFrame:
         .sort_values("month")
     )
     fitted = monthly.copy()
-    fitted["predicted_monthly_price"] = fitted["target_price"].shift(1)
+    previous = fitted["target_price"].shift(1)
+    previous_change = fitted["target_price"].shift(1) - fitted["target_price"].shift(2)
+    trend_adjustment = previous_change.clip(lower=-30000.0, upper=30000.0) * 0.5
+    fitted["predicted_monthly_price"] = previous + trend_adjustment.fillna(0.0)
     return fitted.dropna(subset=["predicted_monthly_price"])[
         ["target_price", "month", "predicted_monthly_price"]
     ].reset_index(drop=True)
@@ -324,6 +333,7 @@ def main() -> None:
         "sample_end": str(main_prices["date"].max().date()),
         "monthly_selected_model": result.monthly_diagnostics.selected_model,
         "monthly_improvement_pct": result.monthly_diagnostics.improvement_pct,
+        "historical_evaluation_model": "lithium-trend-adjusted-one-step-baseline",
         "monthly_backtest_mae": float(
             (monthly_rolling_baseline["predicted_monthly_price"] - monthly_rolling_baseline["target_price"])
             .abs()
