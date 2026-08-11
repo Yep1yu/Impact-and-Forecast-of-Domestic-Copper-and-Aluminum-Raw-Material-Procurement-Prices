@@ -1,11 +1,11 @@
 {
   "metal": "lithium_carbonate",
   "sample_start": "2023-07-21",
-  "sample_end": "2026-07-15",
+  "sample_end": "2026-08-10",
   "monthly_selected_model": "naive",
   "monthly_improvement_pct": -0.21782073454337958,
-  "daily_selected_model": "elastic_net",
-  "daily_improvement_pct": 0.7802913152202687,
+  "daily_selected_model": "rolling-validation multi-model ensemble",
+  "daily_improvement_pct": null,
   "monthly_model_version": "lithium-curated-elasticnet-monthly-v2",
-  "daily_model_version": "lithium-curated-elasticnet-daily-v2"
+  "daily_model_version": "daily-ensemble-v1"
 }

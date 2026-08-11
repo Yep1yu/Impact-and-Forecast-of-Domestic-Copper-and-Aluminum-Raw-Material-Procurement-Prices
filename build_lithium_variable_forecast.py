@@ -6,6 +6,8 @@ from pathlib import Path
 
 import pandas as pd
 
+from build_daily_ensemble_price_model import Args as DailyEnsembleArgs
+from build_daily_ensemble_price_model import model_one_series
 from domestic_prices.db import (
     connect,
     initialize,
@@ -14,7 +16,7 @@ from domestic_prices.db import (
     replace_latest_monthly_forecasts,
     upsert_spot_prices,
 )
-from domestic_prices.lithium_model import build_lithium_forecasts
+from domestic_prices.lithium_model import _direction, build_lithium_forecasts
 
 
 ROOT = Path(__file__).resolve().parent
@@ -148,6 +150,66 @@ def import_to_database(
     conn.close()
 
 
+def build_shared_daily_forecast(main_prices: pd.DataFrame, periods: int) -> pd.DataFrame:
+    """Use the same rolling-validation ensemble route as the five core materials."""
+    frame = main_prices[["date", "settlement_price"]].rename(
+        columns={"settlement_price": "price"}
+    ).copy()
+    frame["date"] = pd.to_datetime(frame["date"])
+    frame["price"] = pd.to_numeric(frame["price"], errors="coerce")
+    frame = frame.dropna(subset=["date", "price"]).sort_values("date").reset_index(drop=True)
+    if len(frame) < periods + 60:
+        raise ValueError("碳酸锂历史样本不足，无法执行日度组合模型")
+
+    min_train_days = min(500, max(120, len(frame) - periods - 1))
+    validation_origins = min(120, max(5, len(frame) - periods - min_train_days))
+    args = DailyEnsembleArgs(
+        input=Path("<lithium-settlement-workbook>"),
+        output_dir=OUTPUT_DIR,
+        forecast_days=periods,
+        validation_origins=validation_origins,
+        min_train_days=min_train_days,
+        retrain_step=20,
+        ridge_alpha=20.0,
+        no_arima=False,
+    )
+    result = model_one_series(METAL, frame, args)
+    forecast = pd.DataFrame(result["forecast"])
+    if forecast.empty:
+        raise RuntimeError("碳酸锂日度组合模型未生成预测结果")
+    forecast["forecast_date"] = pd.to_datetime(forecast["forecast_date"])
+    previous = float(frame.iloc[-1]["price"])
+    forecast["predicted_return"] = forecast["predicted_price"].astype(float).pct_change()
+    forecast.loc[forecast.index[0], "predicted_return"] = (
+        float(forecast.iloc[0]["predicted_price"]) / previous - 1
+    )
+    forecast["month"] = forecast["forecast_date"].dt.to_period("M").dt.start_time
+    forecast["direction"] = forecast["predicted_return"].map(_direction)
+    forecast["metal"] = METAL
+    forecast["model_version"] = "daily-ensemble-v1"
+    forecast["generated_at"] = pd.Timestamp.now(tz="UTC").isoformat()
+    return forecast[
+        [
+            "forecast_date",
+            "predicted_price",
+            "predicted_return",
+            "month",
+            "p10",
+            "p90",
+            "direction",
+            "metal",
+            "model_version",
+            "generated_at",
+        ]
+    ].rename(
+        columns={
+            "predicted_price": "predicted_price_cny_per_tonne",
+            "p10": "lower_bound",
+            "p90": "upper_bound",
+        }
+    )
+
+
 def main() -> None:
     args = parse_args()
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -159,6 +221,7 @@ def main() -> None:
         monthly_periods=args.forecast_months,
         daily_periods=args.forecast_days,
     )
+    shared_daily_forecast = build_shared_daily_forecast(main_prices, args.forecast_days)
     result.monthly_coefficients.to_csv(
         OUTPUT_DIR / "lithium_monthly_model_coefficients.csv",
         index=False,
@@ -169,7 +232,7 @@ def main() -> None:
         index=False,
         encoding="utf-8-sig",
     )
-    result.daily_forecast.to_csv(
+    shared_daily_forecast.to_csv(
         OUTPUT_DIR / "lithium_daily_forecast.csv",
         index=False,
         encoding="utf-8-sig",
@@ -185,10 +248,10 @@ def main() -> None:
         "sample_end": str(main_prices["date"].max().date()),
         "monthly_selected_model": result.monthly_diagnostics.selected_model,
         "monthly_improvement_pct": result.monthly_diagnostics.improvement_pct,
-        "daily_selected_model": result.daily_diagnostics.selected_model,
-        "daily_improvement_pct": result.daily_diagnostics.improvement_pct,
+        "daily_selected_model": "rolling-validation multi-model ensemble",
+        "daily_improvement_pct": None,
         "monthly_model_version": str(result.monthly_forecast.iloc[0]["model_version"]),
-        "daily_model_version": str(result.daily_forecast.iloc[0]["model_version"]),
+        "daily_model_version": str(shared_daily_forecast.iloc[0]["model_version"]),
     }
     (OUTPUT_DIR / "lithium_variable_forecast_summary.json").write_text(
         json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8"
@@ -198,7 +261,7 @@ def main() -> None:
             args.database,
             main_prices,
             result.monthly_forecast,
-            result.daily_forecast,
+            shared_daily_forecast,
             result.monthly_contributions,
         )
     print(json.dumps(summary, ensure_ascii=False, indent=2))
