@@ -56,6 +56,9 @@ FEATURE_COLUMNS = [
     "log_drift_20",
     "log_drift_60",
     "log_drift_120",
+    "volume_change_context",
+    "open_interest_change_context",
+    "contract_roll_context",
 ]
 
 
@@ -197,7 +200,7 @@ def candidate_model_names(no_arima: bool) -> list[str]:
 def model_one_series(series_name: str, frame: pd.DataFrame, args: Args) -> dict[str, object]:
     prices = frame["price"].astype(float).reset_index(drop=True)
     dates = pd.to_datetime(frame["date"]).reset_index(drop=True)
-    features = build_features(prices)
+    features = build_features(prices, frame)
     arima_spec = None if args.no_arima else select_arima_spec(prices)
     origin_indices = validation_origin_indices(len(frame), args.forecast_days, args.validation_origins, args.min_train_days)
     if not origin_indices:
@@ -235,7 +238,7 @@ def validation_origin_indices(n_rows: int, forecast_days: int, requested_origins
     return list(range(first_origin, last_origin + 1))
 
 
-def build_features(prices: pd.Series) -> pd.DataFrame:
+def build_features(prices: pd.Series, context: pd.DataFrame | None = None) -> pd.DataFrame:
     frame = pd.DataFrame({"price": prices.astype(float)})
     log_price = np.log(frame["price"])
     for lag in [1, 2, 3, 5, 10, 20, 30, 60]:
@@ -252,6 +255,20 @@ def build_features(prices: pd.Series) -> pd.DataFrame:
     frame["return_20"] = frame["price"].pct_change(20, fill_method=None)
     frame["volatility_10"] = frame["return_1"].rolling(10, min_periods=5).std()
     frame["volatility_20"] = frame["return_1"].rolling(20, min_periods=10).std()
+    if context is not None:
+        volume = pd.to_numeric(context.get("volume", pd.Series(index=prices.index)), errors="coerce")
+        open_interest = pd.to_numeric(
+            context.get("open_interest", pd.Series(index=prices.index)), errors="coerce"
+        )
+        frame["volume_change_context"] = volume.pct_change().replace([np.inf, -np.inf], np.nan)
+        frame["open_interest_change_context"] = open_interest.pct_change().replace(
+            [np.inf, -np.inf], np.nan
+        )
+        contracts = context.get("contract")
+        if contracts is not None:
+            frame["contract_roll_context"] = pd.Series(contracts).astype(str).ne(
+                pd.Series(contracts).astype(str).shift(1)
+            ).astype(float)
     for column in FEATURE_COLUMNS:
         if column not in frame:
             frame[column] = 0.0

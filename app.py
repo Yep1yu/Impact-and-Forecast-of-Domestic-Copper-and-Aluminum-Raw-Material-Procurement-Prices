@@ -290,18 +290,10 @@ def load_factor_coefficients() -> pd.DataFrame:
     if lithium_path.exists():
         lithium = pd.read_csv(lithium_path, encoding="utf-8-sig")
         if {"变量", "系数"}.issubset(lithium.columns):
-            lithium = lithium[
-                lithium["变量"].isin(
-                    {
-                        "新能源汽车产量当期值_环比",
-                        "汽车产量当期值_环比",
-                        "制造业PMI_变化",
-                        "工业增加值同比增长",
-                        "企业商品价格矿产品环比增长",
-                        "企业商品价格煤油电环比增长",
-                    }
-                )
-            ].copy()
+            # The lithium model has its own factor set.  Keep both the shared
+            # macro/demand variables and the LC-prefixed futures-structure
+            # variables in the influence-analysis table.
+            lithium = lithium[lithium["变量"] != "截距"].copy()
             lithium["品种"] = "碳酸锂"
             lithium["模型版本"] = lithium.get("模型版本", "碳酸锂产业逻辑约束模型")
             lithium["目标变量"] = "碳酸锂价格月环比"

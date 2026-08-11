@@ -155,6 +155,9 @@ def build_shared_daily_forecast(main_prices: pd.DataFrame, periods: int) -> pd.D
     frame = main_prices[["date", "settlement_price"]].rename(
         columns={"settlement_price": "price"}
     ).copy()
+    for column in ["volume", "open_interest", "contract"]:
+        if column in main_prices:
+            frame[column] = main_prices[column].to_numpy()
     frame["date"] = pd.to_datetime(frame["date"])
     frame["price"] = pd.to_numeric(frame["price"], errors="coerce")
     frame = frame.dropna(subset=["date", "price"]).sort_values("date").reset_index(drop=True)
@@ -186,7 +189,7 @@ def build_shared_daily_forecast(main_prices: pd.DataFrame, periods: int) -> pd.D
     forecast["month"] = forecast["forecast_date"].dt.to_period("M").dt.start_time
     forecast["direction"] = forecast["predicted_return"].map(_direction)
     forecast["metal"] = METAL
-    forecast["model_version"] = "daily-ensemble-v1"
+    forecast["model_version"] = "lithium-specific-ensemble-daily-v3"
     forecast["generated_at"] = pd.Timestamp.now(tz="UTC").isoformat()
     return forecast[
         [
@@ -226,11 +229,57 @@ def build_monthly_rolling_baseline(main_prices: pd.DataFrame) -> pd.DataFrame:
     ].reset_index(drop=True)
 
 
+def build_lithium_monthly_features(
+    main_prices: pd.DataFrame, common_factors: pd.DataFrame
+) -> pd.DataFrame:
+    """Combine common macro/demand variables with lithium futures-specific signals."""
+    daily = main_prices.copy().sort_values("date").reset_index(drop=True)
+    daily["month"] = pd.to_datetime(daily["date"]).dt.to_period("M").dt.start_time
+    daily["settlement_price"] = pd.to_numeric(daily["settlement_price"], errors="coerce")
+    for column in ["volume", "open_interest"]:
+        if column not in daily:
+            daily[column] = 0.0
+        daily[column] = pd.to_numeric(daily[column], errors="coerce").fillna(0.0)
+    # Compute volatility from the continuous main-contract series.  Resetting
+    # the return calculation at each month would drop the first trading day of
+    # every month and make the volatility factor depend on calendar boundaries.
+    daily["daily_return"] = daily["settlement_price"].pct_change()
+    daily["contract_roll"] = (
+        daily["contract"].astype(str).ne(daily["contract"].astype(str).shift(1)).astype(float)
+        if "contract" in daily
+        else 0.0
+    )
+    monthly = (
+        daily.groupby("month", as_index=False)
+        .agg(
+            LC成交量=("volume", "sum"),
+            LC持仓量=("open_interest", "last"),
+            LC价格波动率=("daily_return", "std"),
+            LC合约切换=("contract_roll", "sum"),
+        )
+        .sort_values("month")
+    )
+    monthly["LC成交量_环比"] = monthly["LC成交量"].pct_change()
+    monthly["LC持仓量_环比"] = monthly["LC持仓量"].pct_change()
+    factors = common_factors.rename(columns={common_factors.columns[0]: "month"}).copy()
+    factors["month"] = pd.to_datetime(factors["month"], errors="coerce").dt.to_period("M").dt.start_time
+    factors = factors.dropna(subset=["month"]).drop_duplicates("month")
+    merged = factors.merge(
+        monthly[["month", "LC成交量_环比", "LC持仓量_环比", "LC价格波动率", "LC合约切换"]],
+        on="month",
+        how="outer",
+    ).sort_values("month")
+    for column in ["LC成交量_环比", "LC持仓量_环比", "LC价格波动率", "LC合约切换"]:
+        merged[column] = pd.to_numeric(merged[column], errors="coerce")
+    return merged
+
+
 def main() -> None:
     args = parse_args()
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     main_prices = load_settlement_prices(args.input_dir)
-    factors = pd.read_csv(DATASET, encoding="utf-8-sig")
+    common_factors = pd.read_csv(DATASET, encoding="utf-8-sig")
+    factors = build_lithium_monthly_features(main_prices, common_factors)
     result = build_lithium_forecasts(
         main_prices,
         factors,
@@ -246,6 +295,11 @@ def main() -> None:
     )
     result.monthly_forecast.to_csv(
         OUTPUT_DIR / "lithium_monthly_forecast.csv",
+        index=False,
+        encoding="utf-8-sig",
+    )
+    factors.to_csv(
+        OUTPUT_DIR / "lithium_monthly_features.csv",
         index=False,
         encoding="utf-8-sig",
     )

@@ -18,9 +18,13 @@ MONTHLY_FACTORS = [
     "工业增加值同比增长",
     "企业商品价格矿产品环比增长",
     "企业商品价格煤油电环比增长",
+    "LC成交量_环比",
+    "LC持仓量_环比",
+    "LC价格波动率",
+    "LC合约切换",
 ]
-MONTHLY_MODEL_VERSION = "lithium-curated-elasticnet-monthly-v2"
-DAILY_MODEL_VERSION = "lithium-curated-elasticnet-daily-v2"
+MONTHLY_MODEL_VERSION = "lithium-specific-elasticnet-monthly-v3"
+DAILY_MODEL_VERSION = "lithium-specific-elasticnet-daily-v3"
 
 
 @dataclass
@@ -420,6 +424,8 @@ def _seasonal_factor_scenario(
 def _factor_category(factor: str) -> str:
     if factor.startswith("return_lag"):
         return "价格动量"
+    if factor.startswith("LC"):
+        return "碳酸锂期货结构"
     if "汽车" in factor:
         return "需求"
     if "PMI" in factor or "工业增加值" in factor:
