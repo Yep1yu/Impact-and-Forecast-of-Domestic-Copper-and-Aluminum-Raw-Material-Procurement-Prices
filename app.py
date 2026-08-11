@@ -2793,8 +2793,22 @@ def render_daily_backtest_legacy(
     )
 
 
-@st.cache_data(show_spinner=False, ttl=300)
-def load_monthly_history_predictions() -> pd.DataFrame:
+def monthly_history_cache_token() -> str:
+    """Change the cache key only when the local SQLite database changes."""
+    config = load_config()
+    database_path = Path(config.database_path)
+    if not database_path.is_absolute():
+        database_path = Path(__file__).resolve().parent / database_path
+    try:
+        stat = database_path.stat()
+    except OSError:
+        return "missing"
+    return f"{stat.st_mtime_ns}:{stat.st_size}"
+
+
+@st.cache_data(show_spinner=False)
+def load_monthly_history_predictions(cache_token: str = "") -> pd.DataFrame:
+    del cache_token
     output_rows: list[pd.DataFrame] = []
     output_dir = Path(__file__).resolve().parent / "monthly_price_prediction_outputs" / "drop_limited_vars"
     raw_workbook = None
@@ -2929,7 +2943,7 @@ def render_backtest(
 ) -> None:
     del spot, market_features, model_version
     st.subheader("历史月均价与模型预测")
-    history = load_monthly_history_predictions()
+    history = load_monthly_history_predictions(monthly_history_cache_token())
     available_metals = [metal for metal in metals if metal in set(history["metal"])]
     if not available_metals:
         st.info("暂未找到可展示的月度模型历史结果。")
