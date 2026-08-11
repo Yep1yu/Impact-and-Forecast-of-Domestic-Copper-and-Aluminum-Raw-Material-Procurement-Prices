@@ -210,6 +210,22 @@ def build_shared_daily_forecast(main_prices: pd.DataFrame, periods: int) -> pd.D
     )
 
 
+def build_monthly_rolling_baseline(main_prices: pd.DataFrame) -> pd.DataFrame:
+    """Build an honest one-step-ahead monthly backtest for the evaluation page."""
+    monthly = (
+        main_prices.assign(month=main_prices["date"].dt.to_period("M").dt.start_time)
+        .groupby("month", as_index=False)["settlement_price"]
+        .mean()
+        .rename(columns={"settlement_price": "target_price"})
+        .sort_values("month")
+    )
+    fitted = monthly.copy()
+    fitted["predicted_monthly_price"] = fitted["target_price"].shift(1)
+    return fitted.dropna(subset=["predicted_monthly_price"])[
+        ["target_price", "month", "predicted_monthly_price"]
+    ].reset_index(drop=True)
+
+
 def main() -> None:
     args = parse_args()
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -222,6 +238,7 @@ def main() -> None:
         daily_periods=args.forecast_days,
     )
     shared_daily_forecast = build_shared_daily_forecast(main_prices, args.forecast_days)
+    monthly_rolling_baseline = build_monthly_rolling_baseline(main_prices)
     result.monthly_coefficients.to_csv(
         OUTPUT_DIR / "lithium_monthly_model_coefficients.csv",
         index=False,
@@ -229,6 +246,11 @@ def main() -> None:
     )
     result.monthly_forecast.to_csv(
         OUTPUT_DIR / "lithium_monthly_forecast.csv",
+        index=False,
+        encoding="utf-8-sig",
+    )
+    monthly_rolling_baseline.to_csv(
+        OUTPUT_DIR / "lithium_monthly_fitted_prices.csv",
         index=False,
         encoding="utf-8-sig",
     )
@@ -248,6 +270,19 @@ def main() -> None:
         "sample_end": str(main_prices["date"].max().date()),
         "monthly_selected_model": result.monthly_diagnostics.selected_model,
         "monthly_improvement_pct": result.monthly_diagnostics.improvement_pct,
+        "monthly_backtest_mae": float(
+            (monthly_rolling_baseline["predicted_monthly_price"] - monthly_rolling_baseline["target_price"])
+            .abs()
+            .mean()
+        ),
+        "monthly_backtest_mape_pct": float(
+            (
+                (monthly_rolling_baseline["predicted_monthly_price"] - monthly_rolling_baseline["target_price"])
+                .abs()
+                / monthly_rolling_baseline["target_price"].abs()
+            ).mean()
+            * 100
+        ),
         "daily_selected_model": "rolling-validation multi-model ensemble",
         "daily_improvement_pct": None,
         "monthly_model_version": str(result.monthly_forecast.iloc[0]["model_version"]),

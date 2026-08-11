@@ -4,6 +4,8 @@
   "sample_end": "2026-08-10",
   "monthly_selected_model": "naive",
   "monthly_improvement_pct": -0.21782073454337958,
+  "monthly_backtest_mae": 11089.683943683942,
+  "monthly_backtest_mape_pct": 9.353913138959644,
   "daily_selected_model": "rolling-validation multi-model ensemble",
   "daily_improvement_pct": null,
   "monthly_model_version": "lithium-curated-elasticnet-monthly-v2",
