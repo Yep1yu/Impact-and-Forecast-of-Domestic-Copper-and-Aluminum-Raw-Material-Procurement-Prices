@@ -2,10 +2,11 @@ name: Daily price update
 
 on:
   schedule:
-    # Asia/Shanghai 10:30, 11:30 and 14:30, Monday through Friday.
+    # Asia/Shanghai 10:30, 11:30, 14:30 and 16:30, Monday through Friday.
     - cron: "30 2 * * 1-5"
     - cron: "30 3 * * 1-5"
     - cron: "30 6 * * 1-5"
+    - cron: "30 8 * * 1-5"
   workflow_dispatch:
 
 permissions:
@@ -44,6 +45,13 @@ jobs:
           --current-only
           --monthly-workbook "monthly_price_prediction_outputs/drop_limited_vars/引入变量结果分析.xlsx"
 
+      - name: Fetch GFEX lithium prices and rebuild lithium forecasts
+        env:
+          PYTHONUNBUFFERED: "1"
+        run: >
+          python update_gfex_lithium.py
+          --database .tmp/dashboard-update.sqlite
+
       - name: Validate and publish database
         run: |
           python scripts/verify_dashboard_database.py .tmp/dashboard-update.sqlite
@@ -54,6 +62,14 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add domestic_procurement_prices.sqlite ccmn_changjiang_avg_prices.csv ccmn_changjiang_avg_prices_tax_exclusive.csv daily_ensemble_*.csv daily_ensemble_*.json daily_hybrid_*.csv daily_hybrid_*.json monthly_price_prediction_outputs
+          git add lithium_carbonate_prediction_outputs/lithium_daily_history.csv
+          git add lithium_carbonate_prediction_outputs/lithium_daily_forecast.csv
+          git add lithium_carbonate_prediction_outputs/lithium_monthly_features.csv
+          git add lithium_carbonate_prediction_outputs/lithium_monthly_fitted_prices.csv
+          git add lithium_carbonate_prediction_outputs/lithium_monthly_forecast.csv
+          git add lithium_carbonate_prediction_outputs/lithium_monthly_model_coefficients.csv
+          git add lithium_carbonate_prediction_outputs/lithium_forecast_driver_contributions.csv
+          git add lithium_carbonate_prediction_outputs/lithium_variable_forecast_summary.json
           git diff --cached --quiet && exit 0
           git commit -m "Update daily procurement price data"
           git push
