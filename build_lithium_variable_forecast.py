@@ -25,6 +25,7 @@ from domestic_prices.lithium_model import _direction, build_lithium_forecasts
 
 ROOT = Path(__file__).resolve().parent
 DEFAULT_INPUT_DIR = Path(r"D:\Wechat\xwechat_files\wxid_i1mfkj939nq911_dfaf\msg\file\2026-07")
+DEFAULT_INPUT_FILE = Path(r"D:\edge download\LCFUTURES2026.csv")
 DATASET = ROOT / "domestic_material_monthly_dataset_v1.csv"
 OUTPUT_DIR = ROOT / "lithium_carbonate_prediction_outputs"
 METAL = "lithium_carbonate"
@@ -36,6 +37,13 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--input-dir", type=Path, default=DEFAULT_INPUT_DIR)
     parser.add_argument(
+        "--input-file",
+        type=Path,
+        action="append",
+        default=None,
+        help="额外导入的 LCFUTURES Excel/CSV 文件；同一日期和合约重复时以后加载的文件优先。",
+    )
+    parser.add_argument(
         "--database", type=Path, default=ROOT / "domestic_procurement_prices.sqlite"
     )
     parser.add_argument("--forecast-days", type=int, default=30)
@@ -44,57 +52,72 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def load_settlement_prices(input_dir: Path) -> pd.DataFrame:
-    frames = []
-    for path in sorted(input_dir.glob("LCFUTURES*.xlsx")):
+def _load_settlement_file(path: Path) -> pd.DataFrame:
+    if path.suffix.lower() == ".csv":
+        frame = pd.read_csv(path, skiprows=1, encoding="utf-8-sig")
+    else:
         frame = pd.read_excel(path, header=1)
-        if frame.shape[1] < 15:
-            raise ValueError(f"{path} does not look like an LC futures workbook")
-        frame = frame.rename(
-            columns={
-                frame.columns[0]: "date",
-                frame.columns[1]: "product",
-                frame.columns[3]: "contract",
-                frame.columns[9]: "settlement_price",
-                frame.columns[12]: "volume",
-                frame.columns[13]: "open_interest",
-                frame.columns[14]: "open_interest_change",
-            }
-        )
-        frame = frame[frame["product"].astype(str).str.strip() == "碳酸锂"]
-        frame["date"] = pd.to_datetime(
-            frame["date"].astype(str), format="%Y%m%d", errors="coerce"
-        )
-        for column in [
+    if frame.shape[1] < 15:
+        raise ValueError(f"{path} does not look like an LC futures workbook")
+    frame = frame.rename(
+        columns={
+            frame.columns[0]: "date",
+            frame.columns[1]: "product",
+            frame.columns[3]: "contract",
+            frame.columns[9]: "settlement_price",
+            frame.columns[12]: "volume",
+            frame.columns[13]: "open_interest",
+            frame.columns[14]: "open_interest_change",
+        }
+    )
+    frame = frame[frame["product"].astype(str).str.strip() == "碳酸锂"]
+    frame["date"] = pd.to_datetime(
+        frame["date"].astype(str), format="%Y%m%d", errors="coerce"
+    )
+    for column in [
+        "settlement_price",
+        "volume",
+        "open_interest",
+        "open_interest_change",
+    ]:
+        frame[column] = pd.to_numeric(frame[column], errors="coerce")
+    return frame[
+        [
+            "date",
+            "contract",
             "settlement_price",
             "volume",
             "open_interest",
             "open_interest_change",
-        ]:
-            frame[column] = pd.to_numeric(frame[column], errors="coerce")
-        frames.append(
-            frame[
-                [
-                    "date",
-                    "contract",
-                    "settlement_price",
-                    "volume",
-                    "open_interest",
-                    "open_interest_change",
-                ]
-            ]
-        )
+        ]
+    ]
+
+
+def load_settlement_prices(input_dir: Path, input_files: list[Path] | None = None) -> pd.DataFrame:
+    frames = []
+    for path in sorted(input_dir.glob("LCFUTURES*.xlsx")):
+        frames.append(_load_settlement_file(path))
+    for path in input_files or []:
+        frames.append(_load_settlement_file(path))
     if not frames:
-        raise FileNotFoundError(f"No LCFUTURES*.xlsx files found in {input_dir}")
+        raise FileNotFoundError(f"No LCFUTURES files found in {input_dir}")
     raw = pd.concat(frames, ignore_index=True).dropna(
-        subset=["date", "settlement_price", "volume"]
+        subset=["date", "contract", "settlement_price", "volume"]
     )
-    return (
-        raw.sort_values(["date", "volume"], ascending=[True, False])
-        .drop_duplicates("date")
+    raw = raw.drop_duplicates(["date", "contract"], keep="last")
+    daily = (
+        raw.groupby("date", as_index=False)
+        .agg(
+            settlement_price=("settlement_price", "mean"),
+            volume=("volume", "sum"),
+            open_interest=("open_interest", "sum"),
+            open_interest_change=("open_interest_change", "sum"),
+        )
         .sort_values("date")
         .reset_index(drop=True)
     )
+    daily["contract"] = "ALL_CONTRACTS_MEAN"
+    return daily
 
 
 def import_to_database(
@@ -114,7 +137,7 @@ def import_to_database(
         }
     )
     spot["metal"] = METAL
-    spot["source"] = "GFEX LC main contract settlement price"
+    spot["source"] = "GFEX LC all-contract simple mean settlement price"
     upsert_spot_prices(
         conn,
         spot[
@@ -345,7 +368,10 @@ def build_lithium_monthly_features(
 def main() -> None:
     args = parse_args()
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    main_prices = load_settlement_prices(args.input_dir)
+    input_files = args.input_file
+    if input_files is None and DEFAULT_INPUT_FILE.exists():
+        input_files = [DEFAULT_INPUT_FILE]
+    main_prices = load_settlement_prices(args.input_dir, input_files)
     common_factors = pd.read_csv(DATASET, encoding="utf-8-sig")
     factors = build_lithium_monthly_features(main_prices, common_factors)
     result = build_lithium_forecasts(
