@@ -1,13 +1,13 @@
 ﻿metal,forecast_month,predicted_price_cny_per_tonne,lower_bound,upper_bound,direction,predicted_change_pct,source,model_version,generated_at
-lithium_carbonate,2026-09-01,141596.2962962963,118533.95205056024,164658.64054203234,平稳,0.0,Elastic Net未明显优于月度朴素基准,lithium-specific-elasticnet-monthly-v3,2026-08-13T08:00:55.973000+00:00
-lithium_carbonate,2026-10-01,141596.2962962963,108981.21628385925,174211.37630873334,平稳,0.0,Elastic Net未明显优于月度朴素基准,lithium-specific-elasticnet-monthly-v3,2026-08-13T08:00:55.973000+00:00
-lithium_carbonate,2026-11-01,141596.2962962963,101651.1443210377,181541.44827155487,平稳,0.0,Elastic Net未明显优于月度朴素基准,lithium-specific-elasticnet-monthly-v3,2026-08-13T08:00:55.973000+00:00
-lithium_carbonate,2026-12-01,141596.2962962963,95471.60780482419,187720.9847877684,平稳,0.0,Elastic Net未明显优于月度朴素基准,lithium-specific-elasticnet-monthly-v3,2026-08-13T08:00:55.973000+00:00
-lithium_carbonate,2027-01-01,141596.2962962963,90027.32684232936,193165.2657502632,平稳,0.0,Elastic Net未明显优于月度朴素基准,lithium-specific-elasticnet-monthly-v3,2026-08-13T08:00:55.973000+00:00
-lithium_carbonate,2027-02-01,141596.2962962963,85105.32062183118,198087.27197076142,平稳,0.0,Elastic Net未明显优于月度朴素基准,lithium-specific-elasticnet-monthly-v3,2026-08-13T08:00:55.973000+00:00
-lithium_carbonate,2027-03-01,141596.2962962963,80579.06877191721,202613.52382067536,平稳,0.0,Elastic Net未明显优于月度朴素基准,lithium-specific-elasticnet-monthly-v3,2026-08-13T08:00:55.973000+00:00
-lithium_carbonate,2027-04-01,141596.2962962963,76366.13627142222,206826.45632117038,平稳,0.0,Elastic Net未明显优于月度朴素基准,lithium-specific-elasticnet-monthly-v3,2026-08-13T08:00:55.973000+00:00
-lithium_carbonate,2027-05-01,141596.2962962963,72409.26355908813,210783.32903350444,平稳,0.0,Elastic Net未明显优于月度朴素基准,lithium-specific-elasticnet-monthly-v3,2026-08-13T08:00:55.973000+00:00
-lithium_carbonate,2027-06-01,141596.2962962963,68666.76029689239,214525.8322957002,平稳,0.0,Elastic Net未明显优于月度朴素基准,lithium-specific-elasticnet-monthly-v3,2026-08-13T08:00:55.973000+00:00
-lithium_carbonate,2027-07-01,141596.2962962963,65107.153647177896,218085.4389454147,平稳,0.0,Elastic Net未明显优于月度朴素基准,lithium-specific-elasticnet-monthly-v3,2026-08-13T08:00:55.973000+00:00
-lithium_carbonate,2027-08-01,141596.2962962963,61705.99234577912,221486.60024681347,平稳,0.0,Elastic Net未明显优于月度朴素基准,lithium-specific-elasticnet-monthly-v3,2026-08-13T08:00:55.973000+00:00
+lithium_carbonate,2026-09-01,142653.3333333333,119455.1137597837,165851.55290688292,平稳,0.0,Elastic Net未明显优于月度朴素基准,lithium-specific-elasticnet-monthly-v3,2026-08-14T07:57:42.283274+00:00
+lithium_carbonate,2026-10-01,142653.3333333333,109846.09658951043,175460.57007715618,平稳,0.0,Elastic Net未明显优于月度朴素基准,lithium-specific-elasticnet-monthly-v3,2026-08-14T07:57:42.283274+00:00
+lithium_carbonate,2026-11-01,142653.3333333333,102472.83838680656,182833.82827986006,平稳,0.0,Elastic Net未明显优于月度朴素基准,lithium-specific-elasticnet-monthly-v3,2026-08-14T07:57:42.283274+00:00
+lithium_carbonate,2026-12-01,142653.3333333333,96256.89418623407,189049.77248043256,平稳,0.0,Elastic Net未明显优于月度朴素基准,lithium-specific-elasticnet-monthly-v3,2026-08-14T07:57:42.283274+00:00
+lithium_carbonate,2027-01-01,142653.3333333333,90780.53740991018,194526.12925675645,平稳,0.0,Elastic Net未明显优于月度朴素基准,lithium-specific-elasticnet-monthly-v3,2026-08-14T07:57:42.283274+00:00
+lithium_carbonate,2027-02-01,142653.3333333333,85829.53243709156,199477.13422957508,平稳,0.0,Elastic Net未明显优于月度朴素基准,lithium-specific-elasticnet-monthly-v3,2026-08-14T07:57:42.283274+00:00
+lithium_carbonate,2027-03-01,142653.3333333333,81276.61348225016,204030.05318441647,平稳,0.0,Elastic Net未明显优于月度朴素基准,lithium-specific-elasticnet-monthly-v3,2026-08-14T07:57:42.283274+00:00
+lithium_carbonate,2027-04-01,142653.3333333333,77038.85984568756,208267.80682097908,平稳,0.0,Elastic Net未明显优于月度朴素基准,lithium-specific-elasticnet-monthly-v3,2026-08-14T07:57:42.283274+00:00
+lithium_carbonate,2027-05-01,142653.3333333333,73058.67461268444,212247.99205398216,平稳,0.0,Elastic Net未明显优于月度朴素基准,lithium-specific-elasticnet-monthly-v3,2026-08-14T07:57:42.283274+00:00
+lithium_carbonate,2027-06-01,142653.3333333333,69294.1218202165,216012.54484645012,平稳,0.0,Elastic Net未明显优于月度朴素基准,lithium-specific-elasticnet-monthly-v3,2026-08-14T07:57:42.283274+00:00
+lithium_carbonate,2027-07-01,142653.3333333333,65713.54320359076,219593.12346307587,平稳,0.0,Elastic Net未明显优于月度朴素基准,lithium-specific-elasticnet-monthly-v3,2026-08-14T07:57:42.283274+00:00
+lithium_carbonate,2027-08-01,142653.3333333333,62292.343440279794,223014.32322638683,平稳,0.0,Elastic Net未明显优于月度朴素基准,lithium-specific-elasticnet-monthly-v3,2026-08-14T07:57:42.283274+00:00
