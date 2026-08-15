@@ -1,14 +1,6 @@
 {
-  "updated_at": "2026-08-14T11:25:53+08:00",
+  "updated_at": "2026-08-15T10:15:19+08:00",
   "items": [
-    {
-      "source": "长江有色",
-      "title": "无人机关税最高100%：铝、锂、铜、稀土磁材的供应链重新计价",
-      "summary": "8月13日白宫公告对进口无人机及零部件征10%—100%从价关税（21天后对整机/热成像/＞25kg机型及关键组件征100%，180天后对非敏感组件征25%；欧盟日韩等15%、英国10%），本质是将无人机从消费电子重分类为“国防投入品”。对金属产业的影响不在“用多少铝”，而在供应链区域化与机型结构切换。",
-      "published": "",
-      "url": "https://www.ccmn.cn/news/ZX003/202608/23beb29f041a405290a7d0ceed783dae.html",
-      "image_url": ""
-    },
     {
       "source": "SMM",
       "title": "IBAAS–VFMSTA 2026: A New International Platform for Vietnam's Aluminium Industry",
@@ -19,10 +11,10 @@
     },
     {
       "source": "长江有色",
-      "title": "铜价三连跌200元：通胀降温但地缘扰动持续，铜铝锌步入“分化定价”新阶段",
-      "summary": "——8月14日长江现货价格动态： 1#铜价报108150元/吨，跌200元；贴水为130元/吨，跌130元；A00铝锭报23870元/吨，跌260元；0#锌报25580元/吨，跌10元；1#锌报25480元/吨，跌10元；1#铅报15825元/吨，跌175元；1#镍报127800元/吨，跌1100元；1#锡报427500元/吨，涨3750元；",
+      "title": "多国收紧废铝出口政策，印度再生铝产业链遭遇原料供应双重冲击",
+      "summary": "全球地缘政治变化与各国贸易政策调整，正在重塑国际铝废料流通格局，高度依赖进口的印度铝回收产业直面严峻供给挑战。印度约 85% 的铝废料需求依靠海外进口，在 8 月 12 日孟买举办的全球商品会议上，行业人士集体发声，呼吁国内二次铝生产企业加快拓宽原料供应渠道、提高安全库存水平，应对多国废铝出口管控带来的潜在风险。",
       "published": "",
-      "url": "https://www.ccmn.cn/news/ZX003/202608/fbc6b34df1dc4786a6371a14f493dd07.html",
+      "url": "https://www.ccmn.cn/news/ZX018/202608/bd57b01247a24eba8b3a1cbac0f5a095.html",
       "image_url": ""
     },
     {
@@ -35,11 +27,19 @@
     },
     {
       "source": "SMM",
-      "title": "Pullback in Rate-Hike Expectations and Mismatch in Inventories Outside China Lift Copper Price Center [SMM Macro Weekly Review]",
+      "title": "US Dollar Fell; Metals Rose Broadly, with LME Copper Up for Seven Straight Weeks; Coke Rose Nearly 2%; Gold Up for Four Straight Weeks; Crude Oil Posted a Sharp Weekly Gain [Overnight Market]",
       "summary": "",
-      "published": "15 mins ago",
-      "url": "https://news.metal.com/en/newscontent/104059876-pullback-in-rate-hike-expectations-and-mismatch-in-inventories-outside-china-lift-copper-price-center-smm-macro-weekly-r",
-      "image_url": "https://imgqn.smm.cn/usercenter/VLmFt20251217171709.jpg"
+      "published": "1 hour ago",
+      "url": "https://news.metal.com/en/newscontent/104061406-us-dollar-fell-metals-rose-broadly-with-lme-copper-up-for-seven-straight-weeks-coke-rose-nearly-2-gold-up-for-four-strai",
+      "image_url": "https://imgqn.smm.cn/usercenter/LVqfJ20251217171736.jpg"
+    },
+    {
+      "source": "SMM",
+      "title": "[SMM Analysis] Portugal Cancels Construction of Integrated Lithium Mining and Processing Industry",
+      "summary": "",
+      "published": "4 hours ago",
+      "url": "https://news.metal.com/en/newscontent/104061398-smm-analysis-portugal-cancels-construction-of-integrated-lithium-mining-and-processing-industry",
+      "image_url": "https://imgqn.smm.cn/usercenter/WBREf20251217171728.png"
     }
   ],
   "errors": []
