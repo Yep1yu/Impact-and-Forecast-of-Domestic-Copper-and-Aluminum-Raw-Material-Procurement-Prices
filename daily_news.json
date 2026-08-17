@@ -1,6 +1,14 @@
 {
-  "updated_at": "2026-08-16T10:23:12+08:00",
+  "updated_at": "2026-08-17T10:21:29+08:00",
   "items": [
+    {
+      "source": "长江有色",
+      "title": "铜铝分化加剧：逆价差飙升凸显紧缺，获利了结压制铝价",
+      "summary": "近期伦敦金属交易所（LME）基本金属走势呈现显著分化，铜价与铝价在各自的供需逻辑下走出了截然不同的行情。这一现象不仅反映了资金层面的短期博弈，更深刻揭示了两大金属在基本面结构上的本质差异。",
+      "published": "",
+      "url": "https://www.ccmn.cn/news/ZX003/202608/f123216155b147b088f34140b41d51da.html",
+      "image_url": ""
+    },
     {
       "source": "SMM",
       "title": "IBAAS–VFMSTA 2026: A New International Platform for Vietnam's Aluminium Industry",
@@ -11,10 +19,10 @@
     },
     {
       "source": "长江有色",
-      "title": "多国收紧废铝出口政策，印度再生铝产业链遭遇原料供应双重冲击",
-      "summary": "全球地缘政治变化与各国贸易政策调整，正在重塑国际铝废料流通格局，高度依赖进口的印度铝回收产业直面严峻供给挑战。印度约 85% 的铝废料需求依靠海外进口，在 8 月 12 日孟买举办的全球商品会议上，行业人士集体发声，呼吁国内二次铝生产企业加快拓宽原料供应渠道、提高安全库存水平，应对多国废铝出口管控带来的潜在风险。",
+      "title": "铜价三连跌：通胀降温但地缘扰动持续，铜铝锌步入“分化定价”新阶段",
+      "summary": "——8月14日长江现货价格动态： 1#铜价报108150元/吨，跌200元；贴水为130元/吨，跌130元；A00铝锭报23870元/吨，跌260元；0#锌报25580元/吨，跌10元；1#锌报25480元/吨，跌10元；1#铅报15825元/吨，跌175元；1#镍报127800元/吨，跌1100元；1#锡报427500元/吨，涨3750元；",
       "published": "",
-      "url": "https://www.ccmn.cn/news/ZX018/202608/bd57b01247a24eba8b3a1cbac0f5a095.html",
+      "url": "https://www.ccmn.cn/news/ZX003/202608/fbc6b34df1dc4786a6371a14f493dd07.html",
       "image_url": ""
     },
     {
@@ -27,19 +35,11 @@
     },
     {
       "source": "SMM",
-      "title": "US Dollar Fell; Metals Rose Broadly, with LME Copper Up for Seven Straight Weeks; Coke Rose Nearly 2%; Gold Up for Four Straight Weeks; Crude Oil Posted a Sharp Weekly Gain [Overnight Market]",
+      "title": "Silver Prices Consolidated at Highs; Spot Cargo Transactions Skewed Toward a Narrow Range [SMM Daily Review]",
       "summary": "",
-      "published": "1 hour ago",
-      "url": "https://news.metal.com/en/newscontent/104061406-us-dollar-fell-metals-rose-broadly-with-lme-copper-up-for-seven-straight-weeks-coke-rose-nearly-2-gold-up-for-four-strai",
-      "image_url": "https://imgqn.smm.cn/usercenter/LVqfJ20251217171736.jpg"
-    },
-    {
-      "source": "SMM",
-      "title": "China Aluminum Billet Supply: July Extended the Inertia-Driven Uptrend; Expectations of a Retreat from Highs in August",
-      "summary": "",
-      "published": "15 hours ago",
-      "url": "https://news.metal.com/en/newscontent/104061468-china-aluminum-billet-supply-july-extended-the-inertia-driven-uptrend-expectations-of-a-retreat-from-highs-in-august",
-      "image_url": "https://imgqn.smm.cn/usercenter/ppauU20251217171651.jpg"
+      "published": "5 mins ago",
+      "url": "https://news.metal.com/en/newscontent/104061777-silver-prices-consolidated-at-highs-spot-cargo-transactions-skewed-toward-a-narrow-range-smm-daily-review",
+      "image_url": "https://imgqn.smm.cn/usercenter/JYbQQ20251217171736.jpg"
     }
   ],
   "errors": []
