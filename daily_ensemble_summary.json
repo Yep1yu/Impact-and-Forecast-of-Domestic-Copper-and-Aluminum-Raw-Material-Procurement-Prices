@@ -39,7 +39,7 @@
         ],
         "trend": "t"
       },
-      "mean_final_MAE": 2132.3953500898997,
+      "mean_final_MAE": 2132.3953500940975,
       "mean_naive_MAE": 2340.712881022616,
       "beats_naive_horizon_count": 19,
       "checkpoint_horizons": {
@@ -58,16 +58,16 @@
           "beats_naive": false
         },
         "14": {
-          "final_MAE": 2144.9127857928734,
+          "final_MAE": 2144.9127857975386,
           "naive_MAE": 2380.1622418879056,
-          "final_MAPE_%": 2.3941637963898046,
+          "final_MAPE_%": 2.3941637963952944,
           "naive_MAPE_%": 2.654596758495997,
           "beats_naive": true
         },
         "30": {
-          "final_MAE": 2736.041161572575,
+          "final_MAE": 2736.041161575397,
           "naive_MAE": 3235.5457227138636,
-          "final_MAPE_%": 3.026674645216131,
+          "final_MAPE_%": 3.026674645219783,
           "naive_MAPE_%": 3.55542690078234,
           "beats_naive": true
         }
@@ -91,7 +91,7 @@
         ],
         "trend": "n"
       },
-      "mean_final_MAE": 463.3121560813418,
+      "mean_final_MAE": 463.3121560813419,
       "mean_naive_MAE": 531.8682399213372,
       "beats_naive_horizon_count": 24,
       "checkpoint_horizons": {
@@ -103,23 +103,23 @@
           "beats_naive": false
         },
         "7": {
-          "final_MAE": 401.26697463936944,
+          "final_MAE": 401.2669746393697,
           "naive_MAE": 463.8643067846608,
-          "final_MAPE_%": 1.893471220406196,
+          "final_MAPE_%": 1.8934712204061968,
           "naive_MAPE_%": 2.1887859737652273,
           "beats_naive": true
         },
         "14": {
-          "final_MAE": 461.43587632673865,
+          "final_MAE": 461.4358763267383,
           "naive_MAE": 584.2182890855457,
-          "final_MAPE_%": 2.181529948938594,
+          "final_MAPE_%": 2.1815299489385924,
           "naive_MAPE_%": 2.7601228354954634,
           "beats_naive": true
         },
         "30": {
-          "final_MAE": 624.8178332132122,
+          "final_MAE": 624.8178332132119,
           "naive_MAE": 687.536873156342,
-          "final_MAPE_%": 2.9596064792661396,
+          "final_MAPE_%": 2.9596064792661383,
           "naive_MAPE_%": 3.257094020239268,
           "beats_naive": true
         }
@@ -143,14 +143,14 @@
         ],
         "trend": "t"
       },
-      "mean_final_MAE": 2065.2743968471673,
+      "mean_final_MAE": 2065.2743968484056,
       "mean_naive_MAE": 2065.336774827925,
       "beats_naive_horizon_count": 1,
       "checkpoint_horizons": {
         "1": {
-          "final_MAE": 657.1257107247562,
+          "final_MAE": 657.1257107619058,
           "naive_MAE": 658.9970501474927,
-          "final_MAPE_%": 3.5934614690321,
+          "final_MAPE_%": 3.593461469213608,
           "naive_MAPE_%": 3.5952438282392203,
           "beats_naive": true
         },
