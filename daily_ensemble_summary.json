@@ -65,9 +65,9 @@
           "beats_naive": false
         },
         "30": {
-          "final_MAE": 2964.380079157294,
+          "final_MAE": 2964.3800791572908,
           "naive_MAE": 3281.1946902654863,
-          "final_MAPE_%": 3.27330966913671,
+          "final_MAPE_%": 3.273309669136706,
           "naive_MAPE_%": 3.602051305384519,
           "beats_naive": true
         }
