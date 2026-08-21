@@ -1,22 +1,6 @@
 {
-  "updated_at": "2026-08-20T10:19:25+08:00",
+  "updated_at": "2026-08-21T10:25:09+08:00",
   "items": [
-    {
-      "source": "SMM",
-      "title": "1 Gold, Silver, Copper All Fall, Metals Broadly Decline, LME Copper, Aluminum, Zinc, Tin Down Over 1%, NY Silver Drops Over 4%, Coking Coal and Coke Rise Over 2% [Overnight Market]",
-      "summary": "",
-      "published": "",
-      "url": "https://news.metal.com/en/newscontent/104066276-gold-silver-copper-all-fall-metals-broadly-decline-lme-copper-aluminum-zinc-tin-down-over-1-ny-silver-drops-over-4-cokin",
-      "image_url": ""
-    },
-    {
-      "source": "长江有色",
-      "title": "铜价三连跌：通胀降温但地缘扰动持续，铜铝锌步入“分化定价”新阶段",
-      "summary": "",
-      "published": "",
-      "url": "https://www.ccmn.cn/news/ZX003/202608/fbc6b34df1dc4786a6371a14f493dd07.html",
-      "image_url": ""
-    },
     {
       "source": "SMM",
       "title": "[SMM Analysis] Global Lithium-ion Battery Industry Navigates Capacity Switch Between ESS and EV",
@@ -24,6 +8,14 @@
       "published": "Aug 17, 2026 18:08",
       "url": "https://news.metal.com/en/newscontent/104063820-smm-analysis-global-lithium-ion-battery-industry-navigates-capacity-switch-between-ess-and-ev",
       "image_url": "https://imgqn.smm.cn/usercenter/ajAmi20251217171726.jpg"
+    },
+    {
+      "source": "长江有色",
+      "title": "六氟磷酸锂逆市走强，美债风暴下电解液龙头领涨锂电材料",
+      "summary": "隔夜美债收益率暴力反弹、30 年期逼近 5.25% 二十年高位，美元指数 V 型反转，伊朗局势推高原油重燃通胀焦虑 —— 就在全球风险资产集体承压的背景下，国内六氟磷酸锂逆势走强，长江综合市场六氟磷酸锂均价单日跳涨 2750 元至 111000 元 / 吨，成为今日锂电材料赛道唯一亮色。这波 \"逆市拉涨\" 究竟是昙花一现，还是新一轮景气周期的启动信号？",
+      "published": "",
+      "url": "https://www.ccmn.cn/news/ZX003/202608/840290cb3dca48a4b5bc3765da804c34.html",
+      "image_url": ""
     },
     {
       "source": "SMM",
@@ -35,11 +27,19 @@
     },
     {
       "source": "SMM",
-      "title": "US Treasury Bond Repurchase and Dollar Weakness Resonate, Silver Price Surges [SMM Daily Review]",
+      "title": "Red Copper Strip Dominates China’s Copper Strip Exports in July",
       "summary": "",
-      "published": "3 mins ago",
-      "url": "https://news.metal.com/en/newscontent/104068903-us-treasury-bond-repurchase-and-dollar-weakness-resonate-silver-price-surges-smm-daily-review",
-      "image_url": "https://imgqn.smm.cn/usercenter/nQsOk20251217171736.jpg"
+      "published": "16 mins ago",
+      "url": "https://news.metal.com/en/newscontent/104071395-red-copper-strip-dominates-chinas-copper-strip-exports-in-july",
+      "image_url": "https://imgqn.smm.cn/usercenter/xKfXl20251217171711.jpg"
+    },
+    {
+      "source": "SMM",
+      "title": "\"China's July Copper Scrap Imports Surge, Thailand Leads, European Supplies Increase\"",
+      "summary": "",
+      "published": "31 mins ago",
+      "url": "https://news.metal.com/en/newscontent/104071309-chinas-july-copper-scrap-imports-surge-thailand-leads-european-supplies-increase",
+      "image_url": "https://imgqn.smm.cn/usercenter/OsOmo20251217171709.jpg"
     }
   ],
   "errors": []
