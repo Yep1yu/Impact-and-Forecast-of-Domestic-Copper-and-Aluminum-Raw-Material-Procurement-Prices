@@ -1,29 +1,13 @@
 {
-  "updated_at": "2026-08-23T10:24:47+08:00",
+  "updated_at": "2026-08-24T10:24:36+08:00",
   "items": [
     {
-      "source": "SMM",
-      "title": "US dollar fell on the week, metals generally rose, LME copper, aluminum, zinc and SHFE zinc each rose more than 1%, gold, silver and crude oil surged more than 5% on the week [Overnight Market]",
-      "summary": "",
-      "published": "32 mins ago",
-      "url": "https://news.metal.com/en/newscontent/104073943-us-dollar-fell-on-the-week-metals-generally-rose-lme-copper-aluminum-zinc-and-shfe-zinc-each-rose-more-than-1-gold-silve",
-      "image_url": "https://imgqn.smm.cn/usercenter/JYbQQ20251217171736.jpg"
-    },
-    {
       "source": "长江有色",
-      "title": "盐湖检修致产量回落，电芯排产反超正极，碳酸锂迎来强现实行情窗口",
-      "summary": "2026 年 8 月 21 日，长江综合电池级碳酸锂 99.5% 均价 139000 元 / 吨，较上一交易日上涨 500 元；工业级碳酸锂 99.2% 均价 136000 元 / 吨，较上一交易日上涨 500 元。期货市场同步发力，碳酸锂主力合约收涨 4.12%，报 158680 元 / 吨，刷新阶段高位。",
+      "title": "告别地产旧叙事：铜铝锌迎来“科技+制造”新周期分层",
+      "summary": "2026年8月，国内“东数西算”深化、液冷国标、智算集群、半导体材料国产化等政策持续加码，地方配套与央行流动性配合托底；同期世界机器人大会（8.19-8.23北京亦庄）释放硬信号——上半年中国人形机器人出货超4万台、全球占比97%，央企机器人创新联合体入场，具身智能从炫技走向量产。",
       "published": "",
-      "url": "https://www.ccmn.cn/news/ZX003/202608/735ab81c3fbb4d92872d98807665b142.html",
+      "url": "https://www.ccmn.cn/news/ZX003/202608/dd96d58ca9dd4099865db1943e0da3f2.html",
       "image_url": ""
-    },
-    {
-      "source": "SMM",
-      "title": "[SMM Analysis] Southeast Asia Scrap Aluminum Prices Fall as ADC12 Remains Under Pressure Amid Weak Demand",
-      "summary": "",
-      "published": "Aug 21, 2026 23:55",
-      "url": "https://news.metal.com/en/newscontent/104073929-smm-analysis-southeast-asia-scrap-aluminum-prices-fall-as-adc12-remains-under-pressure-amid-weak-demand",
-      "image_url": "https://imgqn.smm.cn/production/admin/votes/imageslvDRc20240314085754.png"
     },
     {
       "source": "SMM",
@@ -34,12 +18,28 @@
       "image_url": "https://imgqn.smm.cn/usercenter/ajAmi20251217171726.jpg"
     },
     {
+      "source": "长江有色",
+      "title": "ccmn8月24日铜铝锌铅锡镍早评",
+      "summary": "长江铜价copper.ccmn.cn短评：美指续跌叠加国内财政托底提振风险偏好，隔周伦铜涨超1%；国内冶炼亏损、8月检修扩大约束铜产量，新兴赛道高景气支撑，预今现铜上涨。",
+      "published": "",
+      "url": "https://www.ccmn.cn/news/ZX003/202608/b0fe8917a2424806b43e2befaf0ae6a2.html",
+      "image_url": ""
+    },
+    {
       "source": "SMM",
       "title": "Solid-State Battery Accelerates, Supply Chain Diverge Sharply – Review of Listed Companies' H1 2026 Performance",
       "summary": "H1 2026, performance of listed companies in the solid-state battery supply chain showed stark divergence. Traditional lithium battery material suppliers reaped huge profit growth (",
       "published": "Aug 17, 2026 15:16",
       "url": "https://news.metal.com/en/newscontent/104063550-solid-state-battery-accelerates-supply-chain-diverge-sharply-%E2%80%93-review-of-listed-companies-h1-2026-performance",
       "image_url": "https://imgqn.smm.cn/usercenter/OjVzX20251217171727.jpg"
+    },
+    {
+      "source": "SMM",
+      "title": "BHP and SiTration Launch Copper Recovery Pilots from Legacy Mine Water in Arizona",
+      "summary": "",
+      "published": "50 mins ago",
+      "url": "https://news.metal.com/en/newscontent/104074221-bhp-and-sitration-launch-copper-recovery-pilots-from-legacy-mine-water-in-arizona",
+      "image_url": "https://imgqn.smm.cn/usercenter/Bwtty20251217171714.jpeg"
     }
   ],
   "errors": []
