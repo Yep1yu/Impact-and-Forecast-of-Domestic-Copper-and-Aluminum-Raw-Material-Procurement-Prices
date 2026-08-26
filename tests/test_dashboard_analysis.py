@@ -60,7 +60,7 @@ class DashboardAnalysisTest(unittest.TestCase):
             {"首页概览", "影响分析", "预测总览", "模型评估"},
         )
         self.assertIn("历史不含税现货均价", PAGE_DESCRIPTIONS["首页概览"])
-        self.assertIn("筛选出的显著因子作为预测模型的输入", PAGE_DESCRIPTIONS["影响分析"])
+        self.assertIn("不把现货或期货价格本身作为影响因子展示", PAGE_DESCRIPTIONS["影响分析"])
         self.assertIn("未来30天日度预测", PAGE_DESCRIPTIONS["预测总览"])
         self.assertIn("MAE、MAPE和RMSE", PAGE_DESCRIPTIONS["模型评估"])
 

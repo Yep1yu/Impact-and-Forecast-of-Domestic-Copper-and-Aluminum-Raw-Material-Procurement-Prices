@@ -24,6 +24,7 @@ from domestic_prices.analytics import (
     factor_series,
     filter_price_history,
     load_curated_factor_catalog,
+    load_lithium_screening_coefficients,
     load_monthly_dataset,
     load_verified_events,
     terminal_snapshot,
@@ -288,6 +289,13 @@ def load_factor_coefficients() -> pd.DataFrame:
     if not FACTOR_COEFFICIENTS.exists():
         return pd.DataFrame()
     coefficients = pd.read_csv(FACTOR_COEFFICIENTS, encoding="utf-8-sig")
+    lithium_screening = load_lithium_screening_coefficients()
+    if not lithium_screening.empty:
+        coefficients = pd.concat(
+            [coefficients, lithium_screening],
+            ignore_index=True,
+        )
+        return coefficients
     lithium_path = Path(__file__).resolve().parent / "lithium_carbonate_prediction_outputs" / "lithium_monthly_model_coefficients.csv"
     if lithium_path.exists():
         lithium = pd.read_csv(lithium_path, encoding="utf-8-sig")
@@ -1987,6 +1995,11 @@ def render_full_factor_strength_overview(
         f"共纳入 {len(factors)} 个变量，按影响强度绝对值从高到低排序；"
         "横向条越长、蓝色越深，影响强度越高。"
     )
+    if metal == "lithium_carbonate":
+        st.caption(
+            "碳酸锂这里展示的是历史影响因子筛选强度；当前月度预测验证后采用朴素基准，"
+            "这些数值不是当前预测模型的直接权重。"
+        )
     fig = build_factor_strength_figure(factors)
     st.plotly_chart(fig, width="stretch", key=f"{key_prefix}_full_factor_strength")
 
@@ -2222,6 +2235,8 @@ def render_top_impact_factors(metal: str) -> None:
     fig.update_yaxes(showgrid=False)
     st.markdown('<div class="section-title">影响因素 Top 5</div>', unsafe_allow_html=True)
     st.caption("影响强度用于比较各因素与价格变化的关联程度；它不表示因果关系，也不代表价格会按同样幅度变化。")
+    if metal == "lithium_carbonate":
+        st.caption("碳酸锂当前月度预测采用朴素基准，以下强度来自历史筛选结果，不代表当前模型直接入模权重。")
     st.plotly_chart(fig, width="stretch")
     st.caption("“ADC12 与 A00铝的价格差”及“ZLD104 与 A00铝的价格差”分别等于对应合金价格减去 A00铝价格。它们反映再生铝或铸造合金相对原铝的成本、加工溢价和替代关系，是模型的市场信号，不表示价差会单向导致价格变化。")
     st.caption("点击下方因素可查看对应官方或原始数据发布页面。")

@@ -13,6 +13,9 @@ FACTOR_COEFFICIENTS_PATH = ROOT / "domestic_material_factor_coefficients_v1.csv"
 LITHIUM_COEFFICIENTS_PATH = (
     ROOT / "lithium_carbonate_prediction_outputs" / "lithium_monthly_model_coefficients.csv"
 )
+LITHIUM_SCREENING_PATH = (
+    ROOT / "lithium_carbonate_prediction_outputs" / "lithium_unified_factor_screening.csv"
+)
 EVENTS_PATH = ROOT / "verified_market_events.csv"
 
 MATERIAL_NAMES = {
@@ -138,6 +141,35 @@ def load_monthly_dataset(path: Path = MONTHLY_DATA_PATH) -> pd.DataFrame:
     data = pd.read_csv(path, encoding="utf-8-sig")
     data["月份"] = pd.to_datetime(data["月份"], errors="coerce")
     return data.dropna(subset=["月份"]).sort_values("月份").reset_index(drop=True)
+
+
+def load_lithium_screening_coefficients(
+    path: Path = LITHIUM_SCREENING_PATH,
+) -> pd.DataFrame:
+    columns = [
+        "品种",
+        "模型版本",
+        "目标变量",
+        "变量",
+        "标准化系数",
+        "影响强度_绝对值",
+        "p值",
+        "显著性",
+        "回归方向",
+        "强弱排名",
+    ]
+    if not path.exists():
+        return pd.DataFrame(columns=columns)
+    screening = pd.read_csv(path, encoding="utf-8-sig")
+    required = {"变量", "标准化系数", "影响强度_绝对值", "p值", "方向", "强弱排名"}
+    if not required.issubset(screening.columns):
+        return pd.DataFrame(columns=columns)
+    screening = screening.rename(columns={"方向": "回归方向"}).copy()
+    screening["品种"] = "碳酸锂"
+    screening["模型版本"] = "lithium-historical-factor-screening-v1"
+    screening["目标变量"] = screening.get("目标变量", "碳酸锂_价格月环比")
+    screening["显著性"] = screening.get("显著性", "未达到显著性阈值")
+    return screening[columns]
 
 
 def load_verified_events(path: Path = EVENTS_PATH) -> pd.DataFrame:
@@ -466,12 +498,17 @@ def build_driver_snapshot(
 
 
 def _load_coefficients() -> pd.DataFrame:
-    if not FACTOR_COEFFICIENTS_PATH.exists():
-        return pd.DataFrame(
-            columns=["品种", "变量", "影响强度_绝对值", "回归方向", "p值"]
+    coefficient_columns = ["品种", "变量", "影响强度_绝对值", "回归方向", "p值"]
+    if FACTOR_COEFFICIENTS_PATH.exists():
+        coefficients = pd.read_csv(FACTOR_COEFFICIENTS_PATH, encoding="utf-8-sig")
+    else:
+        coefficients = pd.DataFrame(columns=coefficient_columns)
+    lithium_screening = load_lithium_screening_coefficients()
+    if not lithium_screening.empty:
+        coefficients = pd.concat(
+            [coefficients, lithium_screening[coefficient_columns]], ignore_index=True
         )
-    coefficients = pd.read_csv(FACTOR_COEFFICIENTS_PATH, encoding="utf-8-sig")
-    if LITHIUM_COEFFICIENTS_PATH.exists():
+    elif LITHIUM_COEFFICIENTS_PATH.exists():
         lithium = pd.read_csv(LITHIUM_COEFFICIENTS_PATH, encoding="utf-8-sig")
         if {"变量", "系数"}.issubset(lithium.columns):
             lithium = lithium[lithium["变量"] != "截距"].copy()
