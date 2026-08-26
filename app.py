@@ -3095,6 +3095,27 @@ def render_model_formula() -> None:
     )
     st.latex(r"P^{ensemble}_{t+h}=\frac{\sum_j w_{j,h}P^{(j)}_{t+h}}{\sum_j w_{j,h}},\quad w_{j,h}\propto \frac{1}{MAE_{j,h}^{2}}")
     st.caption("P 表示价格，t 表示当前日期，h 表示预测到未来第几天；仅保留回测不劣于 Naive_last 的候选，MAE 越小权重越高。")
+    st.markdown("**各日度候选模型的计算公式**")
+    st.markdown("**最近价格基准（Naive_last）**")
+    st.latex(r"P^{naive}_{t+h}=P_t")
+    st.caption("直接把当前最新价格作为未来每一天的预测，不学习额外变量，是所有候选模型的基准。")
+
+    st.markdown("**滚动对数趋势（Rolling_log_drift）**")
+    st.latex(r"d_t^{(w)}=\frac{\log P_t-\log P_{t-w}}{w},\qquad P^{drift,w}_{t+h}=P_t\exp\!\left(hd_t^{(w)}\right),\quad w\in\{5,20,60,120\}")
+    st.caption("分别用 5、20、60、120 个交易日窗口计算平均对数变化速度，并外推到未来第 h 天。")
+
+    st.markdown("**Ridge 直接多步回归（Ridge_direct_h）**")
+    st.latex(r"\hat P^{Ridge}_{t+h}=\operatorname{clip}\!\left(\hat\beta_{0,h}+\hat{\boldsymbol\beta}_{h}^{\mathsf T}z(\boldsymbol X_t),\;P_t-\Delta_h,\;P_t+\Delta_h\right)")
+    st.latex(r"(\hat\beta_{0,h},\hat{\boldsymbol\beta}_{h})=\arg\min_{\beta_0,\beta}\left\{\sum_i\left(P_{i+h}-\beta_0-\beta^{\mathsf T}z(\boldsymbol X_i)\right)^2+\alpha\lVert\beta\rVert_2^2\right\},\quad \alpha=20")
+    st.caption("每个预测期限 h=1～30 天分别训练一个 Ridge 模型；X 包括价格滞后项、均线、涨跌幅、对数趋势、波动率，以及可用的成交量、持仓量和换月状态。z 表示标准化，Δₕ 是代码中的预测幅度限制。")
+
+    st.markdown("**ARIMA 对数价格模型（ARIMA_log）**")
+    st.latex(r"\Delta\log P_t=\text{ARMA}(p,q)+\varepsilon_t,\qquad P^{ARIMA}_{t+h}=\exp\!\left(\widehat{\log P}_{t+h}\right)")
+    st.caption("在对数价格序列上拟合 ARIMA(p,1,q)，从预设阶数组合中按 AIC 选择阶数和趋势项；若模型不可用，则该候选不参与组合。")
+
+    st.markdown("**中位数组合（Median_ensemble）**")
+    st.latex(r"P^{median}_{t+h}=\operatorname{median}\left\{P^{(j)}_{t+h}:j\in\{drift\_5,drift\_20,drift\_60,drift\_120,Ridge,ARIMA\}\right\}")
+    st.caption("对同一天可用的趋势、Ridge 和 ARIMA 预测取中位数；它本身是一个稳健候选，之后再与其他候选一起参加按回测误差加权的最终组合。")
     st.table(
         pd.DataFrame(
             [
