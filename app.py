@@ -3157,7 +3157,7 @@ def render_model_formula() -> None:
         """
     )
     st.latex(r"T_m=\alpha+\rho P^{month}_{m-1}+\sum_j\beta_jX_{j,m}+\varepsilon_m")
-    st.caption("Tₘ 是未来月份月均价；Pᵐᵒⁿᵗʰₘ₋₁ 是上月月均价（价格惯性项，不作为影响因子展示）；X 是入选的非价格变量。")
+    st.caption("Tₘ 是第 m 个月的未来不含税现货月均价；α 是截距；ρ 是价格惯性系数；Pᵐᵒⁿᵗʰₘ₋₁ 是上月月均价（价格惯性项，不作为影响因子展示）；Σⱼ 表示对所有入选变量求和，j 是变量编号；Xⱼ,ₘ 是第 j 个非价格变量在第 m 月的值；βⱼ 是对应影响系数；εₘ 是模型未解释的误差项，预测时按期望值 0 处理。")
     st.table(
         pd.DataFrame(
             [
