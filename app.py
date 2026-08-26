@@ -73,8 +73,8 @@ PAGE_DESCRIPTIONS = {
         "并展示每日更新的铜、铝、白银和碳酸锂等相关资讯。"
     ),
     "影响分析": (
-        "围绕供应、需求、库存、成本、政策和市场价格等方面，收集可能影响原材料价格的指标，"
-        "并结合多元回归显著性检验和时间序列验证筛选有效因子，将筛选出的显著因子作为预测模型的输入。"
+        "围绕供应、需求、库存、成本、宏观和交易状态等方面，收集可能影响原材料价格的指标，"
+        "不把现货或期货价格本身作为影响因子展示；价格历史只作为预测模型的价格基准和惯性项。"
     ),
     "预测总览": (
         "展示当前原材料的最新现货价和未来价格判断，包括未来30天日度预测、预测上下限和月度均价趋势，"
@@ -159,12 +159,17 @@ MONTHLY_EXPORT_MATERIALS = {
     "ADC12": "ADC12",
     "ZLD104": "ZLD104",
 }
+DISPLAY_EXCLUDED_FACTORS = {
+    "SHFE铜主连收盘价_环比",
+    "SHFE铝主连收盘价_环比",
+    "A00铝_价格月环比",
+    "ADC12_A00价差_滞后1期变化",
+    "ZLD104_A00价差_滞后1期变化",
+}
 
 FACTOR_DISPLAY_NAMES = {
-    "SHFE铜主连收盘价_环比": "上海期货交易所（SHFE）铜主力连续合约收盘价月环比",
     "SHFE铜仓单库存_环比": "上海期货交易所（SHFE）铜仓单库存月环比",
     "SHFE铜主连成交量_环比": "上海期货交易所（SHFE）铜主力连续合约成交量月环比",
-    "SHFE铝主连收盘价_环比": "上海期货交易所（SHFE）铝主力连续合约收盘价月环比",
     "SHFE铝仓单库存_环比": "上海期货交易所（SHFE）铝仓单库存月环比",
     "电线电缆光缆及电工器材制造PPI_环比": "电线电缆、光缆及电工器材制造业工业生产者出厂价格指数（PPI）月环比",
     "光缆产量当期值_环比": "全国光缆产量月环比",
@@ -178,9 +183,6 @@ FACTOR_DISPLAY_NAMES = {
     "PPI当月同比增长": "全国工业生产者出厂价格指数（PPI）同比增速",
     "中国经济政策不确定性指数_变化": "中国经济政策不确定性指数月度变化",
     "中国贸易政策不确定性指数_变化": "中国贸易政策不确定性指数月度变化",
-    "ADC12_A00价差_滞后1期变化": "ADC12 与 A00铝的价格差",
-    "ZLD104_A00价差_滞后1期变化": "ZLD104 与 A00铝的价格差",
-    "A00铝_价格月环比": "A00铝现货月均价环比",
     "汽车销量Top50厂商合计_环比": "盖世汽车销量榜前50家厂商销量合计月环比",
     "废铝进口量_环比": "中国废铝进口量月环比",
     "发电量当期值_环比": "全国发电量月环比",
@@ -1785,7 +1787,9 @@ def render_impact_analysis(
     color: str,
     key_prefix: str,
 ) -> None:
-    material_catalog = catalog[catalog["metal"] == metal].copy()
+    material_catalog = catalog[
+        (catalog["metal"] == metal) & ~catalog["factor"].isin(DISPLAY_EXCLUDED_FACTORS)
+    ].copy()
     if material_catalog.empty or monthly_data.empty:
         return
     material_catalog["sort_strength"] = material_catalog["impact_strength"].fillna(-1)
@@ -1797,7 +1801,7 @@ def render_impact_analysis(
         "库存": "库存端影响因子分析",
         "成本": "成本端影响因子分析",
         "宏观": "宏观端影响因子分析",
-        "价格": "市场价格联动因子分析",
+        "交易": "市场交易状态分析",
     }
     for category, title in category_titles.items():
         category_data = material_catalog[material_catalog["category"] == category]
@@ -3069,12 +3073,13 @@ def render_model_formula() -> None:
     st.markdown('<div class="section-title">1. 日度组合预测</div>', unsafe_allow_html=True)
     st.markdown(
         """
-        系统会同时计算多种结果：以最近价格为基准、根据近期变化速度推演、根据历史价格规律推演，
-        以及使用 Ridge 回归等方法。对同一天的多种预测取中间值，可以减少单一方法异常造成的影响。
+        系统会同时计算多种结果：以最近价格为基准、根据不同窗口的近期变化速度推演、根据历史价格规律推演，
+        以及使用 Ridge 回归等方法。系统先用滚动回测评估每个候选模型，再按各自误差给同一天的预测加权，
+        误差越小的候选模型权重越高；中位数组合本身也是候选结果之一。
         """
     )
-    st.latex(r"P^{daily}_{t+h}=\operatorname{median}(P^{recent}_{t+h},P^{trend}_{t+h},P^{history}_{t+h})")
-    st.caption("P 表示价格，t 表示当前日期，h 表示预测到未来第几天。")
+    st.latex(r"P^{ensemble}_{t+h}=\frac{\sum_j w_{j,h}P^{(j)}_{t+h}}{\sum_j w_{j,h}},\quad w_{j,h}\propto \frac{1}{MAE_{j,h}^{2}}")
+    st.caption("P 表示价格，t 表示当前日期，h 表示预测到未来第几天；仅保留回测不劣于 Naive_last 的候选，MAE 越小权重越高。")
     st.table(
         pd.DataFrame(
             [
@@ -3101,7 +3106,7 @@ def render_model_formula() -> None:
                 {
                     "模型": "中位数组合（Median_ensemble）",
                     "核心思路": "对多个候选模型的同日预测取中位数",
-                    "作用": "降低单个模型异常值对结果的影响",
+                    "作用": "作为稳健候选结果，参与最终组合选择",
                 },
             ]
         ),
@@ -3110,18 +3115,33 @@ def render_model_formula() -> None:
     st.markdown('<div class="section-title">2. 月度价格校准</div>', unsafe_allow_html=True)
     st.markdown(
         """
-        月度模型会根据期货、库存、宏观经济和下游需求等因素判断未来月均价格。
-        日度预测与该月判断存在差距时，系统会进行适度校准：近期日期更多保留价格走势，远期日期更多参考月度判断。
+        月度模型以不含税现货月均价为预测目标，以“上月月均价”表示价格惯性，
+        再使用供应、需求、库存、成本、宏观、事件和交易状态等非价格变量判断未来月均价格。
+        直接现货/期货价格变化及产品价差不作为网页影响因子展示。本轮剔除价格类因子的重训结果先独立回测，暂不替换网页现有预测结果。
         """
     )
+    st.latex(r"T_m=\alpha+\rho P^{month}_{m-1}+\sum_j\beta_jX_{j,m}+\varepsilon_m")
+    st.caption("Tₘ 是未来月份月均价；Pᵐᵒⁿᵗʰₘ₋₁ 是上月月均价（价格惯性项，不作为影响因子展示）；X 是入选的非价格变量。")
+    st.table(
+        pd.DataFrame(
+            [
+                {"参数项": "预测目标", "当前设定": "未来月份不含税现货月均价"},
+                {"参数项": "价格惯性", "当前设定": "上月月均价，以递推方式进入未来预测"},
+                {"参数项": "变量筛选", "当前设定": "月度显著性筛选 p＜0.10"},
+                {"参数项": "剔除范围", "当前设定": "直接期货/现货价格变化及产品价差；网页不展示为影响因子"},
+                {"参数项": "未来变量假设", "当前设定": "连续变量沿用最近可得值；事件冲击默认为 0"},
+                {"参数项": "本轮重训结果", "当前设定": "先用于独立回测，不同步替换网页预测"},
+            ]
+        )
+    )
     st.latex(r"P^{final}_{t+h}=P^{daily}_{t+h}+w_h\,(T_m-\overline{P}^{daily}_m)")
-    st.caption("Tₘ 是月度模型判断的月均价格，P̄ᵈᵃⁱˡʸₘ 是日度预测的月均值，wₕ 是随预测期限变化的校准权重。")
+    st.caption("Tₘ 是月度模型判断的月均价格，P̄ᵈᵃⁱˡʸₘ 是日度预测的月均值，wₕ 随预测期限增加，当前最大校准强度为 0.75。")
 
     st.markdown('<div class="section-title">3. 影响因素与显著性</div>', unsafe_allow_html=True)
     st.markdown(
         """
-        影响因素分析以“价格月环比”为目标，候选因素包括期货价格、库存、PPI、PMI、下游行业和进口等指标。
-        系统将数据按月对齐并标准化后进行多元回归：
+        影响因素分析以“价格月环比”为目标，候选因素包括库存、PPI、PMI、下游行业、进口、宏观和事件等指标。
+        直接价格变化及产品价差不纳入本轮网页影响因子展示。系统将数据按月对齐并标准化后进行多元回归：
         """
     )
     st.latex(r"Z(Y)=\beta_0+\beta_1Z(X_1)+\beta_2Z(X_2)+\cdots+\varepsilon")
