@@ -3094,28 +3094,29 @@ def render_model_formula() -> None:
         """
     )
     st.latex(r"P^{ensemble}_{t+h}=\frac{\sum_j w_{j,h}P^{(j)}_{t+h}}{\sum_j w_{j,h}},\quad w_{j,h}\propto \frac{1}{MAE_{j,h}^{2}}")
-    st.caption("P 表示价格，t 表示当前日期，h 表示预测到未来第几天；仅保留回测不劣于 Naive_last 的候选，MAE 越小权重越高。")
+    st.caption("Pᵉⁿˢᵉᵐᵇˡᵉₜ₊ₕ 是最终组合预测价；t 是当前日期，h 是预测天数；j 是候选模型编号；P⁽ʲ⁾ₜ₊ₕ 是第 j 个模型对第 h 天的预测；wⱼ,ₕ 是该模型的权重；Σⱼ 表示对候选模型求和；MAEⱼ,ₕ 是第 j 个模型在第 h 天的历史平均绝对误差；∝ 表示权重与 1/MAE² 成正比。")
     st.markdown("**各日度候选模型的计算公式**")
     st.markdown("**最近价格基准（Naive_last）**")
     st.latex(r"P^{naive}_{t+h}=P_t")
-    st.caption("直接把当前最新价格作为未来每一天的预测，不学习额外变量，是所有候选模型的基准。")
+    st.caption("Pⁿᵃⁱᵛᵉₜ₊ₕ 是最近价格基准模型对未来第 h 天的预测；Pₜ 是当前最新实际价格；t 是当前日期，h 是预测天数。该模型不使用额外变量。")
 
     st.markdown("**滚动对数趋势（Rolling_log_drift）**")
     st.latex(r"d_t^{(w)}=\frac{\log P_t-\log P_{t-w}}{w},\qquad P^{drift,w}_{t+h}=P_t\exp\!\left(hd_t^{(w)}\right),\quad w\in\{5,20,60,120\}")
-    st.caption("分别用 5、20、60、120 个交易日窗口计算平均对数变化速度，并外推到未来第 h 天。")
+    st.caption("dₜ⁽ʷ⁾ 是窗口 w 内的平均对数变化速度；Pₜ 是当前价格；Pₜ₋ᵂ 是 w 个交易日前的价格；w 是窗口长度，取 5、20、60、120 天；Pᵈʳⁱᶠᵗ,ʷₜ₊ₕ 是对应窗口对未来第 h 天的预测；exp 表示指数函数，h 是预测天数。")
 
     st.markdown("**Ridge 直接多步回归（Ridge_direct_h）**")
     st.latex(r"\hat P^{Ridge}_{t+h}=\operatorname{clip}\!\left(\hat\beta_{0,h}+\hat{\boldsymbol\beta}_{h}^{\mathsf T}z(\boldsymbol X_t),\;P_t-\Delta_h,\;P_t+\Delta_h\right)")
+    st.caption("P̂ᴿⁱᵈᵍᵉₜ₊ₕ 是 Ridge 对未来第 h 天的预测；β̂₀,ₕ 是截距；β̂ₕ 是第 h 天对应的特征系数向量；Xₜ 是当前特征向量；z(Xₜ) 是标准化后的特征；Pₜ 是当前价格；Δₕ 是第 h 天允许的最大价格偏离；clip 表示把预测限制在给定上下限内。")
     st.latex(r"(\hat\beta_{0,h},\hat{\boldsymbol\beta}_{h})=\arg\min_{\beta_0,\beta}\left\{\sum_i\left(P_{i+h}-\beta_0-\beta^{\mathsf T}z(\boldsymbol X_i)\right)^2+\alpha\lVert\beta\rVert_2^2\right\},\quad \alpha=20")
-    st.caption("每个预测期限 h=1～30 天分别训练一个 Ridge 模型；X 包括价格滞后项、均线、涨跌幅、对数趋势、波动率，以及可用的成交量、持仓量和换月状态。z 表示标准化，Δₕ 是代码中的预测幅度限制。")
+    st.caption("β̂₀,ₕ 和 β̂ₕ 是通过最小化目标函数得到的参数；i 是历史训练样本编号；Pᵢ₊ₕ 是样本 i 对应的 h 天后真实价格；Xᵢ 是样本 i 的特征；α 是 Ridge 正则化强度，当前为 20；‖β‖₂² 是系数平方和惩罚项。每个 h=1～30 天分别训练一个模型。")
 
     st.markdown("**ARIMA 对数价格模型（ARIMA_log）**")
     st.latex(r"\Delta\log P_t=\text{ARMA}(p,q)+\varepsilon_t,\qquad P^{ARIMA}_{t+h}=\exp\!\left(\widehat{\log P}_{t+h}\right)")
-    st.caption("在对数价格序列上拟合 ARIMA(p,1,q)，从预设阶数组合中按 AIC 选择阶数和趋势项；若模型不可用，则该候选不参与组合。")
+    st.caption("Pₜ 是价格；log Pₜ 是价格的自然对数；Δ 表示一阶差分；p、q 分别是 AR 和 MA 的阶数；εₜ 是随机误差；Pᴬᴿᴵᴹᴬₜ₊ₕ 是 ARIMA 对未来第 h 天的预测；exp 把对数预测还原为价格；帽号表示预测值。模型按 AIC 在预设阶数中选择 p、q。")
 
     st.markdown("**中位数组合（Median_ensemble）**")
     st.latex(r"P^{median}_{t+h}=\operatorname{median}\left\{P^{(j)}_{t+h}:j\in\{drift\_5,drift\_20,drift\_60,drift\_120,Ridge,ARIMA\}\right\}")
-    st.caption("对同一天可用的趋势、Ridge 和 ARIMA 预测取中位数；它本身是一个稳健候选，之后再与其他候选一起参加按回测误差加权的最终组合。")
+    st.caption("Pᵐᵉᵈⁱᵃⁿₜ₊ₕ 是中位数组合对未来第 h 天的预测；median 表示取中位数；P⁽ʲ⁾ₜ₊ₕ 是第 j 个候选模型的同日预测；j 的候选集合包括 4 个趋势模型、Ridge 和 ARIMA；t 是当前日期，h 是预测天数。")
     st.table(
         pd.DataFrame(
             [
@@ -3171,7 +3172,7 @@ def render_model_formula() -> None:
         )
     )
     st.latex(r"P^{final}_{t+h}=P^{daily}_{t+h}+w_h\,(T_m-\overline{P}^{daily}_m)")
-    st.caption("Tₘ 是月度模型判断的月均价格，P̄ᵈᵃⁱˡʸₘ 是日度预测的月均值，wₕ 随预测期限增加，当前最大校准强度为 0.75。")
+    st.caption("Pᶠⁱⁿᵃˡₜ₊ₕ 是月度校准后的最终日度预测；Pᵈᵃⁱˡʸₜ₊ₕ 是日度模型原始预测；Tₘ 是月度模型判断的第 m 月月均价；P̄ᵈᵃⁱˡʸₘ 是该月份日度预测的平均值；wₕ 是第 h 天的校准权重，随预测期限变化，当前最大值为 0.75；t、h、m 分别表示当前日期、预测天数和月份。")
 
     st.markdown('<div class="section-title">3. 影响因素与显著性</div>', unsafe_allow_html=True)
     st.markdown(
@@ -3181,6 +3182,7 @@ def render_model_formula() -> None:
         """
     )
     st.latex(r"Z(Y)=\beta_0+\beta_1Z(X_1)+\beta_2Z(X_2)+\cdots+\varepsilon")
+    st.caption("Z(Y) 是标准化后的价格月环比；β₀ 是截距；Xⱼ 是第 j 个候选影响因素，Z(Xⱼ) 是其标准化值；βⱼ 是对应的标准化回归系数；ε 是无法由这些因素解释的误差项；省略号表示还可能有其他入选因素。")
     st.markdown(
         """
         标准化系数的正负表示影响方向，绝对值越大表示相对影响越强。显著性按 p 值判断：p＜0.01 为极显著，
@@ -3198,9 +3200,11 @@ def render_model_formula() -> None:
     )
     st.markdown("MAE、MAPE 和 RMSE 均用于衡量预测误差，数值越低表示历史表现越好。")
     st.latex(r"MAE=\frac{1}{n}\sum_{i=1}^{n}|\hat{y}_i-y_i|")
+    st.caption("MAE 是平均绝对误差；n 是回测样本数量；i 是样本编号；ŷᵢ 是第 i 个预测值；yᵢ 是第 i 个真实值；|·| 表示绝对值。")
     st.latex(r"MAPE=\frac{100\%}{n}\sum_{i=1}^{n}\left|\frac{\hat{y}_i-y_i}{y_i}\right|")
+    st.caption("MAPE 是平均绝对百分比误差；n 是样本数量；ŷᵢ 是预测值；yᵢ 是真实值；分母 yᵢ 用于计算相对误差；100% 将结果转换为百分比。")
     st.latex(r"RMSE=\sqrt{\frac{1}{n}\sum_{i=1}^{n}(\hat{y}_i-y_i)^2}")
-    st.caption("MAE 表示平均差多少；MAPE 表示平均误差占实际价格的比例；RMSE 对较大的单次误差更敏感。")
+    st.caption("RMSE 是均方根误差；n 是样本数量；ŷᵢ 是预测值；yᵢ 是真实值；平方会放大较大的单次误差；√表示最后开平方。")
 
 
 @st.cache_data(show_spinner=False)
