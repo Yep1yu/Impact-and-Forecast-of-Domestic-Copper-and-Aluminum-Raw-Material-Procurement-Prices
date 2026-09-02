@@ -1,12 +1,20 @@
 {
-  "updated_at": "2026-09-01T14:09:17+08:00",
+  "updated_at": "2026-09-02T13:34:41+08:00",
   "items": [
     {
+      "source": "SMM",
+      "title": "Metals broadly fell; SHFE copper, SHFE zinc, SHFE tin, and iron ore led the declines. Lithium carbonate dropped over 3%, while gold, silver, platinum, and palladium slumped. [SMM Midday Commentary]",
+      "summary": "",
+      "published": "20 mins ago",
+      "url": "https://news.metal.com/en/newscontent/104093268-metals-broadly-fell-shfe-copper-shfe-zinc-shfe-tin-and-iron-ore-led-the-declines-lithium-carbonate-dropped-over-3-while-gold-silver-platinum-and-palladium-slumped-smm-midday-commentary",
+      "image_url": ""
+    },
+    {
       "source": "长江有色",
-      "title": "储能装机量超预期，碳酸锂需求回暖，锂价止跌回升后何去何从？",
-      "summary": "9 月 1 日国内碳酸锂市场迎来强势反弹，长江综合市场，工业级碳酸锂均价报 15.7 万元 / 吨，电池级碳酸锂均价报 16.0 万元 / 吨，单日上涨 2000 元 / 吨。期货市场同步走强，广期所碳酸锂主力合约收报 161720 元 / 吨，上涨 1220 元，涨幅 0.76%，盘面增仓放量，多头攻势明显，产业资金正加速进行跨期套利操作。在全球金融市场震",
+      "title": "新型电网建设落地：铜铝产业跳出地产依赖，开启五年新需求周期",
+      "summary": "国家能源局近期召开新型电网建设工作部署会，明确“十五五”期间电力需求年均5%左右的增长目标，以“主配微协同”新架构和AI+电网新技术为核心抓手，拉开了能源转型深水区的建设大幕。这一顶层规划绝非短期稳投资的脉冲刺激，而是将从根本上重塑铜、铝两大基本金属的长期需求逻辑，推动有色产业彻底跳出传统地产链的需求桎梏。‌",
       "published": "",
-      "url": "https://www.ccmn.cn/news/ZX003/202609/5c1a7f17711a4745a08070de34c5e022.html",
+      "url": "https://www.ccmn.cn/news/ZX003/202609/ec38fe6e0ecb4ed98e4d952d2d6189fd.html",
       "image_url": ""
     },
     {
@@ -32,14 +40,6 @@
       "published": "Aug 26, 2026 16:17",
       "url": "https://news.metal.com/en/newscontent/104081021-can-qinghai-weixiangs-venture-into-lithium-sulfide-shake-up-the-solid-state-battery-upstream-landscape",
       "image_url": "https://imgqn.smm.cn/usercenter/AmiJU20251217171730.jpg"
-    },
-    {
-      "source": "长江有色",
-      "title": "白银：加息预期重燃多空博弈白热化 短期反弹空间几何？",
-      "summary": "中东战火重燃点燃避险情绪，美元指数高位震荡引发利率预期重构，9 月首日白银市场走出罕见分化行情 —— 外盘微涨、内盘回调，16260 元 / 千克关口成为多空争夺生命线。作为兼具货币避险与光伏、电子双重工业属性的高波动品种，白银正站在宏观预期与产业基本面的交叉路口",
-      "published": "",
-      "url": "https://www.ccmn.cn/news/ZX003/202609/c19c8a052b3c417bb74321c67a229f38.html",
-      "image_url": ""
     }
   ],
   "errors": []
