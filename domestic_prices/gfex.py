@@ -121,7 +121,7 @@ def aggregate_lithium_day(contracts: pd.DataFrame) -> pd.DataFrame:
     )
 
 
-def fetch_latest_lithium_day(
+def fetch_lithium_days(
     *,
     as_of: date | datetime | str | None = None,
     lookback_days: int = 10,
@@ -129,6 +129,7 @@ def fetch_latest_lithium_day(
 ) -> pd.DataFrame:
     end = pd.Timestamp(as_of or date.today()).date()
     client = session or requests.Session()
+    days: list[pd.DataFrame] = []
     for offset in range(max(lookback_days, 1)):
         candidate = end - timedelta(days=offset)
         if candidate.weekday() >= 5:
@@ -136,8 +137,24 @@ def fetch_latest_lithium_day(
         payload = fetch_daily_quotes(candidate, session=client)
         contracts = lithium_contracts(payload, candidate)
         if not contracts.empty:
-            return aggregate_lithium_day(contracts)
-    return aggregate_lithium_day(pd.DataFrame())
+            days.append(aggregate_lithium_day(contracts))
+    if not days:
+        return aggregate_lithium_day(pd.DataFrame())
+    return pd.concat(days, ignore_index=True).sort_values("date").reset_index(drop=True)
+
+
+def fetch_latest_lithium_day(
+    *,
+    as_of: date | datetime | str | None = None,
+    lookback_days: int = 10,
+    session: requests.Session | None = None,
+) -> pd.DataFrame:
+    days = fetch_lithium_days(
+        as_of=as_of,
+        lookback_days=lookback_days,
+        session=session,
+    )
+    return days.tail(1).reset_index(drop=True)
 
 
 def merge_lithium_history(path: str | Path, recent: pd.DataFrame) -> pd.DataFrame:

@@ -15,7 +15,7 @@ from build_lithium_variable_forecast import (
     build_shared_daily_forecast,
     import_to_database,
 )
-from domestic_prices.gfex import fetch_latest_lithium_day, merge_lithium_history
+from domestic_prices.gfex import fetch_lithium_days, merge_lithium_history
 
 
 ROOT = Path(__file__).resolve().parent
@@ -49,12 +49,13 @@ def load_history(path: Path) -> pd.DataFrame:
 def main() -> None:
     args = parse_args()
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    latest = fetch_latest_lithium_day(
+    recent = fetch_lithium_days(
         as_of=args.as_of,
         lookback_days=args.lookback_days,
     )
-    if latest.empty:
+    if recent.empty:
         raise RuntimeError("GFEX returned no lithium futures data in the lookback window")
+    latest = recent.tail(1).reset_index(drop=True)
     if args.history.exists() and not args.force:
         cached = load_history(args.history)
         same_date = not cached.empty and cached.iloc[-1]["date"] == latest.iloc[0]["date"]
@@ -70,7 +71,7 @@ def main() -> None:
                 "average_settlement_price": float(latest.iloc[0]["settlement_price"]),
             }, ensure_ascii=False, indent=2))
             return
-    merged = merge_lithium_history(args.history, latest)
+    merged = merge_lithium_history(args.history, recent)
     merged.to_csv(args.history, index=False, encoding="utf-8-sig")
     prices = load_history(args.history)
     common_factors = pd.read_csv(DATASET, encoding="utf-8-sig")
