@@ -102,18 +102,24 @@ def main() -> None:
         if args.skip_fetch:
             messages.append("Skipped CCMN fetch; using existing price CSV.")
         elif args.current_only:
-            current_payload = fetch_current_prices()
-            current = pd.DataFrame([current_row(current_payload)])
-            existing = pd.read_csv(args.price_csv, encoding="utf-8-sig") if args.price_csv.exists() else pd.DataFrame()
-            merged = merge_wide_price_frames(existing, current)
-            merged.to_csv(args.price_csv, index=False, encoding="utf-8-sig")
+            current_payload = update_price_csv_from_current(args.price_csv)
             messages.append(
                 f"Fetched current public CCMN quotes for {current_payload['date']} "
                 f"({len(current_payload['items'])} supported products)."
             )
         else:
-            fetched_rows = update_price_csv_from_ccmn(args.price_csv, args.lookback_days, args.cookie_env)
-            messages.append(f"Fetched/merged {fetched_rows} recent CCMN date rows.")
+            try:
+                fetched_rows = update_price_csv_from_ccmn(args.price_csv, args.lookback_days, args.cookie_env)
+                messages.append(f"Fetched/merged {fetched_rows} recent CCMN date rows.")
+            except Exception as exc:
+                messages.append(
+                    f"Historical CCMN fetch failed ({exc.__class__.__name__}); falling back to current public quotes."
+                )
+                current_payload = update_price_csv_from_current(args.price_csv)
+                messages.append(
+                    f"Fetched current public CCMN quotes for {current_payload['date']} "
+                    f"({len(current_payload['items'])} supported products)."
+                )
 
         write_tax_exclusive_price_csv(args.price_csv, args.tax_exclusive_price_csv)
         messages.append(f"Generated tax-exclusive daily price CSV: {args.tax_exclusive_price_csv.name}.")
@@ -180,10 +186,6 @@ def main() -> None:
 
 
 def update_price_csv_from_ccmn(path: Path, lookback_days: int, cookie_env: str) -> int:
-    cookie = os.environ.get(cookie_env)
-    if not cookie:
-        raise RuntimeError(f"Missing Cookie. Set ${cookie_env} before running automatic CCMN fetch.")
-
     end = date.today()
     start = end - timedelta(days=max(lookback_days, 1))
     existing = pd.read_csv(path, encoding="utf-8-sig") if path.exists() else pd.DataFrame(columns=["date"])
@@ -193,7 +195,6 @@ def update_price_csv_from_ccmn(path: Path, lookback_days: int, cookie_env: str) 
     session = requests.Session()
     session.headers.update(
         {
-            "Cookie": cookie,
             "Referer": f"{BASE_URL}/historyprice/",
             "Origin": BASE_URL,
             "User-Agent": "Mozilla/5.0",
@@ -216,6 +217,15 @@ def update_price_csv_from_ccmn(path: Path, lookback_days: int, cookie_env: str) 
     merged = merge_wide_price_frames(existing, recent)
     merged.to_csv(path, index=False, encoding="utf-8-sig")
     return len(recent)
+
+
+def update_price_csv_from_current(path: Path) -> dict[str, object]:
+    payload = fetch_current_prices()
+    current = pd.DataFrame([current_row(payload)])
+    existing = pd.read_csv(path, encoding="utf-8-sig") if path.exists() else pd.DataFrame()
+    merged = merge_wide_price_frames(existing, current)
+    merged.to_csv(path, index=False, encoding="utf-8-sig")
+    return payload
 
 
 def merge_wide_price_frames(existing: pd.DataFrame, recent: pd.DataFrame) -> pd.DataFrame:

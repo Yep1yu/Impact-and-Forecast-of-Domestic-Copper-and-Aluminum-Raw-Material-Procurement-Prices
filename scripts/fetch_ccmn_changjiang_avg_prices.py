@@ -56,14 +56,9 @@ def main() -> int:
     if start > end:
         raise SystemExit("--start cannot be later than --end")
 
-    cookie = os.environ.get(args.cookie_env)
-    if not cookie:
-        raise SystemExit(f"Missing Cookie. Set ${args.cookie_env} before running this script.")
-
     session = requests.Session()
     session.headers.update(
         {
-            "Cookie": cookie,
             "Referer": f"{BASE_URL}/historyprice/",
             "Origin": BASE_URL,
             "User-Agent": "Mozilla/5.0",
@@ -99,12 +94,13 @@ def fetch_product_range(
     market_vmid: str = MARKET_VM_ID,
 ) -> list[dict[str, Any]]:
     response = session.post(
-        f"{BASE_URL}/shop/historyData/getPriceListStartAndEndTime",
+        f"{BASE_URL}/metalquote/query",
         data={
-            "marketVmid": market_vmid,
-            "productSortVmid": product_id,
-            "startTime": start.strftime("%Y-%m-%d"),
+            "marketId": market_vmid,
+            "productId": product_id,
+            "staTime": start.strftime("%Y-%m-%d"),
             "endTime": end.strftime("%Y-%m-%d"),
+            "state": "1",
         },
         timeout=30,
     )
@@ -113,7 +109,18 @@ def fetch_product_range(
     if not payload.get("success"):
         msg = payload.get("msg") or payload
         raise RuntimeError(f"ccmn.cn request failed for {start} to {end}: {msg}")
-    return payload.get("body", {}).get("priceList") or []
+    json_url = payload.get("body", {}).get("jsonUrl")
+    if not json_url:
+        raise RuntimeError(f"ccmn.cn response did not include chart data for {start} to {end}")
+    chart_response = session.get(f"https://static.ccmn.cn/priceJson{json_url}", timeout=30)
+    chart_response.raise_for_status()
+    chart = chart_response.json()
+    return [
+        {"publishDate": publish_date, "avgPrice": avg_price}
+        for publish_date, avg_price in zip(
+            chart.get("timeList") or [], chart.get("avgPriceList") or [], strict=False
+        )
+    ]
 
 
 def write_wide_csv(path: Path, rows_by_date: dict[str, dict[str, Any]]) -> None:

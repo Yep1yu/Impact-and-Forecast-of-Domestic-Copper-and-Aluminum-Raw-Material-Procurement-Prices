@@ -81,7 +81,7 @@ def main() -> None:
         monthly_periods=args.forecast_months,
         daily_periods=args.forecast_days,
     )
-    daily_forecast = build_shared_daily_forecast(prices, args.forecast_days)
+    daily_forecast = build_shared_daily_forecast(prices, args.forecast_days, OUTPUT_DIR)
     fitted = build_monthly_rolling_baseline(prices)
     result.monthly_coefficients.to_csv(
         OUTPUT_DIR / "lithium_monthly_model_coefficients.csv", index=False, encoding="utf-8-sig"

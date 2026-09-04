@@ -64,15 +64,15 @@ def fetch_current_prices(
 
     selected: dict[str, dict[str, Any]] = {}
     for table in prices:
-        if not isinstance(table, list):
-            continue
-        for item in table:
+        items = table if isinstance(table, list) else [table] if isinstance(table, dict) else []
+        for item in items:
             if not isinstance(item, dict):
                 continue
             product = str(item.get("productSortName") or "").strip()
-            if product in PRODUCTS and item.get("marketName") != CURRENT_MARKET:
+            market_name = item.get("marketName")
+            if product in PRODUCTS and market_name and market_name != CURRENT_MARKET:
                 continue
-            if product == LITHIUM_PRODUCT and item.get("marketName") != LITHIUM_MARKET:
+            if product == LITHIUM_PRODUCT and market_name and market_name != LITHIUM_MARKET:
                 continue
             if product not in (*PRODUCTS, LITHIUM_PRODUCT):
                 continue
