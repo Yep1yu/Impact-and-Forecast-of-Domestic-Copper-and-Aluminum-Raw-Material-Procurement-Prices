@@ -177,7 +177,9 @@ def import_to_database(
     conn.close()
 
 
-def build_shared_daily_forecast(main_prices: pd.DataFrame, periods: int) -> pd.DataFrame:
+def build_shared_daily_forecast(
+    main_prices: pd.DataFrame, periods: int, output_dir: Path = OUTPUT_DIR
+) -> pd.DataFrame:
     """Use the same rolling-validation ensemble route as the five core materials."""
     frame = main_prices[["date", "settlement_price"]].rename(
         columns={"settlement_price": "price"}
@@ -195,7 +197,7 @@ def build_shared_daily_forecast(main_prices: pd.DataFrame, periods: int) -> pd.D
     validation_origins = min(120, max(5, len(frame) - periods - min_train_days))
     args = DailyEnsembleArgs(
         input=Path("<lithium-settlement-workbook>"),
-        output_dir=OUTPUT_DIR,
+        output_dir=output_dir,
         forecast_days=periods,
         validation_origins=validation_origins,
         min_train_days=min_train_days,
