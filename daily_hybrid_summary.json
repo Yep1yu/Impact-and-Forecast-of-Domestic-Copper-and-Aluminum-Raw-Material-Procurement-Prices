@@ -1,9 +1,9 @@
 {
   "model_version": "daily-hybrid-variable-anchor-v1",
-  "daily_prices": "C:\\Users\\Administrator\\Documents\\BSHintern\\.codex_tmp\\publish_september_backfill_20260911\\ccmn_changjiang_avg_prices_tax_exclusive.csv",
-  "ensemble_forecast": "C:\\Users\\Administrator\\Documents\\BSHintern\\.codex_tmp\\publish_september_backfill_20260911\\daily_ensemble_forecast_next_30d.csv",
-  "ensemble_backtest": "C:\\Users\\Administrator\\Documents\\BSHintern\\.codex_tmp\\publish_september_backfill_20260911\\daily_ensemble_actual_vs_pred.csv",
-  "monthly_dir": "C:\\Users\\Administrator\\Documents\\BSHintern\\.codex_tmp\\publish_september_backfill_20260911\\monthly_price_prediction_outputs",
+  "daily_prices": "/home/runner/work/Impact-and-Forecast-of-Domestic-Copper-and-Aluminum-Raw-Material-Procurement-Prices/Impact-and-Forecast-of-Domestic-Copper-and-Aluminum-Raw-Material-Procurement-Prices/ccmn_changjiang_avg_prices_tax_exclusive.csv",
+  "ensemble_forecast": "/home/runner/work/Impact-and-Forecast-of-Domestic-Copper-and-Aluminum-Raw-Material-Procurement-Prices/Impact-and-Forecast-of-Domestic-Copper-and-Aluminum-Raw-Material-Procurement-Prices/daily_ensemble_forecast_next_30d.csv",
+  "ensemble_backtest": "/home/runner/work/Impact-and-Forecast-of-Domestic-Copper-and-Aluminum-Raw-Material-Procurement-Prices/Impact-and-Forecast-of-Domestic-Copper-and-Aluminum-Raw-Material-Procurement-Prices/daily_ensemble_actual_vs_pred.csv",
+  "monthly_dir": "/home/runner/work/Impact-and-Forecast-of-Domestic-Copper-and-Aluminum-Raw-Material-Procurement-Prices/Impact-and-Forecast-of-Domestic-Copper-and-Aluminum-Raw-Material-Procurement-Prices/monthly_price_prediction_outputs",
   "anchor_strength": 0.75,
   "monthly_anchor_months": [
     "2025-06",
@@ -91,9 +91,9 @@
     },
     {
       "series": "1#铜",
-      "mean_hybrid_MAE": 1833.4396147340715,
-      "mean_selected_MAE": 1833.4396147340715,
-      "mean_ensemble_MAE": 2419.430912855146,
+      "mean_hybrid_MAE": 1833.439614734277,
+      "mean_selected_MAE": 1833.439614734277,
+      "mean_ensemble_MAE": 2419.4309128556847,
       "beats_ensemble_horizon_count": 30,
       "selected_beats_ensemble_horizon_count": 30,
       "beats_naive_horizon_count": 30,
@@ -116,32 +116,32 @@
           "selected_MAE": 1430.222395267743,
           "ensemble_MAE": 1712.094395280235,
           "naive_MAE": 1712.094395280235,
-          "hybrid_MAPE_%": 1.583794348867514,
-          "selected_MAPE_%": 1.583794348867514,
+          "hybrid_MAPE_%": 1.5837943488675135,
+          "selected_MAPE_%": 1.5837943488675135,
           "beats_ensemble": true,
           "selected_beats_ensemble": true,
           "beats_naive": true,
           "selected_beats_naive": true
         },
         "14": {
-          "hybrid_MAE": 2064.1818071687603,
-          "selected_MAE": 2064.1818071687603,
+          "hybrid_MAE": 2064.181807168726,
+          "selected_MAE": 2064.181807168726,
           "ensemble_MAE": 2555.678466076696,
           "naive_MAE": 2555.678466076696,
-          "hybrid_MAPE_%": 2.284944614050906,
-          "selected_MAPE_%": 2.284944614050906,
+          "hybrid_MAPE_%": 2.284944614050871,
+          "selected_MAPE_%": 2.284944614050871,
           "beats_ensemble": true,
           "selected_beats_ensemble": true,
           "beats_naive": true,
           "selected_beats_naive": true
         },
         "30": {
-          "hybrid_MAE": 1884.6040647907653,
-          "selected_MAE": 1884.6040647907653,
-          "ensemble_MAE": 3140.6985801730684,
+          "hybrid_MAE": 1884.6040648060816,
+          "selected_MAE": 1884.6040648060816,
+          "ensemble_MAE": 3140.698580189215,
           "naive_MAE": 3626.991150442477,
-          "hybrid_MAPE_%": 2.082663068321928,
-          "selected_MAPE_%": 2.082663068321928,
+          "hybrid_MAPE_%": 2.0826630683386793,
+          "selected_MAPE_%": 2.0826630683386793,
           "beats_ensemble": true,
           "selected_beats_ensemble": true,
           "beats_naive": true,
@@ -331,9 +331,9 @@
     }
   ],
   "outputs": {
-    "forecast": "C:\\Users\\Administrator\\Documents\\BSHintern\\.codex_tmp\\publish_september_backfill_20260911\\daily_hybrid_variable_anchored_forecast_30d.csv",
-    "backtest_by_horizon": "C:\\Users\\Administrator\\Documents\\BSHintern\\.codex_tmp\\publish_september_backfill_20260911\\daily_hybrid_backtest_by_horizon.csv",
-    "actual_vs_pred": "C:\\Users\\Administrator\\Documents\\BSHintern\\.codex_tmp\\publish_september_backfill_20260911\\daily_hybrid_actual_vs_pred.csv",
-    "summary": "C:\\Users\\Administrator\\Documents\\BSHintern\\.codex_tmp\\publish_september_backfill_20260911\\daily_hybrid_summary.json"
+    "forecast": "/home/runner/work/Impact-and-Forecast-of-Domestic-Copper-and-Aluminum-Raw-Material-Procurement-Prices/Impact-and-Forecast-of-Domestic-Copper-and-Aluminum-Raw-Material-Procurement-Prices/daily_hybrid_variable_anchored_forecast_30d.csv",
+    "backtest_by_horizon": "/home/runner/work/Impact-and-Forecast-of-Domestic-Copper-and-Aluminum-Raw-Material-Procurement-Prices/Impact-and-Forecast-of-Domestic-Copper-and-Aluminum-Raw-Material-Procurement-Prices/daily_hybrid_backtest_by_horizon.csv",
+    "actual_vs_pred": "/home/runner/work/Impact-and-Forecast-of-Domestic-Copper-and-Aluminum-Raw-Material-Procurement-Prices/Impact-and-Forecast-of-Domestic-Copper-and-Aluminum-Raw-Material-Procurement-Prices/daily_hybrid_actual_vs_pred.csv",
+    "summary": "/home/runner/work/Impact-and-Forecast-of-Domestic-Copper-and-Aluminum-Raw-Material-Procurement-Prices/Impact-and-Forecast-of-Domestic-Copper-and-Aluminum-Raw-Material-Procurement-Prices/daily_hybrid_summary.json"
   }
 }
