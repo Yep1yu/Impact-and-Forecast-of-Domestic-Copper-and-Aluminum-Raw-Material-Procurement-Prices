@@ -1,12 +1,28 @@
 {
-  "updated_at": "2026-09-17T13:55:27+08:00",
+  "updated_at": "2026-09-18T13:42:07+08:00",
   "items": [
     {
+      "source": "SMM",
+      "title": "[SMM Analysis] Lithium Battery Copper Foil: No Near-Term Supply Constraint, Structural Shortage Risks to Surface in 2027",
+      "summary": "Recently, news of tightening lithium battery copper foil supply has drawn attention from the industry and capital markets. Some worry that tight copper foil supply will immediately",
+      "published": "Sep 16, 2026 15:18",
+      "url": "https://news.metal.com/en/newscontent/104118130-smm-analysis-lithium-battery-copper-foil-no-near-term-supply-constraint-structural-shortage-risks-to-surface-in-2027",
+      "image_url": "https://imgqn.smm.cn/usercenter/BQoXd20251217171731.jpg"
+    },
+    {
       "source": "长江有色",
-      "title": "ccmn9月11日铜铝锌铅锡镍早评",
-      "summary": "长江铜价copper.ccmn.cn短评：美铜关税溢价回吐引发铜价深度下调，隔夜伦铜重挫4.25%收于近三周低位；现货升水连续收窄下游接货更趋理性，今日现货铜或跟跌外盘。",
+      "title": "300亿降税磋商搅动盘面：铜铝稀土钢材，谁被资金选中、谁只是蹭情绪？",
+      "summary": "中美围绕300亿美元规模商品对等降税的磋商预期，这两天在金属圈的存在感，比一份超预期库存数据还高。不是因为关税本身能立刻改变供需，而是它同时碰到了三件事：地缘博弈出现缓和信号、国内稳产政策托底、资金在有色和黑色里找新故事。于是“贸易流重构”这个词，又被搬上了研报标题。",
       "published": "",
-      "url": "https://www.ccmn.cn/news/ZX003/202609/b3881178666449a0936e7eb7aabfc64d.html",
+      "url": "https://www.ccmn.cn/news/ZX018/202609/2cda4b9bf0de416b8660bb3e0d5ec4d2.html",
+      "image_url": ""
+    },
+    {
+      "source": "长江有色",
+      "title": "宏观风暴下铜铝锌的“危”与“机”，今日铜价跌390元/吨",
+      "summary": "——9月14日长江现货价格动态： 1#铜价报109020元/吨，跌390元；升水为90元/吨，跌510元；A00铝锭报24080元/吨，跌160元；升水报10元；0#锌报26330元/吨，跌310元；1#锌报26230元/吨，跌310元；1#铅报15925元/吨，跌275元；1#镍报126350元/吨，跌1200元；1#锡报402500元/吨，跌7750元；",
+      "published": "",
+      "url": "https://www.ccmn.cn/news/ZX003/202609/edeaee42af414ff2953851d86664426c.html",
       "image_url": ""
     },
     {
@@ -18,27 +34,11 @@
       "image_url": "https://imgqn.smm.cn/usercenter/MXbup20251217171745.jpg"
     },
     {
-      "source": "SMM",
-      "title": "Copper Prices Pull Back, Demand Warms Up; High Premiums Return After Delivery Contract Rollover [SMM Shandong Copper Cathode Spot Weekly Review]",
-      "summary": "",
-      "published": "1 min ago",
-      "url": "https://news.metal.com/en/newscontent/104120405-copper-prices-pull-back-demand-warms-up-high-premiums-return-after-delivery-contract-rollover-smm-shandong-copper-cathode-spot-weekly-review",
-      "image_url": "https://imgqn.smm.cn/usercenter/xKfXl20251217171711.jpg"
-    },
-    {
-      "source": "SMM",
-      "title": "After the FOMC announcement in the early morning, silver futures consolidated with moderate trading volume [SMM Daily Review]",
-      "summary": "",
-      "published": "1 hour ago",
-      "url": "https://news.metal.com/en/newscontent/104120242-after-the-fomc-announcement-in-the-early-morning-silver-futures-consolidated-with-moderate-trading-volume-smm-daily-review",
-      "image_url": "https://imgqn.smm.cn/usercenter/QnbfL20251217171735.jpeg"
-    },
-    {
       "source": "长江有色",
-      "title": "宏观利空压制银价，17 日长江现货白银报 15500 元，沪银主力大跌 1.12%",
-      "summary": "17日长江现货 1# 白银均价 15500 元 / 千克，较上一交易日下跌 10 元；截至11:00，沪白银主力合约报 15421 元 / 千克，下跌 175 元，跌幅 1.12%。",
+      "title": "海洋智能基座落地，钛合金与铜缆迎来“算力需求”新范式",
+      "summary": "9月17日全国首个海洋Token工厂在青岛正式落地，这一事件在金属投研领域常被简单归类为“数字海洋”或“软件赋能”的概念炒作。然而，如果我们穿透“智能算法”的表层，审视深海产业从“人力密集”向“算力密集”转型的底层逻辑，就会发现其对上游金属的需求将发生一次深刻的结构性重塑。",
       "published": "",
-      "url": "https://www.ccmn.cn/news/ZX003/202609/0de47a2fbeea446681563d1514633e7c.html",
+      "url": "https://www.ccmn.cn/news/ZX003/202609/33c81ae8e5944987b0aa06698b241256.html",
       "image_url": ""
     }
   ],
