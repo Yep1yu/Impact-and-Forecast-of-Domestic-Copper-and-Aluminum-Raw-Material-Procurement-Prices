@@ -1569,6 +1569,7 @@ def render_monthly_forecast(
     first_forecast_price = float(forecast_prices.iloc[0])
     price_index = forecast_prices.div(first_forecast_price).mul(100.0)
     price_index_labels = price_index.map(lambda value: f"{value:.1f}")
+    price_labels = forecast_prices.map(lambda value: f"{value:,.0f}")
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     fig.add_trace(
         go.Scatter(
@@ -1599,6 +1600,10 @@ def render_monthly_forecast(
             x=data["forecast_month"],
             y=forecast_prices,
             marker_color="#7F9FBE",
+            text=price_labels,
+            textposition="outside",
+            textfont={"size": 10, "color": "#475569"},
+            cliponaxis=False,
             name="预测月均价",
             customdata=np.column_stack(
                 [
@@ -1648,7 +1653,7 @@ def render_monthly_forecast(
         paper_bgcolor="rgba(255,255,255,0)",
         plot_bgcolor="#ffffff",
         font={"color": "#64748b"},
-        margin={"l": 20, "r": 20, "t": 58, "b": 20},
+        margin={"l": 20, "r": 20, "t": 72, "b": 20},
         legend={
             "orientation": "h",
             "yanchor": "bottom",
