@@ -1638,7 +1638,7 @@ def render_monthly_forecast(
     price_min = float(price_values.min())
     price_max = float(price_values.max())
     price_span = max(price_max - price_min, abs(price_max) * 0.01, 1.0)
-    price_padding = price_span * 0.08
+    price_padding = price_span * 0.03
     index_min = float(price_index.min())
     index_max = float(price_index.max())
     index_padding = max((index_max - index_min) * 0.25, 1.0)
