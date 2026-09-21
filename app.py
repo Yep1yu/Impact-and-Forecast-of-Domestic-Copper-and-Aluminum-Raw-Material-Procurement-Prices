@@ -1632,13 +1632,13 @@ def render_monthly_forecast(
         secondary_y=True,
     )
     price_values = pd.concat(
-        [data["lower_bound"], data["upper_bound"], data["predicted_price_cny_per_tonne"]],
+        [forecast_prices],
         ignore_index=True,
     ).astype(float)
     price_min = float(price_values.min())
     price_max = float(price_values.max())
     price_span = max(price_max - price_min, abs(price_max) * 0.01, 1.0)
-    price_padding = price_span * 0.03
+    price_padding = price_span * 0.02
     index_min = float(price_index.min())
     index_max = float(price_index.max())
     index_padding = max((index_max - index_min) * 0.25, 1.0)
