@@ -37,6 +37,7 @@ from domestic_prices.db import (
 from domestic_prices.lithium_model import (
     DAILY_MODEL_VERSION,
     MONTHLY_MODEL_VERSION,
+    _monthly_baseline,
     build_lithium_forecasts,
 )
 
@@ -355,6 +356,23 @@ class DashboardAnalysisTest(unittest.TestCase):
                 result.daily_forecast["lower_bound"]
                 <= result.daily_forecast["predicted_price_cny_per_tonne"]
             ).all()
+        )
+
+    def test_lithium_fallback_tracks_recent_trend(self) -> None:
+        target = pd.DataFrame(
+            {
+                "month": pd.date_range("2026-01-01", periods=4, freq="MS"),
+                "price": [100000.0, 110000.0, 120000.0, 100000.0],
+                "target_return": [np.nan, 0.10, 0.0909, -0.1667],
+            }
+        )
+        forecast, _, diagnostics, _, _ = _monthly_baseline(target, periods=3, reason="test")
+
+        self.assertEqual(diagnostics.selected_model, "recency_trend")
+        self.assertLess(forecast.iloc[0]["predicted_price_cny_per_tonne"], 100000.0)
+        self.assertLess(
+            forecast.iloc[1]["predicted_price_cny_per_tonne"],
+            forecast.iloc[0]["predicted_price_cny_per_tonne"],
         )
 
 

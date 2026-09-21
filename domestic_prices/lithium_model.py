@@ -23,7 +23,7 @@ MONTHLY_FACTORS = [
     "LC价格波动率",
     "LC合约切换",
 ]
-MONTHLY_MODEL_VERSION = "lithium-specific-elasticnet-monthly-v3"
+MONTHLY_MODEL_VERSION = "lithium-specific-elasticnet-monthly-v4"
 DAILY_MODEL_VERSION = "lithium-specific-elasticnet-daily-v3"
 
 
@@ -90,7 +90,7 @@ def _monthly_forecast(
         frame[column] = pd.to_numeric(frame[column], errors="coerce")
     model_frame = frame[["month", "price", "target_return", *feature_columns]].dropna()
     if len(model_frame) < 20:
-        return _monthly_baseline(target, periods, "样本不足，使用月度朴素基准")
+        return _monthly_baseline(target, periods, "样本不足，使用近3个月加权趋势基准")
 
     x = model_frame[feature_columns]
     y = model_frame["target_return"]
@@ -124,7 +124,11 @@ def _monthly_forecast(
     improvement = 1 - model_mae / baseline_mae if baseline_mae > 0 else 0.0
     residual_std = float(np.std(np.asarray(oos_actual) - np.asarray(oos_model), ddof=0))
     if improvement < 0.05:
-        result = _monthly_baseline(target, periods, "Elastic Net未明显优于月度朴素基准")
+        result = _monthly_baseline(
+            target,
+            periods,
+            "Elastic Net未明显优于零收益基准，改用近3个月加权趋势基准",
+        )
         result[2].model_mae = float(model_mae)
         result[2].baseline_mae = float(baseline_mae)
         result[2].improvement_pct = float(improvement)
@@ -216,12 +220,21 @@ def _monthly_baseline(
         target["month"].max() + pd.offsets.MonthBegin(1), periods=periods, freq="MS"
     )
     last_price = float(target.iloc[-1]["price"])
+    recent_returns = target["target_return"].dropna().tail(3)
+    if recent_returns.empty:
+        base_return = 0.0
+    else:
+        weights = np.arange(1, len(recent_returns) + 1, dtype=float)
+        base_return = float(np.average(recent_returns.to_numpy(), weights=weights))
+        base_return = float(np.clip(base_return, -0.08, 0.08))
     residual_std = float(target["target_return"].dropna().tail(24).std(ddof=0))
     if not np.isfinite(residual_std) or residual_std <= 0:
         residual_std = 0.05
     generated_at = pd.Timestamp.now(tz="UTC").isoformat()
     rows = []
     for horizon, month in enumerate(future_months, start=1):
+        predicted_return = base_return * (0.75 ** (horizon - 1))
+        last_price = max(last_price * (1 + predicted_return), 1.0)
         width = 1.282 * residual_std * np.sqrt(horizon)
         rows.append(
             {
@@ -230,22 +243,28 @@ def _monthly_baseline(
                 "predicted_price_cny_per_tonne": last_price,
                 "lower_bound": max(last_price * (1 - width), 1.0),
                 "upper_bound": last_price * (1 + width),
-                "direction": "平稳",
-                "predicted_change_pct": 0.0,
+                "direction": _direction(predicted_return),
+                "predicted_change_pct": predicted_return,
                 "source": reason,
                 "model_version": MONTHLY_MODEL_VERSION,
                 "generated_at": generated_at,
             }
         )
     diagnostics = ModelDiagnostics(
-        selected_model="naive",
+        selected_model="recency_trend",
         model_mae=np.nan,
         baseline_mae=np.nan,
         improvement_pct=0.0,
         residual_std=residual_std,
     )
     coefficients = pd.DataFrame(
-        [{"变量": "价格动量基准", "系数": 0.0, "模型版本": MONTHLY_MODEL_VERSION}]
+        [
+            {
+                "变量": "近3个月加权收益率",
+                "系数": base_return,
+                "模型版本": MONTHLY_MODEL_VERSION,
+            }
+        ]
     )
     return pd.DataFrame(rows), None, diagnostics, coefficients, pd.DataFrame()
 
