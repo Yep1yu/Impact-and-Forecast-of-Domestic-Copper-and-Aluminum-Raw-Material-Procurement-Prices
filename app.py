@@ -1563,17 +1563,12 @@ def render_monthly_forecast(
         st.info("暂无月度均价预测。请先运行数据更新任务。")
         return
     data = ensure_monthly_horizon(monthly_forecast, metal_spot, periods=12)
-    monthly_change_pct = (
-        pd.to_numeric(data["predicted_change_pct"], errors="coerce")
-        .fillna(0.0)
-        .mul(100.0)
-    )
-    monthly_change_labels = monthly_change_pct.map(lambda value: f"{value:+.2f}%")
-    change_colors = np.where(
-        monthly_change_pct >= 0,
-        "#3E8C6E",
-        "#C45A5A",
-    ).tolist()
+    forecast_prices = pd.to_numeric(
+        data["predicted_price_cny_per_tonne"], errors="coerce"
+    ).astype(float)
+    first_forecast_price = float(forecast_prices.iloc[0])
+    price_index = forecast_prices.div(first_forecast_price).mul(100.0)
+    price_index_labels = price_index.map(lambda value: f"{value:.1f}")
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     fig.add_trace(
         go.Scatter(
@@ -1600,23 +1595,21 @@ def render_monthly_forecast(
         secondary_y=False,
     )
     fig.add_trace(
-        go.Scatter(
+        go.Bar(
             x=data["forecast_month"],
-            y=data["predicted_price_cny_per_tonne"],
-            mode="lines+markers",
-            line={"color": "#557EA3", "width": 3},
-            marker={"color": "#557EA3", "size": 7},
+            y=forecast_prices,
+            marker_color="#7F9FBE",
             name="预测月均价",
             customdata=np.column_stack(
                 [
-                    data["predicted_change_pct"].map(lambda value: f"{value:+.2%}"),
+                    price_index_labels,
                     data["lower_bound"].map(lambda value: f"{value:,.0f}"),
                     data["upper_bound"].map(lambda value: f"{value:,.0f}"),
                 ]
             ),
             hovertemplate=(
                 f"<b>%{{x|%Y-%m}}</b><br>预测月均价：%{{y:,.0f}} {unit}"
-                "<br>预测月环比：%{customdata[0]}"
+                "<br>预测价格指数：%{customdata[0]}（首月=100）"
                 f"<br>预测下限-上限：%{{customdata[1]}} - %{{customdata[2]}} {unit}"
                 "<extra></extra>"
             ),
@@ -1624,14 +1617,16 @@ def render_monthly_forecast(
         secondary_y=False,
     )
     fig.add_trace(
-        go.Bar(
+        go.Scatter(
             x=data["forecast_month"],
-            y=monthly_change_pct,
-            marker_color=change_colors,
-            name="预测月环比",
-            customdata=monthly_change_labels,
+            y=price_index,
+            mode="lines+markers",
+            line={"color": "#C45A5A", "width": 2.8},
+            marker={"color": "#C45A5A", "size": 6},
+            name="预测价格指数",
+            customdata=price_index_labels,
             hovertemplate=(
-                "<b>%{x|%Y-%m}</b><br>预测月环比：%{customdata}<extra></extra>"
+                "<b>%{x|%Y-%m}</b><br>预测价格指数：%{customdata}（首月=100）<extra></extra>"
             ),
         ),
         secondary_y=True,
@@ -1644,7 +1639,9 @@ def render_monthly_forecast(
     price_max = float(price_values.max())
     price_span = max(price_max - price_min, abs(price_max) * 0.01, 1.0)
     price_padding = price_span * 0.08
-    change_limit = max(float(monthly_change_pct.abs().max()), 0.1) * 1.2
+    index_min = float(price_index.min())
+    index_max = float(price_index.max())
+    index_padding = max((index_max - index_min) * 0.25, 1.0)
     fig.update_layout(
         height=360,
         template="plotly_white",
@@ -1681,10 +1678,10 @@ def render_monthly_forecast(
         secondary_y=False,
     )
     fig.update_yaxes(
-        range=[-change_limit, change_limit],
+        range=[max(0.0, index_min - index_padding), index_max + index_padding],
         autorange=False,
-        title_text="预测月环比（%）",
-        ticksuffix="%",
+        title_text="预测价格指数（首月=100）",
+        tickformat=".0f",
         showgrid=False,
         zeroline=True,
         zerolinecolor="rgba(100, 116, 139, 0.45)",
@@ -1697,16 +1694,14 @@ def render_monthly_forecast(
             预测月均价=data["predicted_price_cny_per_tonne"].map(
                 lambda value: f"{value:,.0f} {unit}"
             ),
+            预测价格指数=price_index.map(lambda value: f"{value:.1f}"),
             预测下限=data["lower_bound"].map(lambda value: f"{value:,.0f}"),
             预测上限=data["upper_bound"].map(lambda value: f"{value:,.0f}"),
-            预测月环比=data["predicted_change_pct"].map(lambda value: f"{value:+.2%}"),
-        )[["预测月份", "预测月均价", "预测下限", "预测上限", "预测月环比", "direction"]].rename(
-            columns={"direction": "方向"}
-        ),
+        )[["预测月份", "预测月均价", "预测价格指数", "预测下限", "预测上限"]],
         width="stretch",
         hide_index=True,
     )
-    st.caption("折线表示预测月均价，正负柱形表示预测月环比；阴影表示预测下限-上限。")
+    st.caption("柱形表示预测月均价，折线表示预测价格指数（首月=100）；阴影表示预测下限-上限。")
 
 
 def build_price_history_figure(
