@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-20T13:55:10+08:00",
+  "updated_at": "2026-09-21T14:01:44+08:00",
   "items": [
     {
       "source": "SMM",
@@ -11,18 +11,10 @@
     },
     {
       "source": "长江有色",
-      "title": "长江有色：碳酸锂现货再度下跌，主力合约大跌 2.27%，供需博弈加剧",
-      "summary": "2026 年 9 月 18 日，长江综合电池级碳酸锂 99.5% 均价 130500 元 / 吨，较上一交易日下跌 500 元；工业级碳酸锂 99.2% 均价 127500 元 / 吨，较上一交易日下跌 500 元。期货盘面表现更为偏弱，碳酸锂期货今日高开低走，主力合约收跌 2.27%，报 127160 元 / 吨，期现同步承压。",
+      "title": "银价再度抬升！21日长江现货白银上涨 220 元，沪银主力早盘涨 0.78%",
+      "summary": "9 月 21 日，国内白银盘面延续上行态势，长江现货 1# 白银均价报 16225 元 / 千克，较上一交易日上涨 220 元；截至当日 11:00，沪白银主力合约报 16182 元 / 千克，上涨 126 元，涨幅 0.78%，现货价格略高于期货盘面。",
       "published": "",
-      "url": "https://www.ccmn.cn/news/ZX003/202609/356e643513304408b2ead00fde765ab2.html",
-      "image_url": ""
-    },
-    {
-      "source": "长江有色",
-      "title": "宏观风暴下铜铝锌的“危”与“机”，今日铜价跌390元/吨",
-      "summary": "——9月14日长江现货价格动态： 1#铜价报109020元/吨，跌390元；升水为90元/吨，跌510元；A00铝锭报24080元/吨，跌160元；升水报10元；0#锌报26330元/吨，跌310元；1#锌报26230元/吨，跌310元；1#铅报15925元/吨，跌275元；1#镍报126350元/吨，跌1200元；1#锡报402500元/吨，跌7750元；",
-      "published": "",
-      "url": "https://www.ccmn.cn/news/ZX003/202609/edeaee42af414ff2953851d86664426c.html",
+      "url": "https://www.ccmn.cn/news/ZX003/202609/d91b303275d54f478de7e1a440f942eb.html",
       "image_url": ""
     },
     {
@@ -35,11 +27,19 @@
     },
     {
       "source": "SMM",
-      "title": "[August Lithium Hydroxide Imports and Exports Both Decline, Net Imports Narrow]",
-      "summary": "",
-      "published": "8 mins ago",
-      "url": "https://news.metal.com/en/newscontent/104124219-august-lithium-hydroxide-imports-and-exports-both-decline-net-imports-narrow",
-      "image_url": "https://imgqn.smm.cn/usercenter/JmyWy20251217171729.png"
+      "title": "ADC12 Market Prices Stable at 24,500 Yuan/mt; Tax Invoice Policies Impact Supply and Costs",
+      "summary": "[SMM Aluminum Alloy Flash] ADC12 market prices remained generally stable today, with SMM ADC12 prices holding steady at 24,500 yuan/mt from the previous trading day. Raw material p",
+      "published": "12 mins ago",
+      "url": "https://news.metal.com/en/newscontent/104126390-adc12-market-prices-stable-at-24500-yuanmt-tax-invoice-policies-impact-supply-and-costs",
+      "image_url": ""
+    },
+    {
+      "source": "SMM",
+      "title": "Aluminum alloy futures retreat after rapid rise, spot quotes remain stable [ADC12 Price Daily Review]",
+      "summary": "[ADC12 Price Daily Commentary: Aluminum Alloy Futures Retreat after Rapid Rise, Spot Quotes Remain Stable] The most-traded AD2611 cast aluminum alloy contract opened at 23,765 yuan",
+      "published": "16 mins ago",
+      "url": "https://news.metal.com/en/newscontent/104126387-aluminum-alloy-futures-retreat-after-rapid-rise-spot-quotes-remain-stable-adc12-price-daily-review",
+      "image_url": ""
     }
   ],
   "errors": []
