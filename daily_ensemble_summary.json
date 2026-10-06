@@ -39,7 +39,7 @@
         ],
         "trend": "t"
       },
-      "mean_final_MAE": 2239.392938120775,
+      "mean_final_MAE": 2239.3929381250678,
       "mean_naive_MAE": 2431.4331366764995,
       "beats_naive_horizon_count": 19,
       "checkpoint_horizons": {
@@ -65,9 +65,9 @@
           "beats_naive": true
         },
         "30": {
-          "final_MAE": 2591.425786018511,
+          "final_MAE": 2591.4257860332145,
           "naive_MAE": 3301.253687315634,
-          "final_MAPE_%": 2.7736504058605047,
+          "final_MAPE_%": 2.7736504058763742,
           "naive_MAPE_%": 3.5094917953522042,
           "beats_naive": true
         }
