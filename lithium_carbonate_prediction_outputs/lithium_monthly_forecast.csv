@@ -1,13 +1,13 @@
 ﻿metal,forecast_month,predicted_price_cny_per_tonne,lower_bound,upper_bound,direction,predicted_change_pct,source,model_version,generated_at
-lithium_carbonate,2026-11-01,108786.93333333333,90462.41959946141,127111.44706720526,下跌,-0.08,Elastic Net未明显优于零收益基准，改用近3个月加权趋势基准,lithium-specific-elasticnet-monthly-v4,2026-10-09T09:21:42.141587+00:00
-lithium_carbonate,2026-12-01,102259.71733333333,77899.82803777963,126619.60662888704,下跌,-0.06,Elastic Net未明显优于零收益基准，改用近3个月加权趋势基准,lithium-specific-elasticnet-monthly-v4,2026-10-09T09:21:42.141587+00:00
-lithium_carbonate,2027-01-01,97658.03005333334,69165.93979764491,126150.12030902176,下跌,-0.045,Elastic Net未明显优于零收益基准，改用近3个月加权趋势基准,lithium-specific-elasticnet-monthly-v4,2026-10-09T09:21:42.141587+00:00
-lithium_carbonate,2027-02-01,94362.07153903334,62572.608909815215,126151.53416825146,下跌,-0.03375,Elastic Net未明显优于零收益基准，改用近3个月加权趋势基准,lithium-specific-elasticnet-monthly-v4,2026-10-09T09:21:42.141587+00:00
-lithium_carbonate,2027-03-01,91973.53160320155,57331.48117338747,126615.58203301564,下跌,-0.0253125,Elastic Net未明显优于零收益基准，改用近3个月加权趋势基准,lithium-specific-elasticnet-monthly-v4,2026-10-09T09:21:42.141587+00:00
-lithium_carbonate,2027-04-01,90227.47158917203,52999.43456055462,127455.50861778943,下跌,-0.018984375,Elastic Net未明显优于零收益基准，改用近3个月加权趋势基准,lithium-specific-elasticnet-monthly-v4,2026-10-09T09:21:42.141587+00:00
-lithium_carbonate,2027-05-01,88942.787472209,49304.4454487055,128581.1294957125,下跌,-0.01423828125,Elastic Net未明显优于零收益基准，改用近3个月加权趋势基准,lithium-specific-elasticnet-monthly-v4,2026-10-09T09:21:42.141587+00:00
-lithium_carbonate,2027-06-01,87992.9931548178,46070.33528067823,129915.65102895738,下跌,-0.0106787109375,Elastic Net未明显优于零收益基准，改用近3个月加权趋势基准,lithium-specific-elasticnet-monthly-v4,2026-10-09T09:21:42.141587+00:00
-lithium_carbonate,2027-07-01,87288.25435099851,43178.68806440647,131397.82063759054,下跌,-0.008009033203125,Elastic Net未明显优于零收益基准，改用近3个月加权趋势基准,lithium-specific-elasticnet-monthly-v4,2026-10-09T09:21:42.141587+00:00
-lithium_carbonate,2027-08-01,86763.93345549353,40547.656494608425,132980.21041637866,下跌,-0.00600677490234375,Elastic Net未明显优于零收益基准，改用近3个月加权趋势基准,lithium-specific-elasticnet-monthly-v4,2026-10-09T09:21:42.141587+00:00
-lithium_carbonate,2027-09-01,86373.05489206171,38119.38516193446,134626.72462218898,平稳,-0.004505081176757813,Elastic Net未明显优于零收益基准，改用近3个月加权趋势基准,lithium-specific-elasticnet-monthly-v4,2026-10-09T09:21:42.141587+00:00
-lithium_carbonate,2027-10-01,86081.21667423175,35852.19211860141,136310.2412298621,平稳,-0.0033788108825683594,Elastic Net未明显优于零收益基准，改用近3个月加权趋势基准,lithium-specific-elasticnet-monthly-v4,2026-10-09T09:21:42.141587+00:00
+lithium_carbonate,2026-11-01,105419.73333333334,87480.82686151203,123358.63980515464,下跌,-0.08,Elastic Net未明显优于零收益基准，改用近3个月加权趋势基准,lithium-specific-elasticnet-monthly-v4,2026-10-12T09:29:02.346405+00:00
+lithium_carbonate,2026-12-01,99094.54933333333,75247.27119633669,122941.82747032997,下跌,-0.06,Elastic Net未明显优于零收益基准，改用近3个月加权趋势基准,lithium-specific-elasticnet-monthly-v4,2026-10-12T09:29:02.346405+00:00
+lithium_carbonate,2027-01-01,94635.29461333333,66742.77044017003,122527.81878649663,下跌,-0.045,Elastic Net未明显优于零收益基准，改用近3个月加权趋势基准,lithium-specific-elasticnet-monthly-v4,2026-10-12T09:29:02.346405+00:00
+lithium_carbonate,2027-02-01,91441.35342013334,60320.844293558774,122561.86254670791,下跌,-0.03375,Elastic Net未明显优于零收益基准，改用近3个月加权趋势基准,lithium-specific-elasticnet-monthly-v4,2026-10-12T09:29:02.346405+00:00
+lithium_carbonate,2027-03-01,89126.74416168622,55213.674943164435,123039.81338020801,下跌,-0.0253125,Elastic Net未明显优于零收益基准，改用近3个月加权趋势基准,lithium-specific-elasticnet-monthly-v4,2026-10-12T09:29:02.346405+00:00
+lithium_carbonate,2027-04-01,87434.7286279917,50990.09036447165,123879.36689151176,下跌,-0.018984375,Elastic Net未明显优于零收益基准，改用近3个月加权趋势基准,lithium-specific-elasticnet-monthly-v4,2026-10-12T09:29:02.346405+00:00
+lithium_carbonate,2027-05-01,86189.80837076892,47385.58575484655,124994.03098669129,下跌,-0.01423828125,Elastic Net未明显优于零收益基准，改用近3个月加权趋势基准,lithium-specific-elasticnet-monthly-v4,2026-10-12T09:29:02.346405+00:00
+lithium_carbonate,2027-06-01,85269.41232141896,44228.94327670798,126309.88136612994,下跌,-0.0106787109375,Elastic Net未明显优于零收益基准，改用近3个月加权趋势基准,lithium-specific-elasticnet-monthly-v4,2026-10-12T09:29:02.346405+00:00
+lithium_carbonate,2027-07-01,84586.48676692577,41405.12896286353,127767.84457098799,下跌,-0.008009033203125,Elastic Net未明显优于零收益基准，改用近3个月加权趋势基准,lithium-specific-elasticnet-monthly-v4,2026-10-12T09:29:02.346405+00:00
+lithium_carbonate,2027-08-01,84078.39478113675,38834.65833509864,129322.13122717486,下跌,-0.00600677490234375,Elastic Net未明显优于零收益基准，改用近3个月加权趋势基准,lithium-specific-elasticnet-monthly-v4,2026-10-12T09:29:02.346405+00:00
+lithium_carbonate,2027-09-01,83699.61478743624,36461.358930700655,130937.87064417181,平稳,-0.004505081176757813,Elastic Net未明显优于零收益基准，改用近3个月加权趋势基准,lithium-specific-elasticnet-monthly-v4,2026-10-12T09:29:02.346405+00:00
+lithium_carbonate,2027-10-01,83416.80961812567,34244.76681468058,132588.85242157074,平稳,-0.0033788108825683594,Elastic Net未明显优于零收益基准，改用近3个月加权趋势基准,lithium-specific-elasticnet-monthly-v4,2026-10-12T09:29:02.346405+00:00
