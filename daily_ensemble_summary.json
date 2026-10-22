@@ -39,36 +39,36 @@
         ],
         "trend": "t"
       },
-      "mean_final_MAE": 2084.4872882432705,
-      "mean_naive_MAE": 2303.2546705998034,
+      "mean_final_MAE": 2084.4872882433738,
+      "mean_naive_MAE": 2303.254670599803,
       "beats_naive_horizon_count": 20,
       "checkpoint_horizons": {
         "1": {
-          "final_MAE": 671.7551622418874,
-          "naive_MAE": 671.7551622418874,
-          "final_MAPE_%": 0.7343754377476974,
-          "naive_MAPE_%": 0.7343754377476974,
+          "final_MAE": 671.755162241888,
+          "naive_MAE": 671.755162241888,
+          "final_MAPE_%": 0.734375437747698,
+          "naive_MAPE_%": 0.734375437747698,
           "beats_naive": false
         },
         "7": {
-          "final_MAE": 1643.4365781710899,
-          "naive_MAE": 1643.4365781710899,
-          "final_MAPE_%": 1.7984411632791977,
-          "naive_MAPE_%": 1.7984411632791977,
+          "final_MAE": 1643.4365781710906,
+          "naive_MAE": 1643.4365781710906,
+          "final_MAPE_%": 1.7984411632791981,
+          "naive_MAPE_%": 1.7984411632791981,
           "beats_naive": false
         },
         "14": {
-          "final_MAE": 2182.7152373484323,
-          "naive_MAE": 2273.3038348082605,
-          "final_MAPE_%": 2.365946580561186,
-          "naive_MAPE_%": 2.4563071184370124,
+          "final_MAE": 2182.715237348568,
+          "naive_MAE": 2273.30383480826,
+          "final_MAPE_%": 2.3659465805613267,
+          "naive_MAPE_%": 2.456307118437012,
           "beats_naive": true
         },
         "30": {
-          "final_MAE": 2693.236551263685,
-          "naive_MAE": 3334.5870206489667,
-          "final_MAPE_%": 2.868087350358176,
-          "naive_MAPE_%": 3.5254165419264933,
+          "final_MAE": 2693.236551263655,
+          "naive_MAE": 3334.5870206489676,
+          "final_MAPE_%": 2.8680873503580995,
+          "naive_MAPE_%": 3.5254165419264947,
           "beats_naive": true
         }
       },
@@ -96,31 +96,31 @@
       "beats_naive_horizon_count": 0,
       "checkpoint_horizons": {
         "1": {
-          "final_MAE": 135.54572271386417,
-          "naive_MAE": 135.54572271386417,
-          "final_MAPE_%": 0.6404522831644857,
-          "naive_MAPE_%": 0.6404522831644857,
+          "final_MAE": 135.54572271386425,
+          "naive_MAE": 135.54572271386425,
+          "final_MAPE_%": 0.6404522831644862,
+          "naive_MAPE_%": 0.6404522831644862,
           "beats_naive": false
         },
         "7": {
-          "final_MAE": 362.90560471976386,
-          "naive_MAE": 362.90560471976386,
-          "final_MAPE_%": 1.7246063536156289,
-          "naive_MAPE_%": 1.7246063536156289,
+          "final_MAE": 362.90560471976397,
+          "naive_MAE": 362.90560471976397,
+          "final_MAPE_%": 1.7246063536156295,
+          "naive_MAPE_%": 1.7246063536156295,
           "beats_naive": false
         },
         "14": {
-          "final_MAE": 440.6342182890854,
-          "naive_MAE": 440.6342182890854,
-          "final_MAPE_%": 2.093413128417756,
-          "naive_MAPE_%": 2.093413128417756,
+          "final_MAE": 440.63421828908525,
+          "naive_MAE": 440.63421828908525,
+          "final_MAPE_%": 2.093413128417755,
+          "naive_MAPE_%": 2.093413128417755,
           "beats_naive": false
         },
         "30": {
           "final_MAE": 623.5250737463126,
           "naive_MAE": 623.5250737463126,
-          "final_MAPE_%": 2.9771619226932686,
-          "naive_MAPE_%": 2.9771619226932686,
+          "final_MAPE_%": 2.977161922693269,
+          "naive_MAPE_%": 2.977161922693269,
           "beats_naive": false
         }
       },
@@ -137,9 +137,9 @@
       "validation_end_origin": "2026-09-02",
       "arima_spec": {
         "order": [
-          0,
           1,
-          0
+          1,
+          1
         ],
         "trend": "t"
       },
@@ -148,8 +148,8 @@
       "beats_naive_horizon_count": 0,
       "checkpoint_horizons": {
         "1": {
-          "final_MAE": 394.2109144542775,
-          "naive_MAE": 394.2109144542775,
+          "final_MAE": 394.2109144542774,
+          "naive_MAE": 394.2109144542774,
           "final_MAPE_%": 2.6141909913232992,
           "naive_MAPE_%": 2.6141909913232992,
           "beats_naive": false
@@ -162,8 +162,8 @@
           "beats_naive": false
         },
         "14": {
-          "final_MAE": 1176.3274336283184,
-          "naive_MAE": 1176.3274336283184,
+          "final_MAE": 1176.3274336283187,
+          "naive_MAE": 1176.3274336283187,
           "final_MAPE_%": 8.071669820681908,
           "naive_MAPE_%": 8.071669820681908,
           "beats_naive": false
@@ -171,8 +171,8 @@
         "30": {
           "final_MAE": 1976.6961651917406,
           "naive_MAE": 1976.6961651917406,
-          "final_MAPE_%": 14.408162941025052,
-          "naive_MAPE_%": 14.408162941025052,
+          "final_MAPE_%": 14.408162941025049,
+          "naive_MAPE_%": 14.408162941025049,
           "beats_naive": false
         }
       },
@@ -195,36 +195,36 @@
         ],
         "trend": "t"
       },
-      "mean_final_MAE": 283.97246804326426,
-      "mean_naive_MAE": 283.97246804326426,
+      "mean_final_MAE": 283.9724680432647,
+      "mean_naive_MAE": 283.9724680432647,
       "beats_naive_horizon_count": 0,
       "checkpoint_horizons": {
         "1": {
-          "final_MAE": 63.42182890855456,
-          "naive_MAE": 63.42182890855456,
-          "final_MAPE_%": 0.29786159863577744,
-          "naive_MAPE_%": 0.29786159863577744,
+          "final_MAE": 63.42182890855468,
+          "naive_MAE": 63.42182890855468,
+          "final_MAPE_%": 0.29786159863577794,
+          "naive_MAPE_%": 0.29786159863577794,
           "beats_naive": false
         },
         "7": {
-          "final_MAE": 244.1002949852503,
-          "naive_MAE": 244.1002949852503,
-          "final_MAPE_%": 1.1481281744209493,
-          "naive_MAPE_%": 1.1481281744209493,
+          "final_MAE": 244.10029498525088,
+          "naive_MAE": 244.10029498525088,
+          "final_MAPE_%": 1.1481281744209522,
+          "naive_MAPE_%": 1.1481281744209522,
           "beats_naive": false
         },
         "14": {
-          "final_MAE": 268.4365781710915,
-          "naive_MAE": 268.4365781710915,
-          "final_MAPE_%": 1.2678273161532077,
-          "naive_MAPE_%": 1.2678273161532077,
+          "final_MAE": 268.4365781710918,
+          "naive_MAE": 268.4365781710918,
+          "final_MAPE_%": 1.267827316153209,
+          "naive_MAPE_%": 1.267827316153209,
           "beats_naive": false
         },
         "30": {
-          "final_MAE": 392.3303834808255,
-          "naive_MAE": 392.3303834808255,
-          "final_MAPE_%": 1.8594837539737408,
-          "naive_MAPE_%": 1.8594837539737408,
+          "final_MAE": 392.330383480826,
+          "naive_MAE": 392.330383480826,
+          "final_MAPE_%": 1.8594837539737434,
+          "naive_MAPE_%": 1.8594837539737434,
           "beats_naive": false
         }
       },
@@ -247,36 +247,36 @@
         ],
         "trend": "n"
       },
-      "mean_final_MAE": 475.6637168141588,
-      "mean_naive_MAE": 475.6637168141588,
+      "mean_final_MAE": 475.66371681415916,
+      "mean_naive_MAE": 475.66371681415916,
       "beats_naive_horizon_count": 0,
       "checkpoint_horizons": {
         "1": {
-          "final_MAE": 112.0943952802361,
-          "naive_MAE": 112.0943952802361,
-          "final_MAPE_%": 0.5143513086989878,
-          "naive_MAPE_%": 0.5143513086989878,
+          "final_MAE": 112.09439528023599,
+          "naive_MAE": 112.09439528023599,
+          "final_MAPE_%": 0.5143513086989874,
+          "naive_MAPE_%": 0.5143513086989874,
           "beats_naive": false
         },
         "7": {
-          "final_MAE": 357.6696165191737,
-          "naive_MAE": 357.6696165191737,
-          "final_MAPE_%": 1.6488745985603923,
-          "naive_MAPE_%": 1.6488745985603923,
+          "final_MAE": 357.669616519174,
+          "naive_MAE": 357.669616519174,
+          "final_MAPE_%": 1.6488745985603939,
+          "naive_MAPE_%": 1.6488745985603939,
           "beats_naive": false
         },
         "14": {
-          "final_MAE": 429.94100294985213,
-          "naive_MAE": 429.94100294985213,
-          "final_MAPE_%": 2.0089482800878393,
-          "naive_MAPE_%": 2.0089482800878393,
+          "final_MAE": 429.9410029498524,
+          "naive_MAE": 429.9410029498524,
+          "final_MAPE_%": 2.00894828008784,
+          "naive_MAPE_%": 2.00894828008784,
           "beats_naive": false
         },
         "30": {
-          "final_MAE": 706.4896755162234,
-          "naive_MAE": 706.4896755162234,
-          "final_MAPE_%": 3.3100635891200185,
-          "naive_MAPE_%": 3.3100635891200185,
+          "final_MAE": 706.4896755162243,
+          "naive_MAE": 706.4896755162243,
+          "final_MAPE_%": 3.310063589120023,
+          "naive_MAPE_%": 3.310063589120023,
           "beats_naive": false
         }
       },
