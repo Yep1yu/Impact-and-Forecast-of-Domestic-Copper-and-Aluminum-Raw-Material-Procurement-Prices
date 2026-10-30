@@ -39,7 +39,7 @@
         ],
         "trend": "t"
       },
-      "mean_final_MAE": 2010.9032600055539,
+      "mean_final_MAE": 2010.9032600063329,
       "mean_naive_MAE": 2222.1509341199603,
       "beats_naive_horizon_count": 27,
       "checkpoint_horizons": {
@@ -58,16 +58,16 @@
           "beats_naive": true
         },
         "14": {
-          "final_MAE": 2077.668060639838,
+          "final_MAE": 2077.6680606402424,
           "naive_MAE": 2191.2241887905607,
-          "final_MAPE_%": 2.2358285287801376,
+          "final_MAPE_%": 2.2358285287805835,
           "naive_MAPE_%": 2.3519890906462195,
           "beats_naive": true
         },
         "30": {
-          "final_MAE": 2688.0255455585047,
+          "final_MAE": 2688.025545560873,
           "naive_MAE": 3235.0294985250734,
-          "final_MAPE_%": 2.853855413514818,
+          "final_MAPE_%": 2.8538554135175933,
           "naive_MAPE_%": 3.413143879346061,
           "beats_naive": true
         }
@@ -137,11 +137,11 @@
       "validation_end_origin": "2026-09-10",
       "arima_spec": {
         "order": [
-          2,
+          0,
           1,
-          1
+          0
         ],
-        "trend": "t"
+        "trend": "n"
       },
       "mean_final_MAE": 1212.8658808025332,
       "mean_naive_MAE": 1237.4803343166175,
