@@ -1,22 +1,6 @@
 {
-  "updated_at": "2026-11-01T15:15:46+08:00",
+  "updated_at": "2026-11-02T15:30:25+08:00",
   "items": [
-    {
-      "source": "SMM",
-      "title": "Gold and silver plunged, with nearly all metals falling. LME tin and nickel led the decline, while LME copper and zinc, along with SHFE zinc, tin, and nickel, posted the largest losses [Overnight Market].",
-      "summary": "",
-      "published": "6 hours ago",
-      "url": "https://news.metal.com/en/newscontent/104189737-gold-and-silver-plunged-with-nearly-all-metals-falling-lme-tin-and-nickel-led-the-decline-while-lme-copper-and-zinc-along-with-shfe-zinc-tin-and-nickel-posted-the-largest-losses-overnight-market",
-      "image_url": "https://imgqn.smm.cn/usercenter/wDeWQ20251217171734.jpeg"
-    },
-    {
-      "source": "长江有色",
-      "title": "碳酸锂破位下行，主力合约冲高回落收跌 2.9%，云母复产预期持续施压",
-      "summary": "2026 年 10 月 30 日，国内碳酸锂现货价格继续下调，长江综合电池级碳酸锂（99.5%）均价 93500 元 / 吨，工业级碳酸锂（99.2%）均价 90500 元 / 吨，两类品种较上一交易日同步下跌 2500 元。期货盘面波动加剧，碳酸锂主力合约走出冲高回落行情，最终收跌 2.9%，报 88500 元 / 吨。",
-      "published": "",
-      "url": "https://www.ccmn.cn/news/ZX003/202610/fb6478f02a28412192f2bf66003b8050.html",
-      "image_url": ""
-    },
     {
       "source": "长江有色",
       "title": "碳酸锂2701跌至92200元！95000关口两度失守，46万手持仓遇上2万手仓单",
@@ -40,6 +24,22 @@
       "published": "Oct 26, 2026 16:42 (GMT+8)",
       "url": "https://news.metal.com/en/newscontent/104179210-silver-price-correction-brings-key-50-level-into-focus",
       "image_url": "https://imgqn.smm.cn/usercenter/BVoXk20251217171736.jpg"
+    },
+    {
+      "source": "SMM",
+      "title": "Cherokee Nation Committee Rejects $4B Oklahoma Aluminium Smelter Project Amid Environmental Concerns",
+      "summary": "[SMM Aluminum Express News] Cherokee Nation committee opposes US$4 billion Oklahoma aluminums smelter, adding uncertainty to 750,000 mt/year project. The Cherokee Nation Tribal Cou",
+      "published": "1 hour ago",
+      "url": "https://news.metal.com/en/newscontent/104191742-cherokee-nation-committee-rejects-4b-oklahoma-aluminium-smelter-project-amid-environmental-concerns",
+      "image_url": ""
+    },
+    {
+      "source": "SMM",
+      "title": "1 Gold and silver plunged, with nearly all metals falling. LME tin and nickel led the decline, while LME copper and zinc, along with SHFE zinc, tin, and nickel, posted the largest losses [Overnight Market].",
+      "summary": "",
+      "published": "",
+      "url": "https://news.metal.com/en/newscontent/104189737-gold-and-silver-plunged-with-nearly-all-metals-falling-lme-tin-and-nickel-led-the-decline-while-lme-copper-and-zinc-along-with-shfe-zinc-tin-and-nickel-posted-the-largest-losses-overnight-market",
+      "image_url": ""
     }
   ],
   "errors": []
