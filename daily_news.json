@@ -1,6 +1,22 @@
 {
-  "updated_at": "2026-11-02T15:30:25+08:00",
+  "updated_at": "2026-11-03T15:44:37+08:00",
   "items": [
+    {
+      "source": "长江有色",
+      "title": "碳酸锂现货持平，期货主力收跌 1.33%，四季度行情缺乏强驱动",
+      "summary": "2026 年 11 月 3 日，长江综合电池级碳酸锂 99.5% 均价 94000 元 / 吨，较上一交易日持平；工业级碳酸锂 99.2% 均价 91000 元 / 吨，较上一交易日持平。期货盘面表现分化，碳酸锂主力合约震荡下行，收盘下跌 1.33%，报 89300 元 / 吨，期现价差进一步拉开，市场多空博弈加剧。",
+      "published": "",
+      "url": "https://www.ccmn.cn/news/ZX003/202611/5eeba51adb254fba9085d1aa5653b8c0.html",
+      "image_url": ""
+    },
+    {
+      "source": "SMM",
+      "title": "【SMM Analysis】Vietnam Proposes Aluminium Export Duty Cuts, Implications for Southeast Asian Billet and Extrusion Trade",
+      "summary": "Vietnam is proposing to cut export duties on selected aluminium products, potentially giving domestic suppliers more room to adjust export offers. According to the Vietnam Chamber ",
+      "published": "Oct 30, 2026 12:05 (GMT+8)",
+      "url": "https://news.metal.com/en/newscontent/104188620-smm-analysisvietnam-proposes-aluminium-export-duty-cuts-implications-for-southeast-asian-billet-and-extrusion-trade",
+      "image_url": "https://imgqn.smm.cn/usercenter/hRRxy20251217171652.jpg"
+    },
     {
       "source": "长江有色",
       "title": "碳酸锂2701跌至92200元！95000关口两度失守，46万手持仓遇上2万手仓单",
@@ -11,35 +27,19 @@
     },
     {
       "source": "SMM",
-      "title": "[SMM Analysis] Countries Race to Retain Copper Scrap—Could Export Restrictions Undermine Domestic Recycling?",
-      "summary": "[SMM Analysis: Countries Race to Retain Copper Scrap—Could Export Restrictions Undermine Domestic Recycling?] Countries are moving to retain copper scrap as supply security gains i",
-      "published": "Oct 28, 2026 00:15 (GMT+8)",
-      "url": "https://news.metal.com/en/newscontent/104181862-smm-analysis-countries-race-to-retain-copper-scrapcould-export-restrictions-undermine-domestic-recycling",
-      "image_url": "https://imgqn.smm.cn/usercenter/MXbup20251217171745.jpg"
+      "title": "DRC: KPM Launches Africa's Largest Renewable Mine Power System",
+      "summary": "On the southern edge of the DRC's copper belt, there is a question every operator learns to live with: not how much ore is in the ground, but how much electricity will arrive today",
+      "published": "Oct 30, 2026 10:00 (GMT+8)",
+      "url": "https://news.metal.com/en/newscontent/104179193-drc-kpm-launches-africas-largest-renewable-mine-power-system",
+      "image_url": "https://imgqn.smm.cn/usercenter/pJSbE20251217171713.jpeg"
     },
     {
       "source": "SMM",
-      "title": "Silver price: Correction brings key $50 level into focus",
-      "summary": "October 25, 2026 As of October 23, 2026, by Florian Grummes In an environment marked by high uncertainty and tension, precious metals prices came under further pressure over the pa",
-      "published": "Oct 26, 2026 16:42 (GMT+8)",
-      "url": "https://news.metal.com/en/newscontent/104179210-silver-price-correction-brings-key-50-level-into-focus",
-      "image_url": "https://imgqn.smm.cn/usercenter/BVoXk20251217171736.jpg"
-    },
-    {
-      "source": "SMM",
-      "title": "Cherokee Nation Committee Rejects $4B Oklahoma Aluminium Smelter Project Amid Environmental Concerns",
-      "summary": "[SMM Aluminum Express News] Cherokee Nation committee opposes US$4 billion Oklahoma aluminums smelter, adding uncertainty to 750,000 mt/year project. The Cherokee Nation Tribal Cou",
-      "published": "1 hour ago",
-      "url": "https://news.metal.com/en/newscontent/104191742-cherokee-nation-committee-rejects-4b-oklahoma-aluminium-smelter-project-amid-environmental-concerns",
-      "image_url": ""
-    },
-    {
-      "source": "SMM",
-      "title": "1 Gold and silver plunged, with nearly all metals falling. LME tin and nickel led the decline, while LME copper and zinc, along with SHFE zinc, tin, and nickel, posted the largest losses [Overnight Market].",
-      "summary": "",
-      "published": "",
-      "url": "https://news.metal.com/en/newscontent/104189737-gold-and-silver-plunged-with-nearly-all-metals-falling-lme-tin-and-nickel-led-the-decline-while-lme-copper-and-zinc-along-with-shfe-zinc-tin-and-nickel-posted-the-largest-losses-overnight-market",
-      "image_url": ""
+      "title": "Solid-State Batteries Await Mass Production, Gotion Positions Itself as a First-Mover",
+      "summary": "Gotion’s current solid-state layout puts materials, cells and customer validation on almost the same timetable. Near term, watch whether the 300-ton lithium sulfide pilot line in A",
+      "published": "Oct 29, 2026 15:35 (GMT+8)",
+      "url": "https://news.metal.com/en/newscontent/104186355-solid-state-batteries-await-mass-production-gotion-positions-itself-as-a-first-mover",
+      "image_url": "https://imgqn.smm.cn/usercenter/QXufg20251217171730.jpg"
     }
   ],
   "errors": []
