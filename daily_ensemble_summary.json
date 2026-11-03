@@ -39,7 +39,7 @@
         ],
         "trend": "t"
       },
-      "mean_final_MAE": 1980.5571760392172,
+      "mean_final_MAE": 1980.5571760389332,
       "mean_naive_MAE": 2170.9267453293996,
       "beats_naive_horizon_count": 26,
       "checkpoint_horizons": {
@@ -58,16 +58,16 @@
           "beats_naive": true
         },
         "14": {
-          "final_MAE": 2064.4692069999187,
+          "final_MAE": 2064.469206999784,
           "naive_MAE": 2170.2064896755164,
-          "final_MAPE_%": 2.216702648526522,
+          "final_MAPE_%": 2.2167026485263865,
           "naive_MAPE_%": 2.32250437272431,
           "beats_naive": true
         },
         "30": {
-          "final_MAE": 2676.81105398083,
+          "final_MAE": 2676.8110539799245,
           "naive_MAE": 3122.1976401179936,
-          "final_MAPE_%": 2.8392674251936096,
+          "final_MAPE_%": 2.8392674251926677,
           "naive_MAPE_%": 3.2885223151794527,
           "beats_naive": true
         }
