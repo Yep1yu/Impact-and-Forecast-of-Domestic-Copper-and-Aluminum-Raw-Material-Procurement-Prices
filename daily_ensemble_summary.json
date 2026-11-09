@@ -39,7 +39,7 @@
         ],
         "trend": "t"
       },
-      "mean_final_MAE": 1892.7857778812315,
+      "mean_final_MAE": 1892.785777881033,
       "mean_naive_MAE": 2078.5471976401172,
       "beats_naive_horizon_count": 28,
       "checkpoint_horizons": {
@@ -58,16 +58,16 @@
           "beats_naive": true
         },
         "14": {
-          "final_MAE": 1950.2626200766874,
+          "final_MAE": 1950.2626200766185,
           "naive_MAE": 2038.4955752212388,
-          "final_MAPE_%": 2.084796011599027,
+          "final_MAPE_%": 2.084796011598956,
           "naive_MAPE_%": 2.170405437854341,
           "beats_naive": true
         },
         "30": {
-          "final_MAE": 2353.198302381612,
+          "final_MAE": 2353.19830238187,
           "naive_MAE": 2816.076696165191,
-          "final_MAPE_%": 2.495330578880256,
+          "final_MAPE_%": 2.4953305788804867,
           "naive_MAPE_%": 2.9644688519151132,
           "beats_naive": true
         }
@@ -91,7 +91,7 @@
         ],
         "trend": "n"
       },
-      "mean_final_MAE": 429.28558731816014,
+      "mean_final_MAE": 429.28558731816025,
       "mean_naive_MAE": 431.1406096361849,
       "beats_naive_horizon_count": 2,
       "checkpoint_horizons": {
@@ -117,9 +117,9 @@
           "beats_naive": false
         },
         "30": {
-          "final_MAE": 608.2335713668114,
+          "final_MAE": 608.2335713668105,
           "naive_MAE": 641.0766961651917,
-          "final_MAPE_%": 2.9086731329911557,
+          "final_MAPE_%": 2.908673132991151,
           "naive_MAPE_%": 3.068861988715202,
           "beats_naive": true
         }
@@ -148,9 +148,9 @@
       "beats_naive_horizon_count": 8,
       "checkpoint_horizons": {
         "1": {
-          "final_MAE": 346.0352363411163,
+          "final_MAE": 346.0352363411162,
           "naive_MAE": 347.1607669616521,
-          "final_MAPE_%": 2.348916615598453,
+          "final_MAPE_%": 2.3489166155984527,
           "naive_MAPE_%": 2.35417625417031,
           "beats_naive": true
         },
