@@ -1,22 +1,6 @@
 {
-  "updated_at": "2026-11-08T15:02:32+08:00",
+  "updated_at": "2026-11-09T15:47:18+08:00",
   "items": [
-    {
-      "source": "长江有色",
-      "title": "短线反弹来袭！碳酸锂主力涨 2.27%，预期博弈下维持弱震荡格局",
-      "summary": "2026 年 11 月 6 日，长江综合电池级碳酸锂 99.5% 均价 94000 元 / 吨，较上一交易日上涨 750 元；工业级碳酸锂 99.2% 均价 91000 元 / 吨，同步上调 750 元。期货盘面表现强于现货，碳酸锂主力合约收涨 2.27%，报 92860 元 / 吨，期现价差持续博弈。",
-      "published": "",
-      "url": "https://www.ccmn.cn/news/ZX003/202611/45f9b4a307cf454e9ecefc4251135ab7.html",
-      "image_url": ""
-    },
-    {
-      "source": "SMM",
-      "title": "[SMM Analysis] Can Project Ramp-Ups Offset Declines at Major Copper Mines and Keep Full-Year Targets Within Reach?",
-      "summary": "[SMM Analysis] Mines are restarting and new projects are ramping up. Why is copper output still falling? Lower grades at Escondida, severe weather in Chile and operational disrupti",
-      "published": "Nov 04, 2026 10:45 (GMT+8)",
-      "url": "https://news.metal.com/en/newscontent/THBTMUZHBC4INBBHQO4MVN3ZQ6GX5LCZNCFD3IY-smm-analysis-can-project-ramp-ups-offset-declines-at-major-copper-mines-and-keep-full-year-targets-within-reach",
-      "image_url": "https://imgqn.smm.cn/production/admin/votes/imagesGUrHu20261104104632.png"
-    },
     {
       "source": "长江有色",
       "title": "锂电铜箔单日涨1000元、六氟磷酸锂却跌1250元：新能源材料链这轮冷热不均，谁在真拿货",
@@ -27,19 +11,35 @@
     },
     {
       "source": "SMM",
-      "title": "【SMM Analysis】Vietnam Proposes Aluminium Export Duty Cuts, Implications for Southeast Asian Billet and Extrusion Trade",
-      "summary": "Vietnam is proposing to cut export duties on selected aluminium products, potentially giving domestic suppliers more room to adjust export offers. According to the Vietnam Chamber ",
-      "published": "Oct 30, 2026 12:05 (GMT+8)",
-      "url": "https://news.metal.com/en/newscontent/UJOVPUWUTG53FKYSD2GPIUWMJQFJ4N3WOVALPMI-smm-analysisvietnam-proposes-aluminium-export-duty-cuts-implications-for-southeast-asian-billet-and-extrusion-trade",
-      "image_url": "https://imgqn.smm.cn/usercenter/hRRxy20251217171652.jpg"
+      "title": "[SMM Analysis] Australian Lithium Miners Shift Focus from Capacity Growth to Cost Competition",
+      "summary": "The latest round of quarterly results from Australian lithium miners provides a very clear picture of the widening cost dispersion across the global lithium resource base. Greenbus",
+      "published": "Nov 06, 2026 19:25 (GMT+8)",
+      "url": "https://news.metal.com/en/newscontent/M7IR324M56USM4V7QVR5OU7IFP5N4FPIXV6RAMA-smm-analysis-australian-lithium-miners-shift-focus-from-capacity-growth-to-cost-competition",
+      "image_url": "https://imgqn.smm.cn/usercenter/BmqWy20251217171726.jpg"
     },
     {
       "source": "SMM",
-      "title": "[SMM Analysis] Chile’s Lithium Policy Shift Analyzed",
-      "summary": "I. Overview of the News Event On 21 October 2026 local time, during London LME Week, Chile’s Minister of Economy and Mining, Daniel Mas, gave an interview to Reuters in which he an",
-      "published": "Oct 31, 2026 18:50 (GMT+8)",
-      "url": "https://news.metal.com/en/newscontent/MZIZ6UAK4PFOJYIKI4TZ2W3NGYBF3DPVWYJNNWA-smm-analysis-chiles-lithium-policy-shift-analyzed",
-      "image_url": "https://imgqn.smm.cn/usercenter/mpqgn20251217171727.jpg"
+      "title": "India Approves $296.52M Scheme to Boost Domestic Lithium, Nickel Processing Capacity",
+      "summary": "India has approved a Rs 2,814 crore (US$296.52 million) scheme to establish domestic lithium and nickel processing capacity and reduce critical mineral import dependence.",
+      "published": "Nov 06, 2026 12:14 (GMT+8)",
+      "url": "https://news.metal.com/en/newscontent/HC4QXJLSPEXRL7EOYBYILSMDGGWPVHAEAINGXDY-india-approves-29652m-scheme-to-boost-domestic-lithium-nickel-processing-capacity",
+      "image_url": "https://imgqn.smm.cn/usercenter/GmHLU20251217171733.jpg"
+    },
+    {
+      "source": "SMM",
+      "title": "Shanghai spot copper premiums surge to 2615 yuan/mt, the highest level in history. How tight is supply before delivery?",
+      "summary": "On November 6, SMM assessed #1 copper cathode spot premiums at RMB 2,480–2,750/t over the Shanghai Futures Exchange’s November 2026 copper contract (CU2611). The average premium ro",
+      "published": "Nov 06, 2026 22:08 (GMT+8)",
+      "url": "https://news.metal.com/en/newscontent/NQRRDOW4PF4QUS2GCEOQQUIPZQOA3MZEHWL5Z5Y-shanghai-spot-copper-premiums-surge-to-2615-yuanmt-the-highest-level-in-history-how-tight-is-supply-before-delivery",
+      "image_url": "https://imgqn.smm.cn/usercenter/BdFZr20251217171712.jpg"
+    },
+    {
+      "source": "SMM",
+      "title": "World Bank sees gold holding above $4,000 through 2028, but warns silver faces steeper correction",
+      "summary": "(Kitco News) - Gold and silver prices are expected to remain historically elevated through 2027, but investors should not expect a repeat of the explosive gains and volatility that",
+      "published": "Nov 06, 2026 16:59 (GMT+8)",
+      "url": "https://news.metal.com/en/newscontent/OPAPJSTPELWGAGG26MZQ3U7KTTYUQHLPSZB327Q-world-bank-sees-gold-holding-above-4000-through-2028-but-warns-silver-faces-steeper-correction",
+      "image_url": "https://imgqn.smm.cn/usercenter/qopTu20251217171736.jpg"
     }
   ],
   "errors": []
