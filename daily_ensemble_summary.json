@@ -39,7 +39,7 @@
         ],
         "trend": "t"
       },
-      "mean_final_MAE": 1834.3286477487975,
+      "mean_final_MAE": 1834.3286477486201,
       "mean_naive_MAE": 2007.0771878072758,
       "beats_naive_horizon_count": 25,
       "checkpoint_horizons": {
@@ -58,16 +58,16 @@
           "beats_naive": true
         },
         "14": {
-          "final_MAE": 1890.6906738081489,
+          "final_MAE": 1890.6906738080836,
           "naive_MAE": 1953.7610619469024,
-          "final_MAPE_%": 2.015209790004845,
+          "final_MAPE_%": 2.0152097900047723,
           "naive_MAPE_%": 2.075713820179393,
           "beats_naive": true
         },
         "30": {
-          "final_MAE": 2292.5844357583505,
+          "final_MAE": 2292.584435757695,
           "naive_MAE": 2713.7905604719763,
-          "final_MAPE_%": 2.4268432393979076,
+          "final_MAPE_%": 2.426843239397231,
           "naive_MAPE_%": 2.8532384874427343,
           "beats_naive": true
         }
@@ -117,9 +117,9 @@
           "beats_naive": false
         },
         "30": {
-          "final_MAE": 615.6826508797524,
+          "final_MAE": 615.6826508797519,
           "naive_MAE": 655.014749262537,
-          "final_MAPE_%": 2.9469100899633958,
+          "final_MAPE_%": 2.946910089963394,
           "naive_MAPE_%": 3.1388694193370044,
           "beats_naive": true
         }
