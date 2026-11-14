@@ -1,29 +1,13 @@
 {
-  "updated_at": "2026-11-13T15:42:34+08:00",
+  "updated_at": "2026-11-14T15:28:55+08:00",
   "items": [
     {
-      "source": "长江有色",
-      "title": "干线重卡“兆瓦级超充”上路：锂、铜、铝、镍、钴、铟的金属账本开始重算",
-      "summary": "11月12日，4辆装载钢卷的京产新能源重卡从北京首钢冷轧薄板有限公司驶出，往返顺义—京唐港近300公里干线。这批车辆搭载800伏高压平台，采用双枪1600安、1.44兆瓦液冷超充，充电6分钟续航100公里，电量20%至80%仅需18分钟。京唐港将配套超充设施，后续车辆还将扩容。",
-      "published": "",
-      "url": "https://www.ccmn.cn/news/ZX003/202611/d3c8739950aa4a7a8f549a2a7deb7d57.html",
-      "image_url": ""
-    },
-    {
       "source": "SMM",
-      "title": "[SMM Analysis] Australian Lithium Miners Shift Focus from Capacity Growth to Cost Competition",
-      "summary": "The latest round of quarterly results from Australian lithium miners provides a very clear picture of the widening cost dispersion across the global lithium resource base. Greenbus",
-      "published": "Nov 06, 2026 19:25 (GMT+8)",
-      "url": "https://news.metal.com/en/newscontent/M7IR324M56USM4V7QVR5OU7IFP5N4FPIXV6RAMA-smm-analysis-australian-lithium-miners-shift-focus-from-capacity-growth-to-cost-competition",
-      "image_url": "https://imgqn.smm.cn/usercenter/BmqWy20251217171726.jpg"
-    },
-    {
-      "source": "长江有色",
-      "title": "长江有色：锡镍铜铝铅锌分化加剧算力退潮 ， 加息压顶 ，有色“近紧远松”格局再演绎",
-      "summary": "11月13日长江有色金属网数据显示：长江现货1#锡领涨360250，涨5000；1#铜109480元/吨，涨590；升水490，跌500；A00铝23130，涨10；0#锌25400，跌40；1#铅16175，涨125；1#镍124100，涨450。上期所早盘收盘：沪铜2612报105380，涨240；沪铝2701报22150，跌85；氧化铝2701报264",
-      "published": "",
-      "url": "https://www.ccmn.cn/news/ZX003/202611/080afbb4471c4defbe924135723dd28f.html",
-      "image_url": ""
+      "title": "US Oct PPI hits 4-year high, metals broadly lower; LME copper, nickel and SHFE zinc lead declines, gold and silver fall on weekly charts [Overnight Market Wrap]",
+      "summary": "",
+      "published": "3 hours ago",
+      "url": "https://news.metal.com/en/newscontent/BNR5U7MWDLXZOQN5WNKIZ4ERVWHXS5YVUXMKI3I-us-oct-ppi-hits-4-year-high-metals-broadly-lower-lme-copper-nickel-and-shfe-zinc-lead-declines-gold-and-silver-fall-on-weekly-charts-overnight-market-wrap",
+      "image_url": "https://imgqn.smm.cn/usercenter/wDeWQ20251217171734.jpeg"
     },
     {
       "source": "长江有色",
@@ -35,11 +19,27 @@
     },
     {
       "source": "SMM",
+      "title": "[SMM Analysis] Australian Lithium Miners Shift Focus from Capacity Growth to Cost Competition",
+      "summary": "The latest round of quarterly results from Australian lithium miners provides a very clear picture of the widening cost dispersion across the global lithium resource base. Greenbus",
+      "published": "Nov 06, 2026 19:25 (GMT+8)",
+      "url": "https://news.metal.com/en/newscontent/M7IR324M56USM4V7QVR5OU7IFP5N4FPIXV6RAMA-smm-analysis-australian-lithium-miners-shift-focus-from-capacity-growth-to-cost-competition",
+      "image_url": "https://imgqn.smm.cn/usercenter/BmqWy20251217171726.jpg"
+    },
+    {
+      "source": "SMM",
       "title": "India Approves $296.52M Scheme to Boost Domestic Lithium, Nickel Processing Capacity",
       "summary": "India has approved a Rs 2,814 crore (US$296.52 million) scheme to establish domestic lithium and nickel processing capacity and reduce critical mineral import dependence.",
       "published": "Nov 06, 2026 12:14 (GMT+8)",
       "url": "https://news.metal.com/en/newscontent/HC4QXJLSPEXRL7EOYBYILSMDGGWPVHAEAINGXDY-india-approves-29652m-scheme-to-boost-domestic-lithium-nickel-processing-capacity",
       "image_url": "https://imgqn.smm.cn/usercenter/GmHLU20251217171733.jpg"
+    },
+    {
+      "source": "SMM",
+      "title": "Shanghai spot copper premiums surge to 2615 yuan/mt, the highest level in history. How tight is supply before delivery?",
+      "summary": "On November 6, SMM assessed #1 copper cathode spot premiums at RMB 2,480–2,750/t over the Shanghai Futures Exchange’s November 2026 copper contract (CU2611). The average premium ro",
+      "published": "Nov 06, 2026 22:08 (GMT+8)",
+      "url": "https://news.metal.com/en/newscontent/NQRRDOW4PF4QUS2GCEOQQUIPZQOA3MZEHWL5Z5Y-shanghai-spot-copper-premiums-surge-to-2615-yuanmt-the-highest-level-in-history-how-tight-is-supply-before-delivery",
+      "image_url": "https://imgqn.smm.cn/usercenter/BdFZr20251217171712.jpg"
     }
   ],
   "errors": []
