@@ -1,14 +1,6 @@
 {
-  "updated_at": "2026-11-14T15:28:55+08:00",
+  "updated_at": "2026-11-15T15:41:42+08:00",
   "items": [
-    {
-      "source": "SMM",
-      "title": "US Oct PPI hits 4-year high, metals broadly lower; LME copper, nickel and SHFE zinc lead declines, gold and silver fall on weekly charts [Overnight Market Wrap]",
-      "summary": "",
-      "published": "3 hours ago",
-      "url": "https://news.metal.com/en/newscontent/BNR5U7MWDLXZOQN5WNKIZ4ERVWHXS5YVUXMKI3I-us-oct-ppi-hits-4-year-high-metals-broadly-lower-lme-copper-nickel-and-shfe-zinc-lead-declines-gold-and-silver-fall-on-weekly-charts-overnight-market-wrap",
-      "image_url": "https://imgqn.smm.cn/usercenter/wDeWQ20251217171734.jpeg"
-    },
     {
       "source": "长江有色",
       "title": "碳酸锂2701跌3.72%失守8.9万！现货升水3730元，去库2994吨为何托不住价格",
@@ -40,6 +32,14 @@
       "published": "Nov 06, 2026 22:08 (GMT+8)",
       "url": "https://news.metal.com/en/newscontent/NQRRDOW4PF4QUS2GCEOQQUIPZQOA3MZEHWL5Z5Y-shanghai-spot-copper-premiums-surge-to-2615-yuanmt-the-highest-level-in-history-how-tight-is-supply-before-delivery",
       "image_url": "https://imgqn.smm.cn/usercenter/BdFZr20251217171712.jpg"
+    },
+    {
+      "source": "SMM",
+      "title": "World Bank sees gold holding above $4,000 through 2028, but warns silver faces steeper correction",
+      "summary": "(Kitco News) - Gold and silver prices are expected to remain historically elevated through 2027, but investors should not expect a repeat of the explosive gains and volatility that",
+      "published": "Nov 06, 2026 16:59 (GMT+8)",
+      "url": "https://news.metal.com/en/newscontent/OPAPJSTPELWGAGG26MZQ3U7KTTYUQHLPSZB327Q-world-bank-sees-gold-holding-above-4000-through-2028-but-warns-silver-faces-steeper-correction",
+      "image_url": "https://imgqn.smm.cn/usercenter/qopTu20251217171736.jpg"
     }
   ],
   "errors": []
