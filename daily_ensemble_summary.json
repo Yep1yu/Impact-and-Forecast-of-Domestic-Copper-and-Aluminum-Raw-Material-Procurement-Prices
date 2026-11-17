@@ -39,7 +39,7 @@
         ],
         "trend": "t"
       },
-      "mean_final_MAE": 1729.3943075843786,
+      "mean_final_MAE": 1729.3943075843572,
       "mean_naive_MAE": 1878.5963618485737,
       "beats_naive_horizon_count": 21,
       "checkpoint_horizons": {
@@ -58,16 +58,16 @@
           "beats_naive": false
         },
         "14": {
-          "final_MAE": 1784.451248007167,
+          "final_MAE": 1784.4512480071635,
           "naive_MAE": 1832.9646017699115,
-          "final_MAPE_%": 1.8922856550851908,
+          "final_MAPE_%": 1.8922856550851872,
           "naive_MAPE_%": 1.9387612493010347,
           "beats_naive": true
         },
         "30": {
-          "final_MAE": 2114.0512414587506,
+          "final_MAE": 2114.051241458752,
           "naive_MAE": 2585.1769911504425,
-          "final_MAPE_%": 2.2313412643367982,
+          "final_MAPE_%": 2.2313412643368,
           "naive_MAPE_%": 2.710294267217145,
           "beats_naive": true
         }
@@ -91,7 +91,7 @@
         ],
         "trend": "n"
       },
-      "mean_final_MAE": 438.993430929644,
+      "mean_final_MAE": 438.9934309296441,
       "mean_naive_MAE": 449.04375614552595,
       "beats_naive_horizon_count": 9,
       "checkpoint_horizons": {
@@ -117,9 +117,9 @@
           "beats_naive": false
         },
         "30": {
-          "final_MAE": 628.5836581530878,
+          "final_MAE": 628.5836581530883,
           "naive_MAE": 682.0058997050148,
-          "final_MAPE_%": 3.0155828624331726,
+          "final_MAPE_%": 3.015582862433176,
           "naive_MAPE_%": 3.273297047539234,
           "beats_naive": true
         }
