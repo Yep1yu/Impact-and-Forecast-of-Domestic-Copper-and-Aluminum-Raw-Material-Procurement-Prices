@@ -39,7 +39,7 @@
         ],
         "trend": "n"
       },
-      "mean_final_MAE": 1657.9926820794506,
+      "mean_final_MAE": 1657.9926820794503,
       "mean_naive_MAE": 1806.278269419862,
       "beats_naive_horizon_count": 22,
       "checkpoint_horizons": {
@@ -58,16 +58,16 @@
           "beats_naive": false
         },
         "14": {
-          "final_MAE": 1714.3230727904588,
+          "final_MAE": 1714.323072790455,
           "naive_MAE": 1770.7227138643066,
-          "final_MAPE_%": 1.8119041834000431,
+          "final_MAPE_%": 1.8119041834000391,
           "naive_MAPE_%": 1.867609974762429,
           "beats_naive": true
         },
         "30": {
-          "final_MAE": 2181.4751978405034,
+          "final_MAE": 2181.4751978405047,
           "naive_MAE": 2572.9351032448376,
-          "final_MAPE_%": 2.3046124197090583,
+          "final_MAPE_%": 2.30461241970906,
           "naive_MAPE_%": 2.6983471321409467,
           "beats_naive": true
         }
@@ -91,7 +91,7 @@
         ],
         "trend": "n"
       },
-      "mean_final_MAE": 442.2419866431954,
+      "mean_final_MAE": 442.24198664319533,
       "mean_naive_MAE": 453.6479842674533,
       "beats_naive_horizon_count": 11,
       "checkpoint_horizons": {
@@ -117,9 +117,9 @@
           "beats_naive": false
         },
         "30": {
-          "final_MAE": 653.2803152477337,
+          "final_MAE": 653.280315247733,
           "naive_MAE": 708.3333333333334,
-          "final_MAPE_%": 3.1376999688662934,
+          "final_MAPE_%": 3.13769996886629,
           "naive_MAPE_%": 3.4082102972806982,
           "beats_naive": true
         }
@@ -195,7 +195,7 @@
         ],
         "trend": "n"
       },
-      "mean_final_MAE": 219.71480789809087,
+      "mean_final_MAE": 219.71480785538404,
       "mean_naive_MAE": 228.9823008849559,
       "beats_naive_horizon_count": 15,
       "checkpoint_horizons": {
@@ -221,9 +221,9 @@
           "beats_naive": false
         },
         "30": {
-          "final_MAE": 248.5854005296712,
+          "final_MAE": 248.58540042904164,
           "naive_MAE": 275.8112094395281,
-          "final_MAPE_%": 1.1722757480881447,
+          "final_MAPE_%": 1.1722757476172958,
           "naive_MAPE_%": 1.2987860986958093,
           "beats_naive": true
         }
