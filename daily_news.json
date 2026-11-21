@@ -1,6 +1,22 @@
 {
-  "updated_at": "2026-11-20T16:15:00+08:00",
+  "updated_at": "2026-11-21T16:07:51+08:00",
   "items": [
+    {
+      "source": "SMM",
+      "title": "Gold, silver, copper, and tin weekly lines plunge; metals broadly weaken; LME copper falls for six consecutive weeks; silver weekly line drops over 16% [Overnight Market]",
+      "summary": "",
+      "published": "2 hours ago",
+      "url": "https://news.metal.com/en/newscontent/M3PGTDHOQRYXTCMQFIS5G3LLTREKVGXCZ6EXHHQ-gold-silver-copper-and-tin-weekly-lines-plunge-metals-broadly-weaken-lme-copper-falls-for-six-consecutive-weeks-silver-weekly-line-drops-over-16-overnight-market",
+      "image_url": "https://imgqn.smm.cn/usercenter/wDeWQ20251217171734.jpeg"
+    },
+    {
+      "source": "长江有色",
+      "title": "库存去化放缓、冶炼厂累库，碳酸锂短期难现单边行情",
+      "summary": "2026 年 11 月 20 日，长江综合电池级碳酸锂（99.5%）均价 91000 元 / 吨，工业级碳酸锂（99.2%）均价 88000 元 / 吨，两类现货价格较上一交易日均保持持平。期货盘面波动明显，碳酸锂主力合约日内宽幅震荡，收盘下跌 0.88%，报 90040 元 / 吨，期现走势出现分化。",
+      "published": "",
+      "url": "https://www.ccmn.cn/news/ZX003/202611/bd50b2e3e4514a66a6a126c37812ed8c.html",
+      "image_url": ""
+    },
     {
       "source": "长江有色",
       "title": "美元加息预期再抬头，有色内盘分化：铜锡强现实托底，铝锌铅镍承压寻位",
@@ -8,14 +24,6 @@
       "published": "",
       "url": "https://www.ccmn.cn/news/ZX003/202611/c69827bfc5754252a9d0bee34de1966b.html",
       "image_url": ""
-    },
-    {
-      "source": "SMM",
-      "title": "[SMM Analysis] Lithium Carbonate Market in Deficit in Q3 2026: Why Prices Failed to Rise？",
-      "summary": "In Q3 2026, China's lithium carbonate market saw a weak trend with the price center moving lower month by month. Alongside the persistently weakening prices, the supply-demand bala",
-      "published": "Nov 16, 2026 17:04 (GMT+8)",
-      "url": "https://news.metal.com/en/newscontent/L6QS46S5OC6U4LEM5XP53OGYD2NNBF5WQA6M3PQ-smm-analysis-lithium-carbonate-market-in-deficit-in-q3-2026-why-prices-failed-to-rise",
-      "image_url": "https://imgqn.smm.cn/usercenter/oVqJl20251217171730.jpg"
     },
     {
       "source": "长江有色",
@@ -27,19 +35,11 @@
     },
     {
       "source": "SMM",
-      "title": "Lithium Market: From End-User Consumption and Active Destocking to the Mismatch in Marginal Procurement [SMM Analysis]",
-      "summary": "1. Core Conclusions The key issue in the current lithium market is not a collapse in end demand, but rather that active destocking across the supply chain has amplified changes in ",
-      "published": "Nov 18, 2026 09:33 (GMT+8)",
-      "url": "https://news.metal.com/en/newscontent/65WIRLZO5376Z2P4ZGCQIMJG2FVIOFZ7AETRAPY-lithium-market-from-end-user-consumption-and-active-destocking-to-the-mismatch-in-marginal-procurement-smm-analysis",
-      "image_url": "https://imgqn.smm.cn/usercenter/PPLUj20251217171727.jpg"
-    },
-    {
-      "source": "长江有色",
-      "title": "【铝系原料周度分析报告】：宏观强逆风下的成本磨底与结构分化",
-      "summary": "本周（11月16日至20日）铝系两大品种走出“先抑后稳、分化运行”的独立行情：氧化铝主力2701合约周内累计微跌0.04%，全周在2590-2618元/吨区间低位磨底，全周现货价格在各区域维持持稳运行，盘面持续贴水行业完全成本线；铸造铝主力2701合约周内累计下跌2.75%，周初开盘21895元/吨，周中最低下探21220元/吨，周尾依托成本支撑小幅反弹收于",
-      "published": "",
-      "url": "https://www.ccmn.cn/news/ZX003/202611/06f208f66432449d81d2cdcc2e76a383.html",
-      "image_url": ""
+      "title": "[SMM Analysis] Lithium Carbonate Market in Deficit in Q3 2026: Why Prices Failed to Rise？",
+      "summary": "In Q3 2026, China's lithium carbonate market saw a weak trend with the price center moving lower month by month. Alongside the persistently weakening prices, the supply-demand bala",
+      "published": "Nov 16, 2026 17:04 (GMT+8)",
+      "url": "https://news.metal.com/en/newscontent/L6QS46S5OC6U4LEM5XP53OGYD2NNBF5WQA6M3PQ-smm-analysis-lithium-carbonate-market-in-deficit-in-q3-2026-why-prices-failed-to-rise",
+      "image_url": "https://imgqn.smm.cn/usercenter/oVqJl20251217171730.jpg"
     }
   ],
   "errors": []
