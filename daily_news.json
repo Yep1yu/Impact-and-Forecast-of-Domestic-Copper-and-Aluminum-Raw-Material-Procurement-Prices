@@ -1,12 +1,12 @@
 {
-  "updated_at": "2026-11-23T16:45:42+08:00",
+  "updated_at": "2026-11-24T18:45:53+08:00",
   "items": [
     {
       "source": "长江有色",
-      "title": "碳酸锂小幅走弱，年末供需博弈持续，单边驱动缺失",
-      "summary": "2026 年 11 月 23 日，长江综合电池级碳酸锂 99.5% 均价 90500 元 / 吨，较上一交易日下跌 500 元 / 吨；工业级碳酸锂 99.2% 均价 87500 元 / 吨，同步下调 500 元 / 吨。期货盘面表现相对平缓，碳酸锂主力合约收跌 0.29%，报 90500 元 / 吨。",
+      "title": "悲观预期已充分计价，碳酸锂小幅下行，产业去库托底现货",
+      "summary": "短期碳酸锂大概率维持区间震荡格局，多空力量相互牵制。下方边际成本线、产业持续去库对盘面形成支撑，价格进一步下探，需要等待现货出现实质性累库信号；上方则受远期供给放量预期、套保抛压压制，反弹空间受限。",
       "published": "",
-      "url": "https://www.ccmn.cn/news/ZX003/202611/35e8d3823f1b41f6a470c9299cb76062.html",
+      "url": "https://www.ccmn.cn/news/ZX003/202611/2a9286dd8c1f4aeaa6fe282cedb02412.html",
       "image_url": ""
     },
     {
@@ -19,27 +19,27 @@
     },
     {
       "source": "长江有色",
-      "title": "【铸造铝合金日报】成本抬升支撑报价 ADC12合金锭价格上涨",
-      "summary": "铸造铝合金主力AD2701收盘21205元，涨15元。ADC12均价23700元较前交易日涨100元，A00铝上涨抬升成本预期，需求平淡，短期盘整运行。",
+      "title": "【铸造铝合金日报】废铝货源平稳 ADC12现货持稳",
+      "summary": "铸造铝合金主力AD2701收盘21070元，跌280元。ADC12均价持稳23700元，A00铝小涨抬升成本预期，需求平淡，现货抗跌盘面回落，关注23500-24000元区间。",
       "published": "",
-      "url": "https://www.ccmn.cn/news/ZX003/202611/4848d0a0edb4458eab10fe088270ccf3.html",
+      "url": "https://www.ccmn.cn/news/ZX003/202611/3092619d2cdb440f845856d6d8448732.html",
       "image_url": ""
     },
     {
       "source": "长江有色",
-      "title": "【碳酸锂日报】成本支撑渐显，碳酸锂跌幅收窄",
-      "summary": "碳酸锂主力LC2701收盘90500元，跌260元（-0.29%）。电池级现货90500元较前交易日跌500元，期现结构收敛至平水，下方成本支撑渐显，短期盘面料于88000-93000元区间震荡。",
+      "title": "ccmn11月19日铜铝锌铅锡镍早评",
+      "summary": "长江铜价copper.ccmn.cn短评：美联储释放最强鹰叠加投机客大量抛售施压，隔夜伦铜暴跌4.55%；AI投资节奏存疑，国内高升水大幅压制下游买盘，预今现铜大跌。",
       "published": "",
-      "url": "https://www.ccmn.cn/news/ZX003/202611/29ab472758c9412781d8e960d9a6fbd6.html",
+      "url": "https://www.ccmn.cn/news/QH004/202611/ff6242606e714b8e9ccc0965ba92a356.html",
       "image_url": ""
     },
     {
-      "source": "长江有色",
-      "title": "美元加息预期再抬头，有色内盘分化：铜锡强现实托底，铝锌铅镍承压寻位",
-      "summary": "11月17日长江现货显示，基本金属走势明显分化：1#铜报107930元/吨，涨460元，升水4150元/吨，涨570元；1#锡报352750元/吨，涨2000元；A00铝锭报23870元/吨，跌90元，升水425元；0#锌报24930元/吨，1#锌报24830元/吨，均跌50元；1#铅报16175元/吨，跌100元；1#镍报121350元/吨，跌50元。",
-      "published": "",
-      "url": "https://www.ccmn.cn/news/ZX003/202611/c69827bfc5754252a9d0bee34de1966b.html",
-      "image_url": ""
+      "source": "SMM",
+      "title": "Lithium Market: From End-User Consumption and Active Destocking to the Mismatch in Marginal Procurement [SMM Analysis]",
+      "summary": "1. Core Conclusions The key issue in the current lithium market is not a collapse in end demand, but rather that active destocking across the supply chain has amplified changes in ",
+      "published": "Nov 18, 2026 09:33 (GMT+8)",
+      "url": "https://news.metal.com/en/newscontent/65WIRLZO5376Z2P4ZGCQIMJG2FVIOFZ7AETRAPY-lithium-market-from-end-user-consumption-and-active-destocking-to-the-mismatch-in-marginal-procurement-smm-analysis",
+      "image_url": "https://imgqn.smm.cn/usercenter/PPLUj20251217171727.jpg"
     }
   ],
   "errors": []
