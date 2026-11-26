@@ -58,16 +58,16 @@
           "beats_naive": false
         },
         "14": {
-          "final_MAE": 1685.4949088560538,
+          "final_MAE": 1685.49490885605,
           "naive_MAE": 1758.9970501474925,
-          "final_MAPE_%": 1.7769672165288088,
+          "final_MAPE_%": 1.7769672165288055,
           "naive_MAPE_%": 1.8517616393306298,
           "beats_naive": true
         },
         "30": {
-          "final_MAE": 2585.2534090309155,
+          "final_MAE": 2585.2534090309177,
           "naive_MAE": 2908.1120943952797,
-          "final_MAPE_%": 2.783425918933694,
+          "final_MAPE_%": 2.7834259189336956,
           "naive_MAPE_%": 3.0998364618387373,
           "beats_naive": true
         }
@@ -117,9 +117,9 @@
           "beats_naive": false
         },
         "30": {
-          "final_MAE": 668.2262899658823,
+          "final_MAE": 668.2262899658815,
           "naive_MAE": 722.7138643067847,
-          "final_MAPE_%": 3.216507833962727,
+          "final_MAPE_%": 3.216507833962722,
           "naive_MAPE_%": 3.4860202387112897,
           "beats_naive": true
         }
